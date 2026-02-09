@@ -1,0 +1,28 @@
+# This is a workflow used for checking the coding standard
+name: Style Check
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on pull request events on the "main" branch
+  pull_request:
+    branches: [ "main" ]
+    types: [edited, synchronize, opened, reopened]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This job checks the code style
+  linter:
+    runs-on: windows-latest
+    
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      
+      - name: Check code style
+        shell: pwsh
+        run: |
+          cd vhdllint-ohwr
+          .\check-files.bat . ..\hardware\design

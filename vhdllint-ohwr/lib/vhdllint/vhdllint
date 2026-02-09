@@ -1,0 +1,139 @@
+#! /usr/bin/env python
+
+"""Example of Python interface.
+   Check that casing of reference is the same as the definition.
+"""
+import sys
+import os.path
+import inspect
+import importlib
+
+from rulesexec import RulesExec, execute_and_report
+
+import libghdl.thin as thin
+
+
+def get_all_rules():
+    """Return a list of class of the predefined rules"""
+    res = []
+    # Predefined rules are in known subdirectories
+    for ruledir in ['filerules', 'lexrules',
+                    'syntaxrules', 'semrules', 'synthrules']:
+        dirname = os.path.join(os.path.dirname(__file__), ruledir)
+        # Get all files in those subdirs
+        for filename in os.listdir(dirname):
+            (root, ext) = os.path.splitext(filename)
+            # But exclude non-python files or __init__.py
+            if ext != '.py' or root.startswith('__'):
+                continue
+            # Import
+            name = ruledir + '.' + root
+            module = importlib.import_module(name)
+            for e in dir(module):
+                # And keep only classes defined in those modules.
+                el = getattr(module, e)
+                if inspect.isclass(el) and el.__module__ == name:
+                    res.append(el)
+    return res
+
+
+def disp_all_rules(allrules):
+    print("Known rules:")
+    for r in allrules:
+        print(" {0}: {1}".format(r.rulename, r.__doc__.splitlines()[0]))
+
+
+def run_testsuite(allrules, opts):
+    exe = RulesExec(quiet=not ('-v' in opts))
+
+    print("Run testsuite")
+    for r in allrules:
+        print("Testing rule {0}:".format(r.rulename))
+        r.test(exe)
+
+    if exe.get_nbr_errors() == 0:
+        print('Testsuite is OK')
+        sys.exit(0)
+    else:
+        print('{0} error(s) found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'.format(
+            exe.get_nbr_errors()))
+        sys.exit(1)
+
+
+def generate_my_lint(allrules):
+    print("#!/usr/bin/env python")
+    print("")
+    print("import sys")
+    print("import rulesexec")
+    print("# Import all rules")
+    for r in allrules:
+        print("from {} import {}".format(r.__module__, r.__name__))
+    print("")
+    print("# Create rules")
+    print("rules = rulesexec.RulesExec()")
+    for r in allrules:
+        print("rules.add({}())".format(r.__name__))
+    print("")
+    print("rulesexec.execute_and_report(rules, sys.argv[1:])")
+
+
+def usage():
+    print('usage: {0} [OPTIONS] files...'.format(sys.argv[0]))
+    print('Options are:')
+    print(' -h  --help    disp this help')
+    print(' --list-rules  disp all known rule')
+    print(' --testsuite   run internal testsuite')
+    sys.exit(0)
+
+
+def main():
+    allrules = get_all_rules()
+
+    optind = 0
+    for i in range(1, len(sys.argv)):
+        arg = sys.argv[i]
+        if arg[0] != '-':
+            optind = i
+            break
+        if arg in ['-h', '--help']:
+            usage()
+            sys.exit(0)
+        elif arg == '--list-rules':
+            disp_all_rules(allrules)
+            sys.exit(0)
+        elif arg == '--testsuite':
+            run_testsuite(allrules, sys.argv[i + 1:])
+            sys.exit(4)
+        elif arg == '--gen-my-lint':
+            generate_my_lint(allrules)
+            sys.exit(0)
+        elif arg.startswith('--rule='):
+            nrules = []
+            for n in arg[7:].split(','):
+                r = [r for r in allrules if r.rulename == n]
+                if len(r) == 0:
+                    print("rule '{}' is not known, try --list-rules".format(n))
+                    sys.exit(2)
+                nrules.append(r[0])
+            allrules = nrules
+        elif arg in ['--import', '--synth', '--tb', '--top']:
+            optind = i
+            break
+        elif thin.set_option(arg) != 0:
+            print('unknown option {0}'.format(arg))
+            print('try: {0} --help'.format(sys.argv[0]))
+            sys.exit(2)
+
+    if optind == 0:
+        print('no input file')
+        sys.exit(2)
+
+    rules = RulesExec()
+    for r in allrules:
+        rules.add(r())
+
+    execute_and_report(rules, sys.argv[optind:])
+
+
+if __name__ == "__main__":
+    main()
