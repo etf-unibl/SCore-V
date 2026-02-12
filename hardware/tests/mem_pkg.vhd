@@ -8,7 +8,7 @@
 --
 -- description:
 --
---   This file implements a simple memory package.
+--   This file implements a simple memory package module.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -48,50 +48,49 @@ package mem_pkg is
 
   end record t_instruction_rec;
 
+  --! @brief R-type instruction format (Register-Register).
+  type t_instruction_R is record
+
+    func7 : std_logic_vector(6 downto 0);
+    rs2   : std_logic_vector(4 downto 0);
+    rs1   : std_logic_vector(4 downto 0);
+    func3 : std_logic_vector(2 downto 0);
+    rd    : std_logic_vector(4 downto 0);
+
+  end record t_instruction_R;
+
+  --! @brief I-type instruction format (Immediate).
+  type t_instruction_I is record
+
+    imm   : std_logic_vector(11 downto 0);
+    rs1   : std_logic_vector(4 downto 0);
+    func3 : std_logic_vector(2 downto 0);
+    rd    : std_logic_vector(4 downto 0);
+
+  end record t_instruction_I;
+
+  --! @brief S-type instruction format (Store).
+  type t_instruction_S is record
+
+    imm2  : std_logic_vector(5 downto 0);
+    rs2   : std_logic_vector(4 downto 0);
+    rs1   : std_logic_vector(4 downto 0);
+    func3 : std_logic_vector(2 downto 0);
+    imm1  : std_logic_vector(4 downto 0);
+
+  end record t_instruction_S;
 
   --! @brief Array type representing the instruction memory storage.
-  subtype t_byte  is std_logic_vector(7 downto 0);
-  type t_bytes is array (0 to 200) of t_byte;
+  type t_instr_array is array (0 to 31) of t_instruction_rec;
 
   --! @brief Constant array containing the program to be executed.
   --! @details This serves as the ROM for the instruction fetch unit.
-  constant c_IMEM : t_bytes := (
-    0      => "10110011",
-    1      => "10000111",
-    2      => "00010000",
-    3      => "00000000",
-    4      => "10110011",
-    5      => "10000011",
-    6      => "00010001",
-    7      => "00000000",
-    8      => "10110011",
-    9      => "10000111",
-    10     => "00010011",
-    11     => "00000000",
-    12     => "10110011",
-    13     => "10000111",
-    14     => "00010111",
-    15     => "00000000",
-    16     => "10110011",
-    17     => "10000111",
-    18     => "00011111",
-    19     => "00000000",
-    20     => "00000000",
-    21     => "00000000",
-    22     => "00000000",
-    23     => "10110011",
-    24     => "00000000",
-    25     => "00000000",
-    26     => "10000111",
-    27     => "10110011",
-    28     => "00000000",
-    29     => "00000000",
-    30     => "10000111",
-    31     => "10110011",
-    32     => "00000000",
-    33     => "00000000",
-    34     => "00000000",
-    others => "00000000"
+  constant c_IMEM : t_instr_array := (
+    0      => (opcode => "0110011", other_instruction_bits => "0000000000010000100001111"),
+    1      => (opcode => "0110011", other_instruction_bits => "0000000000010001100000111"),
+    2      => (opcode => "0110011", other_instruction_bits => "0000000000010011100000011"),
+    3      => (opcode => "0110011", other_instruction_bits => "0000000000010011100000011"),
+    others => (opcode => (others => '0'), other_instruction_bits => (others => '0'))
   );
 
 end mem_pkg;
