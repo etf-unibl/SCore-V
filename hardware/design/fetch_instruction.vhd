@@ -60,11 +60,16 @@ end fetch_instruction;
 
 --! @brief Architecture implementing the combinational lookup logic.
 architecture arch of fetch_instruction is
-
+  signal full_instruction : std_logic_vector(31 downto 0);
 begin
 
   --! @brief Asynchronous memory read.
   --! @details Accesses the c_IMEM array defined in mem_pkg.
-  instruction_bits_o <= c_IMEM(to_integer(instruction_count_i));
+  full_instruction <= c_IMEM(to_integer(instruction_count_i) + 3) &
+                      c_IMEM(to_integer(instruction_count_i) + 2) &
+                      c_IMEM(to_integer(instruction_count_i) + 1) &
+                      c_IMEM(to_integer(instruction_count_i));
+  instruction_bits_o.opcode                 <= full_instruction(6 downto 0);
+  instruction_bits_o.other_instruction_bits <= full_instruction(31 downto 7);
 
 end arch;

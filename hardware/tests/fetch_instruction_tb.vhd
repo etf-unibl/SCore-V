@@ -72,24 +72,29 @@ begin
   begin
     test_in <= to_unsigned(0, 32);
     wait for 200 ns;
-    test_in <= to_unsigned(1, 32);
+    test_in <= to_unsigned(4, 32);
     wait for 200 ns;
-    test_in <= to_unsigned(2, 32);
+    test_in <= to_unsigned(8, 32);
     wait for 200 ns;
-    test_in <= to_unsigned(3, 32);
+    test_in <= to_unsigned(16, 32);
     wait for 200 ns;
     wait;
   end process;
 
   --! Checker process : Checks the values in the LUT based on the input signal
   process
+    variable full_instruction : std_logic_vector(31 downto 0);
   begin
     wait on test_in;
     wait for 100 ns;
-    assert (test_out.opcode = c_IMEM(to_integer(test_in)).opcode)
+    full_instruction := c_IMEM(to_integer(test_in + 3)) &
+                         c_IMEM(to_integer(test_in + 2)) &
+                         c_IMEM(to_integer(test_in + 1)) &
+                         c_IMEM(to_integer(test_in));
+    assert (test_out.opcode = full_instruction(6 downto 0))
       report "Opcode mismatch at index " & integer'image(to_integer(test_in))
       severity error;
-    assert (test_out.other_instruction_bits = c_IMEM(to_integer(test_in)).other_instruction_bits)
+    assert (test_out.other_instruction_bits = full_instruction(31 downto 7))
       report "Data bits mismatch at index " & integer'image(to_integer(test_in))
       severity error;
   end process;
