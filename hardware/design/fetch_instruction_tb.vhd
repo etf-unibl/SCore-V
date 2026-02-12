@@ -4,11 +4,11 @@
 -- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
--- unit name: instruction fetch unit
+-- unit name: instruction fetch testbench unit
 --
 -- description:
 --
---   This file implements a simple instruction fetch logic.
+--   This file implements a simple testbench file for the instruction fetch logic.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -37,34 +37,60 @@
 -----------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use work.mem_pkg.all;
 use ieee.numeric_std.all;
+use work.mem_pkg.all;
 
---! @brief Entity for fetching instructions from memory.
---! @details This module maps a numerical index to a structured instruction record.
-entity fetch_instruction is
+--! @brief Top-level entity for the fetch instruction testbench.
+--! @details As a testbench, this entity has no ports.
+entity fetch_instruction_tb is
+end fetch_instruction_tb;
 
-  generic
-  (
-    --! Width of the instruction address bus.
-    g_ADDR_WIDTH      : integer := 32
-  );
-  port
-  (
-  instruction_count_i : in  unsigned(g_ADDR_WIDTH-1 downto 0);
-  instruction_bits_o  : out t_instruction_rec
-  );
+--! @brief Architecture implementing the stimulus and verification logic.
+architecture arch of fetch_instruction_tb is
+  --! Component declaration for the Unit Under Test (UUT)
+  component fetch_instruction
+    port
+    (
+        instruction_count_i : in  unsigned(1 downto 0);
+        instruction_bits_o  : out t_instruction_rec
+    );
+  end component;
 
-end fetch_instruction;
-
-
---! @brief Architecture implementing the combinational lookup logic.
-architecture arch of fetch_instruction is
+  signal test_in  : unsigned(1 downto 0);
+  signal test_out : t_instruction_rec;
 
 begin
+  --! @brief UUT instantiation and port mapping.
+  uut : fetch_instruction
+    port map(
+    instruction_count_i => test_in,
+    instruction_bits_o  => test_out
+    );
 
-  --! @brief Asynchronous memory read.
-  --! @details Accesses the c_IMEM array defined in mem_pkg.
-  instruction_bits_o <= IMEM(to_integer(instruction_count_i));
+  --! Stimulus process : Cycles through addresses
+  process
+  begin
+    test_in <= "00";
+    wait for 200 ns;
+    test_in <= "01";
+    wait for 200 ns;
+    test_in <= "10";
+    wait for 200 ns;
+    test_in <= "11";
+    wait for 200 ns;
+    wait;
+  end process;
 
+  --! Checker process : Checks the values in the LUT based on the input signal
+  process
+  begin
+    wait on test_in;
+    wait for 100 ns;
+    assert (test_out.opcode = IMEM(to_integer(test_in)).opcode)
+      report "Opcode mismatch at index " & integer'image(to_integer(test_in))
+      severity error;
+    assert (test_out.other_instruction_bits = IMEM(to_integer(test_in)).other_instruction_bits)
+      report "Data bits mismatch at index " & integer'image(to_integer(test_in))
+      severity error;
+  end process;
 end arch;
