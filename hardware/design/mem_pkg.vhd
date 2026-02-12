@@ -81,15 +81,16 @@ package mem_pkg is
   end record t_instruction_S;
 
   --! @brief Array type representing the instruction memory storage.
-  type t_instr_array is array (0 to 3) of t_instruction_rec;
+  type t_instr_array is array (0 to 31) of t_instruction_rec;
 
   --! @brief Constant array containing the program to be executed.
   --! @details This serves as the ROM for the instruction fetch unit.
   constant c_IMEM : t_instr_array := (
-    0 => (opcode => "0110011", other_instruction_bits => "0000000000010000100001111"),
-    1 => (opcode => "0110011", other_instruction_bits => "0000000000010001100000111"),
-    2 => (opcode => "0110011", other_instruction_bits => "0000000000010011100000011"),
-    3 => (opcode => "0110011", other_instruction_bits => "0000000000010011100000011")
+    0      => (opcode => "0110011", other_instruction_bits => "0000000000010000100001111"),
+    1      => (opcode => "0110011", other_instruction_bits => "0000000000010001100000111"),
+    2      => (opcode => "0110011", other_instruction_bits => "0000000000010011100000011"),
+    3      => (opcode => "0110011", other_instruction_bits => "0000000000010011100000011"),
+    others => (opcode => (others => '0'), other_instruction_bits => (others => '0'))
   );
 
 end mem_pkg;

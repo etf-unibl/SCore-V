@@ -65,6 +65,6 @@ begin
 
   --! @brief Asynchronous memory read.
   --! @details Accesses the c_IMEM array defined in mem_pkg.
-  instruction_bits_o <= IMEM(to_integer(instruction_count_i));
+  instruction_bits_o <= c_IMEM(to_integer(instruction_count_i));
 
 end arch;

@@ -51,12 +51,12 @@ architecture arch of fetch_instruction_tb is
   component fetch_instruction
     port
     (
-        instruction_count_i : in  unsigned(1 downto 0);
+        instruction_count_i : in  unsigned(31 downto 0);
         instruction_bits_o  : out t_instruction_rec
     );
   end component;
 
-  signal test_in  : unsigned(1 downto 0);
+  signal test_in  : unsigned(31 downto 0);
   signal test_out : t_instruction_rec;
 
 begin
@@ -70,13 +70,13 @@ begin
   --! Stimulus process : Cycles through addresses
   process
   begin
-    test_in <= "00";
+    test_in <= to_unsigned(0, 32);
     wait for 200 ns;
-    test_in <= "01";
+    test_in <= to_unsigned(1, 32);
     wait for 200 ns;
-    test_in <= "10";
+    test_in <= to_unsigned(2, 32);
     wait for 200 ns;
-    test_in <= "11";
+    test_in <= to_unsigned(3, 32);
     wait for 200 ns;
     wait;
   end process;
@@ -86,10 +86,10 @@ begin
   begin
     wait on test_in;
     wait for 100 ns;
-    assert (test_out.opcode = IMEM(to_integer(test_in)).opcode)
+    assert (test_out.opcode = c_IMEM(to_integer(test_in)).opcode)
       report "Opcode mismatch at index " & integer'image(to_integer(test_in))
       severity error;
-    assert (test_out.other_instruction_bits = IMEM(to_integer(test_in)).other_instruction_bits)
+    assert (test_out.other_instruction_bits = c_IMEM(to_integer(test_in)).other_instruction_bits)
       report "Data bits mismatch at index " & integer'image(to_integer(test_in))
       severity error;
   end process;
