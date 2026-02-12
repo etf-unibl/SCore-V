@@ -51,8 +51,8 @@ entity fetch_instruction is
   );
   port
   (
-  instruction_count_i : in  unsigned(g_ADDR_WIDTH-1 downto 0);
-  instruction_bits_o  : out t_instruction_rec
+  instruction_count_i : in  unsigned(g_ADDR_WIDTH-1 downto 0); --! program counter which has a step of 4
+  instruction_bits_o  : out t_instruction_rec                  --! instruction consisting of opcode and the rest of the bits
   );
 
 end fetch_instruction;
