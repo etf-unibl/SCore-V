@@ -49,14 +49,14 @@ end entity;
 architecture arch of reg_file_tb is
 
     -- Test Signals
-    signal clk        : std_logic := '0';                     --! System clock signal
-    signal reg_write  : std_logic := '0';                     --! Register write enable control
-    signal rs1_addr   : std_logic_vector(4 downto 0) := (others => '0'); --! Source register 1 address
-    signal rs2_addr   : std_logic_vector(4 downto 0) := (others => '0'); --! Source register 2 address
-    signal rd_addr    : std_logic_vector(4 downto 0) := (others => '0'); --! Destination register address
+    signal clk        : std_logic := '0';                                 --! System clock signal
+    signal reg_write  : std_logic := '0';                                 --! Register write enable control
+    signal rs1_addr   : std_logic_vector(4 downto 0) := (others => '0');  --! Source register 1 address
+    signal rs2_addr   : std_logic_vector(4 downto 0) := (others => '0');  --! Source register 2 address
+    signal rd_addr    : std_logic_vector(4 downto 0) := (others => '0');  --! Destination register address
     signal rd_data    : std_logic_vector(31 downto 0) := (others => '0'); --! Data to be written to RD
-    signal rs1_data   : std_logic_vector(31 downto 0);        --! Data output from rs1 port
-    signal rs2_data   : std_logic_vector(31 downto 0);        --! Data output from rs2 port
+    signal rs1_data   : std_logic_vector(31 downto 0);                    --! Data output from rs1 port
+    signal rs2_data   : std_logic_vector(31 downto 0);                    --! Data output from rs2 port
 
     --! Clock period constant (100 MHz)
     constant clk_period : time := 10 ns;
@@ -64,14 +64,14 @@ architecture arch of reg_file_tb is
     --! @brief Component declaration for the Register File module.
     component reg_file
         port (
-            clk       : in  std_logic;
-            reg_write : in  std_logic;
-            rs1_addr  : in  std_logic_vector(4 downto 0);
-            rs2_addr  : in  std_logic_vector(4 downto 0);
-            rd_addr   : in  std_logic_vector(4 downto 0);
-            rd_data   : in  std_logic_vector(31 downto 0);
-            rs1_data  : out std_logic_vector(31 downto 0);
-            rs2_data  : out std_logic_vector(31 downto 0)
+            clk_i       : in  std_logic;
+            reg_write_i : in  std_logic;
+            rs1_addr_i  : in  std_logic_vector(4 downto 0);
+            rs2_addr_i  : in  std_logic_vector(4 downto 0);
+            rd_addr_i   : in  std_logic_vector(4 downto 0);
+            rd_data_i   : in  std_logic_vector(31 downto 0);
+            rs1_data_o  : out std_logic_vector(31 downto 0);
+            rs2_data_o  : out std_logic_vector(31 downto 0)
         );
     end component;
 
@@ -80,14 +80,14 @@ begin
     --! @brief Instance of the Unit Under Test (UUT).
     DUT: reg_file
         port map(
-            clk       => clk,
-            reg_write => reg_write,
-            rs1_addr  => rs1_addr,
-            rs2_addr  => rs2_addr,
-            rd_addr   => rd_addr,
-            rd_data   => rd_data,
-            rs1_data  => rs1_data,
-            rs2_data  => rs2_data
+            clk_i       => clk,
+            reg_write_i => reg_write,
+            rs1_addr_i  => rs1_addr,
+            rs2_addr_i  => rs2_addr,
+            rd_addr_i   => rd_addr,
+            rd_data_i   => rd_data,
+            rs1_data_o  => rs1_data,
+            rs2_data_o  => rs2_data
         );
 
     --! @brief Clock generation process.
@@ -160,4 +160,4 @@ begin
         wait;
     end process;
 
-end architecture;
+end arch;
