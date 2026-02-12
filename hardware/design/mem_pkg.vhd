@@ -8,7 +8,7 @@
 --
 -- description:
 --
---   This file implements a simple memory package.
+--   This file implements a simple memory package module.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
