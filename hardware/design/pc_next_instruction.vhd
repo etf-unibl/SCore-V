@@ -59,5 +59,7 @@ architecture arch of pc_next_instruction is
   signal tmp : unsigned(31 downto 0); --! Temporary unsigned signal for arithmetic operation
 begin
   tmp <= unsigned(pc_i) + 4;
+  
+  --! @brief Output assignment
   pc_next_o <= std_logic_vector(tmp);
 end arch;
