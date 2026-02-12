@@ -58,7 +58,7 @@ entity reg_file is
 end entity;
 
 --! @brief RTL implementation of the Register File.
-architecture rtl of reg_file is
+architecture arch of reg_file is
   --! Internal array type for 32x32-bit registers.
   type reg_array is array (0 to 31) of std_logic_vector(31 downto 0);
   --! Register array signal initialized to all zeros.
