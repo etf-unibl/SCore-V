@@ -1,15 +1,15 @@
 -----------------------------------------------------------------------------
 -- Faculty of Electrical Engineering
 -- PDS 2025
--- https://github.com/etf-unibl/pds-2025/
+-- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
 -- unit name:     alu_tb
 --
--- description:   Self-checking testbench for alu
---   
---   
+-- description:   
 --
+--                Self-checking testbench for alu
+--   
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
 -----------------------------------------------------------------------------
