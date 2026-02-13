@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDS-PROJECT: File List</title>
+<title>PDS-PROJECT: arch Architecture Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -46,7 +46,6 @@ $(function() {
 /* @license-end */
 </script>
 <div id="main-nav"></div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -68,18 +67,25 @@ $(function() {
 </div>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="classcontrol.html">control</a></li><li class="navelem"><a class="el" href="classcontrol_1_1arch.html">arch</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
-  <div class="headertitle"><div class="title">File List</div></div>
+  <div class="headertitle"><div class="title">arch Architecture Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock">Here is a list of all files with brief descriptions:</div><div class="directory">
-<table class="directory">
-<tr id="row_0_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icondoc"></span><a class="el" href="alu_8vhd.html" target="_self">alu.vhd</a></td><td class="desc">Arithmetic Logic Unit </td></tr>
-<tr id="row_1_" class="odd"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icondoc"></span><a class="el" href="control_8vhd.html" target="_self">control.vhd</a></td><td class="desc">Combinational control unit for the RISC-V core </td></tr>
-<tr id="row_2_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icondoc"></span><a class="el" href="fetch__instruction_8vhd.html" target="_self">fetch_instruction.vhd</a></td><td class="desc"></td></tr>
-<tr id="row_3_" class="odd"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icondoc"></span><a class="el" href="mem__pkg_8vhd.html" target="_self">mem_pkg.vhd</a></td><td class="desc"></td></tr>
-</table>
-</div><!-- directory -->
+
+<p>Architecture implementation of control logic.  
+ <a href="classcontrol_1_1arch.html#details">More...</a></p>
+<b>Architecture &gt;&gt; </b><a class="el" href="classcontrol_1_1arch.html">arch</a><br />
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p >Architecture implementation of control logic. </p>
+<p >Asserts reg_write_enable_o when the instruction encoding corresponds to the R-type ADD instruction: opcode = 0110011 funct3 = 000 funct7 = 0000000 </p>
+</div><hr/>The documentation for this design unit was generated from the following file:<ul>
+<li><a class="el" href="control_8vhd.html">control.vhd</a></li>
+</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

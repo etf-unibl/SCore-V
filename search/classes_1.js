@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fetch_5finstruction_0',['fetch_instruction',['../classfetch__instruction.html',1,'']]]
+  ['control_0',['control',['../classcontrol.html',1,'']]]
 ];
