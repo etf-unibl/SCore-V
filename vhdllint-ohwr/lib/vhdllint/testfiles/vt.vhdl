@@ -1,4 +1,0 @@
-entity hello is
-end;
-
-

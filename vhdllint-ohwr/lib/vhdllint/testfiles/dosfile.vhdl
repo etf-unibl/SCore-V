@@ -1,3 +1,0 @@
--- This file is encoded
--- using DOS convention
--- That is \r\n
