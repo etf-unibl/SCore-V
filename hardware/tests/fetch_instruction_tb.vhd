@@ -51,12 +51,12 @@ architecture arch of fetch_instruction_tb is
   component fetch_instruction
     port
     (
-        instruction_count_i : in  unsigned(31 downto 0);
+        instruction_count_i : in  std_logic_vector(31 downto 0);
         instruction_bits_o  : out t_instruction_rec
     );
   end component;
 
-  signal test_in  : unsigned(31 downto 0);
+  signal test_in  : std_logic_vector(31 downto 0);
   signal test_out : t_instruction_rec;
 
 begin
@@ -70,13 +70,13 @@ begin
   --! Stimulus process : Cycles through addresses
   process
   begin
-    test_in <= to_unsigned(0, 32);
+    test_in <= std_logic_vector(to_unsigned(0, 32));
     wait for 200 ns;
-    test_in <= to_unsigned(4, 32);
+    test_in <= std_logic_vector(to_unsigned(4, 32));
     wait for 200 ns;
-    test_in <= to_unsigned(8, 32);
+    test_in <= std_logic_vector(to_unsigned(8, 32));
     wait for 200 ns;
-    test_in <= to_unsigned(16, 32);
+    test_in <= std_logic_vector(to_unsigned(16, 32));
     wait for 200 ns;
     wait;
   end process;
@@ -84,18 +84,20 @@ begin
   --! Checker process : Checks the values in the LUT based on the input signal
   process
     variable full_instruction : std_logic_vector(31 downto 0);
+    variable addr_int         : integer;
   begin
     wait on test_in;
     wait for 100 ns;
-    full_instruction := c_IMEM(to_integer(test_in + 3)) &
-                         c_IMEM(to_integer(test_in + 2)) &
-                         c_IMEM(to_integer(test_in + 1)) &
-                         c_IMEM(to_integer(test_in));
+    addr_int := to_integer(unsigned(test_in));
+    full_instruction := c_IMEM(addr_int + 3) &
+                        c_IMEM(addr_int + 2) &
+                        c_IMEM(addr_int + 1) &
+                        c_IMEM(addr_int);
     assert (test_out.opcode = full_instruction(6 downto 0))
-      report "Opcode mismatch at index " & integer'image(to_integer(test_in))
+      report "Opcode mismatch at index " & integer'image(addr_int)
       severity error;
     assert (test_out.other_instruction_bits = full_instruction(31 downto 7))
-      report "Data bits mismatch at index " & integer'image(to_integer(test_in))
+      report "Data bits mismatch at index " & integer'image(addr_int)
       severity error;
   end process;
 end arch;
