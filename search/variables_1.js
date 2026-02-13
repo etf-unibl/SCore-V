@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['full_5finstruction_0',['full_instruction',['../classfetch__instruction_1_1arch.html#aac9aa5e57a5a094301738f2d478d6cec',1,'fetch_instruction::arch']]]
+  ['b_5fi_0',['b_i',['../classalu.html#a6dd3c8a9210700e2533265bc1a926de6',1,'alu']]]
 ];

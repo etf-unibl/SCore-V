@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mem_5fpkg_2evhd_0',['mem_pkg.vhd',['../mem__pkg_8vhd.html',1,'']]]
+  ['fetch_5finstruction_2evhd_0',['fetch_instruction.vhd',['../fetch__instruction_8vhd.html',1,'']]]
 ];

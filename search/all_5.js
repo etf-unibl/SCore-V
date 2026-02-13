@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['mem_5fpkg_0',['mem_pkg',['../classmem__pkg.html',1,'mem_pkg'],['../namespacemem__pkg.html',1,'mem_pkg'],['../classfetch__instruction.html#abafacda428d973c04eff9cb53862d2c8',1,'fetch_instruction.mem_pkg()']]],
-  ['mem_5fpkg_2evhd_1',['mem_pkg.vhd',['../mem__pkg_8vhd.html',1,'']]]
+  ['ieee_0',['ieee',['../classalu.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu.ieee()'],['../classfetch__instruction.html#a0a6af6eef40212dbaf130d57ce711256',1,'fetch_instruction.ieee()'],['../classmem__pkg.html#a0a6af6eef40212dbaf130d57ce711256',1,'mem_pkg.ieee()']]],
+  ['instruction_5fbits_5fo_1',['instruction_bits_o',['../classfetch__instruction.html#abdce7358176852bf67f503fc459762e0',1,'fetch_instruction']]],
+  ['instruction_5fcount_5fi_2',['instruction_count_i',['../classfetch__instruction.html#a902662b755e48cb5eba9eaa9d241c378',1,'fetch_instruction']]]
 ];

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['t_5fbyte_0',['t_byte',['../classmem__pkg.html#a035297a06be6a2436d6945dbc434cd9e',1,'mem_pkg']]],
-  ['t_5fbytes_1',['t_bytes',['../classmem__pkg.html#a338078dd1bf1177cd815bf0c5f93b709',1,'mem_pkg']]],
-  ['t_5finstruction_5frec_2',['t_instruction_rec',['../classmem__pkg.html#a3347bc436dedb097d5c7e8fd57707c3a',1,'mem_pkg']]]
+  ['opcode_7e0_0',['opcode~0',['../classmem__pkg.html#a7332976f975cf87bc30a666091905726',1,'mem_pkg']]],
+  ['other_5finstruction_5fbits_7e1_1',['other_instruction_bits~1',['../classmem__pkg.html#a185ebe26758bb8c6995d6c5a95983950',1,'mem_pkg']]]
 ];

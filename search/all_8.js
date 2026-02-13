@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['std_5flogic_5f1164_0',['std_logic_1164',['../classfetch__instruction.html#acd03516902501cd1c7296a98e22c6fcb',1,'fetch_instruction.std_logic_1164()'],['../classmem__pkg.html#acd03516902501cd1c7296a98e22c6fcb',1,'mem_pkg.std_logic_1164()']]]
+  ['opcode_7e0_0',['opcode~0',['../classmem__pkg.html#a7332976f975cf87bc30a666091905726',1,'mem_pkg']]],
+  ['other_5finstruction_5fbits_7e1_1',['other_instruction_bits~1',['../classmem__pkg.html#a185ebe26758bb8c6995d6c5a95983950',1,'mem_pkg']]]
 ];

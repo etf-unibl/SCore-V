@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['g_5faddr_5fwidth_0',['g_ADDR_WIDTH',['../classfetch__instruction.html#a4db2646837d0670543c327c71272f242',1,'fetch_instruction']]]
+  ['c_5fimem_0',['c_IMEM',['../classmem__pkg.html#ab20dcda18af0f0cd5a84763254342d50',1,'mem_pkg']]]
 ];
