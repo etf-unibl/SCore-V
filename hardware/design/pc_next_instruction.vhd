@@ -47,8 +47,8 @@ use ieee.numeric_std.all;
 
 entity pc_next_instruction is
   port (
-    pc_i       : in  unsigned(31 downto 0); --! Current Program Counter value
-    pc_next_o  : out unsigned(31 downto 0)  --! Next sequential PC value
+    pc_i       : in  std_logic_vector(31 downto 0); --! Current Program Counter value
+    pc_next_o  : out std_logic_vector(31 downto 0)  --! Next sequential PC value
   );
 end pc_next_instruction;
 
@@ -57,5 +57,5 @@ end pc_next_instruction;
 architecture arch of pc_next_instruction is
 begin
   --! @brief Output assignment
-  pc_next_o <= pc_i + 4;
+  pc_next_o <= std_logic_vector(unsigned(pc_i) + 4);
 end arch;

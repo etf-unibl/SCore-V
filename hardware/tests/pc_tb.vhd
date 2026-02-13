@@ -44,32 +44,33 @@ entity pc_tb is
 end pc_tb;
 
 architecture arch of pc_tb is
+
   component pc
     port (
       clk_i     : in  std_logic;
       rst_i     : in  std_logic;
-      pc_next_i : in  unsigned(31 downto 0);
-      pc_o      : out unsigned(31 downto 0)
+      pc_next_i : in  std_logic_vector(31 downto 0);
+      pc_o      : out std_logic_vector(31 downto 0)
     );
   end component;
 
   component pc_next_instruction
     port (
-      pc_i      : in  unsigned(31 downto 0);
-      pc_next_o : out unsigned(31 downto 0)
+      pc_i      : in  std_logic_vector(31 downto 0);
+      pc_next_o : out std_logic_vector(31 downto 0)
     );
   end component;
 
   signal clk_i    : std_logic := '0';
   signal rst_i    : std_logic := '0';
-  signal pc_out  : unsigned(31 downto 0) := (others => '0');
-  signal pc_next : unsigned(31 downto 0) := (others => '0');
-
+  signal pc_out   : std_logic_vector(31 downto 0) := (others => '0');
+  signal pc_next  : std_logic_vector(31 downto 0) := (others => '0');
 
   signal test_stop : std_logic := '0';
   constant c_CLK_PERIOD : time := 10 ns;
 
 begin
+
   uut_pc_next_instr : pc_next_instruction
     port map (
       pc_i      => pc_out,
@@ -103,10 +104,13 @@ begin
 
     for i in 1 to 6 loop
       wait until rising_edge(clk_i);
-      assert false report "PC = " & integer'image(to_integer(pc_out)) severity note;
+      assert false report
+        "PC = " & integer'image(to_integer(unsigned(pc_out)))
+        severity note;
     end loop;
 
     test_stop <= '1';
     wait;
   end process stim_proc;
+
 end arch;
