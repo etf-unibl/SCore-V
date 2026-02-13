@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- Faculty of Electrical Engineering
 -- PDS 2025
--- https://github.com/etf-unibl/pds-2025/
+-- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
 -- unit name:     instruction_decoder
