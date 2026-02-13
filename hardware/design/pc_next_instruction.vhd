@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- Faculty of Electrical Engineering
 -- PDS 2025
--- https://github.com/etf-unibl/pds-2025/
+-- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
 -- unit name:     pc_next_instruction
@@ -47,19 +47,15 @@ use ieee.numeric_std.all;
 
 entity pc_next_instruction is
   port (
-    pc_i       : in  std_logic_vector(31 downto 0); --! Current Program Counter value
-    pc_next_o  : out std_logic_vector(31 downto 0)  --! Next sequential PC value
+    pc_i       : in  unsigned(31 downto 0); --! Current Program Counter value
+    pc_next_o  : out unsigned(31 downto 0)  --! Next sequential PC value
   );
 end pc_next_instruction;
 
 --! @brief Architecture arch for next PC computation
 --! @details Implements combinational logic for sequential PC increment.
 architecture arch of pc_next_instruction is
-  --! @brief Internal signal declarations
-  signal tmp : unsigned(31 downto 0); --! Temporary unsigned signal for arithmetic operation
 begin
-  tmp <= unsigned(pc_i) + 4;
-  
   --! @brief Output assignment
-  pc_next_o <= std_logic_vector(tmp);
+  pc_next_o <= pc_i + 4;
 end arch;
