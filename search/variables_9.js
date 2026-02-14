@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['rd_5fo_0',['rd_o',['../classinstruction__decoder.html#aa7c99d73898bf89bf201ff204e3a567d',1,'instruction_decoder']]],
-  ['reg_5fwrite_5fenable_5fo_1',['reg_write_enable_o',['../classcontrol.html#a6e84d3cf2be401a779fe4a3a5432446a',1,'control']]],
-  ['rs1_5fo_2',['rs1_o',['../classinstruction__decoder.html#ae07aba5b1bec511c0c5488f7a3dd43fa',1,'instruction_decoder']]],
-  ['rs2_5fo_3',['rs2_o',['../classinstruction__decoder.html#a2c0ca28c959e96b26f2eeb65ac70b4e0',1,'instruction_decoder']]]
+  ['pc_5fi_0',['pc_i',['../classpc__next__instruction.html#a502f81044ff8162c618e699013f2ee15',1,'pc_next_instruction']]],
+  ['pc_5fnext_5fi_1',['pc_next_i',['../classpc.html#a21cbcb54a218b71b0f435f1b195c484d',1,'pc']]],
+  ['pc_5fnext_5fo_2',['pc_next_o',['../classpc__next__instruction.html#a47c1c29745d97b2d7ff3958d3af1f856',1,'pc_next_instruction']]],
+  ['pc_5fo_3',['pc_o',['../classpc.html#a3b1dd06064836b982a39318569cd4bad',1,'pc']]],
+  ['pc_5freg_4',['pc_reg',['../classpc_1_1arch.html#ab1848495c0d58b151137f7d3fc1bdc30',1,'pc::arch']]]
 ];
