@@ -61,12 +61,12 @@ architecture arch of pc_tb is
     );
   end component;
 
-  signal clk_i    : std_logic := '0';
-  signal rst_i    : std_logic := '0';
-  signal pc_out   : std_logic_vector(31 downto 0) := (others => '0');
-  signal pc_next  : std_logic_vector(31 downto 0) := (others => '0');
+  signal clk_i      : std_logic := '0';
+  signal rst_i      : std_logic := '0';
+  signal pc_out     : std_logic_vector(31 downto 0) := (others => '0');
+  signal pc_next    : std_logic_vector(31 downto 0) := (others => '0');
+  signal sim_stop_s : std_logic := '0';
 
-  signal test_stop : std_logic := '0';
   constant c_CLK_PERIOD : time := 10 ns;
 
 begin
@@ -87,7 +87,7 @@ begin
 
   clk_process : process
   begin
-    while test_stop = '0' loop
+    while sim_stop_s = '0' loop
       clk_i <= '0';
       wait for c_CLK_PERIOD/2;
       clk_i <= '1';
@@ -96,21 +96,55 @@ begin
     wait;
   end process clk_process;
 
+  -- PC increment uses unsigned arithmetic (numeric_std).
+  -- Since the PC is 32-bit wide, addition is performed modulo 2^32.
+  -- Therefore, when PC = 0xFFFFFFFC and 4 is added,
+  -- the result wraps around to 0x00000000.
   stim_proc : process
+    variable expected_pc : std_logic_vector(31 downto 0);
   begin
+    --- Test 1: Reset
     rst_i <= '1';
-    wait for c_CLK_PERIOD;
+    wait until rising_edge(clk_i);
+    wait until rising_edge(clk_i);
+    expected_pc := (others => '0');
+    assert pc_out = expected_pc
+      report "FAIL: PC not 0 after reset!"
+      severity failure;
+
     rst_i <= '0';
 
-    for i in 1 to 6 loop
+    --- Test 2: First cycle after reset
+    wait until rising_edge(clk_i);
+    assert pc_out = expected_pc
+      report "FAIL: PC changed in first cycle after reset!"
+      severity failure;
+
+    --- Test 3: Normal increment
+    for i in 1 to 5 loop
       wait until rising_edge(clk_i);
-      assert false report
-        "PC = " & integer'image(to_integer(unsigned(pc_out)))
-        severity note;
+      expected_pc := std_logic_vector(unsigned(expected_pc) + 4);
+      assert pc_out = expected_pc
+        report "FAIL: PC increment incorrect!"
+        severity failure;
     end loop;
 
-    test_stop <= '1';
+    --- Test 4: Reset during operation
+    rst_i <= '1';
+    wait until rising_edge(clk_i);
+    wait until rising_edge(clk_i);
+    expected_pc := (others => '0');
+    assert pc_out = expected_pc
+      report "FAIL: PC not reset during operation!"
+      severity failure;
+
+    rst_i <= '0';
+
+    assert false report "All tests passed!" severity note;
+
+    sim_stop_s <= '1';
     wait;
+
   end process stim_proc;
 
 end arch;
