@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mem_5fpkg_0',['mem_pkg',['../classmem__pkg.html',1,'']]]
+  ['instruction_5fdecoder_0',['instruction_decoder',['../classinstruction__decoder.html',1,'']]]
 ];
