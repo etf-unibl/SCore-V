@@ -1,8 +1,17 @@
 var searchData=
 [
-  ['rd_5fo_0',['rd_o',['../classinstruction__decoder.html#aa7c99d73898bf89bf201ff204e3a567d',1,'instruction_decoder']]],
-  ['reg_5fwrite_5fenable_5fo_1',['reg_write_enable_o',['../classcontrol.html#a6e84d3cf2be401a779fe4a3a5432446a',1,'control']]],
-  ['rs1_5fo_2',['rs1_o',['../classinstruction__decoder.html#ae07aba5b1bec511c0c5488f7a3dd43fa',1,'instruction_decoder']]],
-  ['rs2_5fo_3',['rs2_o',['../classinstruction__decoder.html#a2c0ca28c959e96b26f2eeb65ac70b4e0',1,'instruction_decoder']]],
-  ['rst_5fi_4',['rst_i',['../classpc.html#ab86c7a8eec3a8327e506892977f85708',1,'pc']]]
+  ['rd_5faddr_5fi_0',['rd_addr_i',['../classreg__file.html#a5e6b353cbeacab1589daee7fbd530005',1,'reg_file']]],
+  ['rd_5fdata_5fi_1',['rd_data_i',['../classreg__file.html#a31b73ac032eee7dd08f01d4fecee504d',1,'reg_file']]],
+  ['rd_5fo_2',['rd_o',['../classinstruction__decoder.html#aa7c99d73898bf89bf201ff204e3a567d',1,'instruction_decoder']]],
+  ['reg_5farray_3',['reg_array',['../classreg__file_1_1arch.html#aaadeb230bfe788c96ae07d0bd43af53c',1,'reg_file::arch']]],
+  ['reg_5fwrite_5fenable_5fo_4',['reg_write_enable_o',['../classcontrol.html#a6e84d3cf2be401a779fe4a3a5432446a',1,'control']]],
+  ['reg_5fwrite_5fi_5',['reg_write_i',['../classreg__file.html#a61f4592267a733ccc60e8502552dc03d',1,'reg_file']]],
+  ['regs_6',['regs',['../classreg__file_1_1arch.html#a46bece3088effc3b0cb8260b26b9ebf7',1,'reg_file::arch']]],
+  ['rs1_5faddr_5fi_7',['rs1_addr_i',['../classreg__file.html#a619a7c8fffa9bf56e343253ef1fda868',1,'reg_file']]],
+  ['rs1_5fdata_5fo_8',['rs1_data_o',['../classreg__file.html#a08f2b01bb7e45773bb3a61c3d6a2c81d',1,'reg_file']]],
+  ['rs1_5fo_9',['rs1_o',['../classinstruction__decoder.html#ae07aba5b1bec511c0c5488f7a3dd43fa',1,'instruction_decoder']]],
+  ['rs2_5faddr_5fi_10',['rs2_addr_i',['../classreg__file.html#a79562ccb18c95a2b51c0d82d6dab0a52',1,'reg_file']]],
+  ['rs2_5fdata_5fo_11',['rs2_data_o',['../classreg__file.html#a69539a218d2ec8d3ee9c2c2324bc6913',1,'reg_file']]],
+  ['rs2_5fo_12',['rs2_o',['../classinstruction__decoder.html#a2c0ca28c959e96b26f2eeb65ac70b4e0',1,'instruction_decoder']]],
+  ['rst_5fi_13',['rst_i',['../classpc.html#ab86c7a8eec3a8327e506892977f85708',1,'pc']]]
 ];
