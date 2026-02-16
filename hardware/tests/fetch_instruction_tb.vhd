@@ -35,69 +35,63 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+library vunit_lib;  
+context vunit_lib.vunit_context;
+library design_lib;
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.mem_pkg.all;
+use design_lib.mem_pkg.all;
 
 --! @brief Top-level entity for the fetch instruction testbench.
 --! @details As a testbench, this entity has no ports.
 entity fetch_instruction_tb is
+  generic (runner_cfg : string);
 end fetch_instruction_tb;
 
 --! @brief Architecture implementing the stimulus and verification logic.
 architecture arch of fetch_instruction_tb is
-  --! Component declaration for the Unit Under Test (UUT)
-  component fetch_instruction
-    port
-    (
-        instruction_count_i : in  std_logic_vector(31 downto 0);
-        instruction_bits_o  : out t_instruction_rec
-    );
-  end component;
 
   signal test_in  : std_logic_vector(31 downto 0);
   signal test_out : t_instruction_rec;
 
 begin
   --! @brief UUT instantiation and port mapping.
-  uut : fetch_instruction
+  uut_fetch_instruction : entity design_lib.fetch_instruction
     port map(
     instruction_count_i => test_in,
     instruction_bits_o  => test_out
     );
-
-  --! Stimulus process : Cycles through addresses
-  process
-  begin
-    test_in <= std_logic_vector(to_unsigned(0, 32));
-    wait for 200 ns;
-    test_in <= std_logic_vector(to_unsigned(4, 32));
-    wait for 200 ns;
-    test_in <= std_logic_vector(to_unsigned(8, 32));
-    wait for 200 ns;
-    test_in <= std_logic_vector(to_unsigned(16, 32));
-    wait for 200 ns;
-    wait;
-  end process;
-
-  --! Checker process : Checks the values in the LUT based on the input signal
-  process
+  
+  main : process
     variable full_instruction : std_logic_vector(31 downto 0);
     variable addr_int         : integer;
+
   begin
-    wait on test_in;
-    wait for 100 ns;
-    addr_int := to_integer(unsigned(test_in));
-    full_instruction := c_IMEM(addr_int + 3) &
+    test_runner_setup(runner, runner_cfg);
+    
+    while test_suite loop
+      if run("test_fetch_instruction") then
+        for i in 0 to 16 loop
+          if i mod 4 = 0 then 
+            test_in <= std_logic_vector(to_unsigned(i, 32));
+            wait for 100 ns;
+          end if;
+          addr_int := to_integer(unsigned(test_in));
+          full_instruction := c_IMEM(addr_int + 3) &
                         c_IMEM(addr_int + 2) &
                         c_IMEM(addr_int + 1) &
                         c_IMEM(addr_int);
-    assert (test_out.opcode = full_instruction(6 downto 0))
-      report "Opcode mismatch at index " & integer'image(addr_int)
-      severity error;
-    assert (test_out.other_instruction_bits = full_instruction(31 downto 7))
-      report "Data bits mismatch at index " & integer'image(addr_int)
-      severity error;
+        end loop;
+        check_equal(test_out.opcode, full_instruction(6 downto 0), 
+                    "Opcode mismatch at index " & integer'image(addr_int));
+
+        check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7), 
+                    "Data bits mismatch at index " & integer'image(addr_int));
+      end if;
+    end loop;
+
+    test_runner_cleanup(runner);
   end process;
 end arch;
