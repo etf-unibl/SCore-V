@@ -40,27 +40,16 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library vunit_lib;
+context vunit_lib.vunit_context;
+
+library design_lib;
+
 entity pc_tb is
+  generic (runner_cfg : string);
 end pc_tb;
 
 architecture arch of pc_tb is
-
-  component pc
-    port (
-      clk_i     : in  std_logic;
-      rst_i     : in  std_logic;
-      pc_next_i : in  std_logic_vector(31 downto 0);
-      pc_o      : out std_logic_vector(31 downto 0)
-    );
-  end component;
-
-  component pc_next_instruction
-    port (
-      pc_i      : in  std_logic_vector(31 downto 0);
-      pc_next_o : out std_logic_vector(31 downto 0)
-    );
-  end component;
-
   signal clk_i      : std_logic := '0';
   signal rst_i      : std_logic := '0';
   signal pc_out     : std_logic_vector(31 downto 0) := (others => '0');
@@ -71,13 +60,13 @@ architecture arch of pc_tb is
 
 begin
 
-  uut_pc_next_instr : pc_next_instruction
+  uut_pc_next_instr : entity design_lib.pc_next_instruction
     port map (
       pc_i      => pc_out,
       pc_next_o => pc_next
     );
 
-  uut_pc : pc
+  uut_pc : entity design_lib.pc
     port map (
       clk_i     => clk_i,
       rst_i     => rst_i,
@@ -100,51 +89,54 @@ begin
   -- Since the PC is 32-bit wide, addition is performed modulo 2^32.
   -- Therefore, when PC = 0xFFFFFFFC and 4 is added,
   -- the result wraps around to 0x00000000.
-  stim_proc : process
+  main : process
     variable expected_pc : std_logic_vector(31 downto 0);
   begin
-    --- Test 1: Reset
-    rst_i <= '1';
-    wait until rising_edge(clk_i);
-    wait until rising_edge(clk_i);
-    expected_pc := (others => '0');
-    assert pc_out = expected_pc
-      report "FAIL: PC not 0 after reset!"
-      severity failure;
+    test_runner_setup(runner, runner_cfg);
 
-    rst_i <= '0';
+    while test_suite loop
+      if run("test_reset") then
+        -- Testing reset itself
+        info("Testing reset");
+        rst_i <= '1';
+        wait until rising_edge(clk_i);
+        wait until rising_edge(clk_i);
+        expected_pc := (others => '0');
+        check_equal(pc_out, expected_pc, "pc should be 0 after reset");
+        
+        -- Testing first cycle after reset
+        wait until rising_edge(clk_i);
+        check_equal(pc_out, expected_pc, "pc should not change on first cycle");
 
-    --- Test 2: First cycle after reset
-    wait until rising_edge(clk_i);
-    assert pc_out = expected_pc
-      report "FAIL: PC changed in first cycle after reset!"
-      severity failure;
+      elsif run("test_increment") then
+        info("Testing incrementing");
+        for i in 1 to 5 loop
+          wait until rising_edge(clk_i);
+          expected_pc := std_logic_vector(unsigned(expected_pc) + 4);
+          if pc_out /= expected_pc then
+            failure("FAIL: pc should be " & to_string(expected_pc) & " and not " & to_string(pc_out));
+          end if;
+        end loop;
 
-    --- Test 3: Normal increment
-    for i in 1 to 5 loop
-      wait until rising_edge(clk_i);
-      expected_pc := std_logic_vector(unsigned(expected_pc) + 4);
-      assert pc_out = expected_pc
-        report "FAIL: PC increment incorrect!"
-        severity failure;
+      elsif run("test_increment_reset") then
+
+        for i in 1 to 5 loop
+          wait until rising_edge(clk_i);
+          expected_pc := std_logic_vector(unsigned(expected_pc) + 4);
+          check_equal(pc_out, expected_pc, "pc should be " & to_string(expected_pc));
+        end loop;
+
+        rst_i <= '1';
+        wait until rising_edge(clk_i);
+        wait until rising_edge(clk_i);
+        expected_pc := (others => '0');
+        check_equal(pc_out, expected_pc, "pc should be 0 after reset");
+
+      end if;
     end loop;
 
-    --- Test 4: Reset during operation
-    rst_i <= '1';
-    wait until rising_edge(clk_i);
-    wait until rising_edge(clk_i);
-    expected_pc := (others => '0');
-    assert pc_out = expected_pc
-      report "FAIL: PC not reset during operation!"
-      severity failure;
-
-    rst_i <= '0';
-
-    assert false report "All tests passed!" severity note;
-
+    test_runner_cleanup(runner);
     sim_stop_s <= '1';
     wait;
-
-  end process stim_proc;
-
+  end process main;
 end arch;
