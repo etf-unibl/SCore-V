@@ -49,10 +49,10 @@ use ieee.numeric_std.all;
 --! Unit implements a simple 4-bit counter.
 entity counter_vunit_example is
   port (
-    clk_i    : in  std_logic;
-    rst_i    : in  std_logic;
-    enable_i : in  std_logic;
-    count_o  : out std_logic_vector(3 downto 0)
+    clk_i    : in  std_logic;                   --! Clock input of the unit
+    rst_i    : in  std_logic;                   --! Reset input of the unit
+    enable_i : in  std_logic;                   --! Input which enables counting
+    count_o  : out std_logic_vector(3 downto 0) --! 4-bit output of the counter
   );
 end entity counter_vunit_example;
 
