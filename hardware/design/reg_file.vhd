@@ -39,6 +39,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.mem_pkg.all;
 
 --! @brief Register File module for RV32I processor.
 --! @details This module implements 32 general-purpose 32-bit registers.
@@ -59,23 +60,18 @@ end reg_file;
 
 --! @brief RTL implementation of the Register File.
 architecture arch of reg_file is
-  --! Internal array type for 32x32-bit registers.
-  type reg_array is array (0 to 31) of std_logic_vector(31 downto 0);
-  signal regs : reg_array := (
-    1 => x"00000003",
-    2 => x"00000005",
-    others => (others => '0')
-  );
+  --! Internal storage array, initialized with values from mem_pkg.
+  signal s_regs : t_regs := regs;
 
 begin
 
   --! Read logic for rs1: returns zero if address is 0, otherwise returns register value.
   rs1_data_o <= (others => '0') when rs1_addr_i = "00000"
-              else regs(to_integer(unsigned(rs1_addr_i)));
+              else s_regs(to_integer(unsigned(rs1_addr_i)));
 
   --! Read logic for rs2: returns zero if address is 0, otherwise returns register value.
   rs2_data_o <= (others => '0') when rs2_addr_i = "00000"
-              else regs(to_integer(unsigned(rs2_addr_i)));
+              else s_regs(to_integer(unsigned(rs2_addr_i)));
 
   --! @brief Synchronous Write Process.
   --! @details Writes data to rd_addr_i on the rising edge of the clock if write enable is active
@@ -84,7 +80,7 @@ begin
   begin
     if rising_edge(clk_i) then
       if reg_write_i = '1' and rd_addr_i /= "00000" then
-        regs(to_integer(unsigned(rd_addr_i))) <= rd_data_i;
+        s_regs(to_integer(unsigned(rd_addr_i))) <= rd_data_i;
       end if;
     end if;
   end process;
