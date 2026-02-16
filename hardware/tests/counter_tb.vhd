@@ -42,9 +42,6 @@ use ieee.numeric_std.all;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-library design_lib;
-use design_lib.counter.all;
-
 entity counter_tb is
   generic (runner_cfg : string);
 end entity counter_tb;
