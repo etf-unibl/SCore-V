@@ -62,7 +62,7 @@ architecture arch of tb_counter_vunit_example is
 begin
 
   -- Instantiate the counter
-  uut : entity design_lib.counter
+  uut : entity design_lib.counter_vunit_example
     port map (
       clk_i    => clk,
       rst_i    => rst,
