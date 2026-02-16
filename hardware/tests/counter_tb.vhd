@@ -71,7 +71,7 @@ architecture arch of counter_tb is
 begin
 
   -- Instantiate the counter
-  dut : counter
+  uut : counter
     port map (
       clk_i    => clk,
       rst_i    => rst,
