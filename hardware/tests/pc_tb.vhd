@@ -8,7 +8,7 @@
 --
 -- description:
 --
---   This file implements a simple program counter testbench.
+--   This file implements self-checking testbench for pc unit
 --
 --
 -----------------------------------------------------------------------------
