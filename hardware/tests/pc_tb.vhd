@@ -106,23 +106,34 @@ begin
         
         -- Testing first cycle after reset
         wait until rising_edge(clk_i);
-        check_equal(pc_out, expected_pc, "pc should not change on first cycle");
+        check_equal(pc_out, expected_pc, "pc should still be 0");
 
       elsif run("test_increment") then
         info("Testing incrementing");
+        rst_i <= '1';
+        wait until rising_edge(clk_i);
+        wait until rising_edge(clk_i);
+        rst_i <= '0';
+        wait until rising_edge(clk_i);
+
         for i in 1 to 5 loop
           wait until rising_edge(clk_i);
-          expected_pc := std_logic_vector(unsigned(expected_pc) + 4);
+          expected_pc := std_logic_vector(to_unsigned(i * 4, 32));
           if pc_out /= expected_pc then
             failure("FAIL: pc should be " & to_string(expected_pc) & " and not " & to_string(pc_out));
           end if;
         end loop;
 
       elsif run("test_increment_reset") then
+        rst_i <= '1';
+        wait until rising_edge(clk_i);
+        wait until rising_edge(clk_i);
+        rst_i <= '0';
+        wait until rising_edge(clk_i);
 
         for i in 1 to 5 loop
           wait until rising_edge(clk_i);
-          expected_pc := std_logic_vector(unsigned(expected_pc) + 4);
+          expected_pc := std_logic_vector(to_unsigned(i*4, 32));
           check_equal(pc_out, expected_pc, "pc should be " & to_string(expected_pc));
         end loop;
 
