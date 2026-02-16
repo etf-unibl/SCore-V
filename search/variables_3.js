@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['enable_5fi_0',['enable_i',['../classcounter__vunit__example.html#aa4d5bbd60281e36188c0528a451703cd',1,'counter_vunit_example']]]
+  ['dmem_0',['DMEM',['../classmem__pkg.html#ae8c5f68f141bee4bd88c44118090fbb5',1,'mem_pkg']]]
 ];
