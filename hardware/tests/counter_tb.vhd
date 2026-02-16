@@ -42,6 +42,8 @@ use ieee.numeric_std.all;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
+library design_lib;
+
 entity counter_tb is
   generic (runner_cfg : string);
 end entity counter_tb;
@@ -49,15 +51,6 @@ end entity counter_tb;
 architecture arch of counter_tb is
 
   constant c_CLK_PERIOD : time := 10 ns;
-
-  component counter is
-    port (
-      clk_i    : in  std_logic;
-      rst_i    : in  std_logic;
-      enable_i : in  std_logic;
-      count_o  : out std_logic_vector(3 downto 0)
-    );
-  end component;
 
   signal clk    : std_logic := '0';
   signal rst    : std_logic := '0';
@@ -69,7 +62,7 @@ architecture arch of counter_tb is
 begin
 
   -- Instantiate the counter
-  uut : counter
+  uut : entity design_lib.counter
     port map (
       clk_i    => clk,
       rst_i    => rst,
