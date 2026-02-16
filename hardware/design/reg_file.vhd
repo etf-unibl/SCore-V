@@ -62,8 +62,8 @@ architecture arch of reg_file is
   --! Internal array type for 32x32-bit registers.
   type reg_array is array (0 to 31) of std_logic_vector(31 downto 0);
     signal regs : reg_array := (
-      1 => x"00000003",
-      2 => x"00000005",
+    1 => x"00000003",
+    2 => x"00000005",
     others => (others => '0')
   );
 
