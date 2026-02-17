@@ -59,19 +59,17 @@ entity reg_file is
 end reg_file;
 
 --! @brief RTL implementation of the Register File.
+--! @details Accesses the regs defined in mem_pkg.
 architecture arch of reg_file is
-  --! Internal storage array, initialized with values from mem_pkg.
-  signal s_regs : t_regs := regs;
-
 begin
 
   --! Read logic for rs1: returns zero if address is 0, otherwise returns register value.
   rs1_data_o <= (others => '0') when rs1_addr_i = "00000"
-              else s_regs(to_integer(unsigned(rs1_addr_i)));
+              else regs(to_integer(unsigned(rs1_addr_i)));
 
   --! Read logic for rs2: returns zero if address is 0, otherwise returns register value.
   rs2_data_o <= (others => '0') when rs2_addr_i = "00000"
-              else s_regs(to_integer(unsigned(rs2_addr_i)));
+              else regs(to_integer(unsigned(rs2_addr_i)));
 
   --! @brief Synchronous Write Process.
   --! @details Writes data to rd_addr_i on the rising edge of the clock if write enable is active
@@ -80,7 +78,7 @@ begin
   begin
     if rising_edge(clk_i) then
       if reg_write_i = '1' and rd_addr_i /= "00000" then
-        s_regs(to_integer(unsigned(rd_addr_i))) <= rd_data_i;
+        regs(to_integer(unsigned(rd_addr_i))) <= rd_data_i;
       end if;
     end if;
   end process;
