@@ -4,11 +4,11 @@
 -- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
--- unit name:     control_tb
+-- unit name:     imm_gen_tb
 --
 -- description:
 --
---   This file implements self-checking testbench for control unit
+--   This file implements self-checking testbench for immediate generator unit
 --
 --
 -----------------------------------------------------------------------------
@@ -45,47 +45,70 @@ context vunit_lib.vunit_context;
 
 library design_lib;
 
-entity control_tb is
+entity imm_gen_tb is
   generic (runner_cfg : string);
-end control_tb;
+end imm_gen_tb;
 
-architecture arch of control_tb is
+architecture arch of imm_gen_tb is
 
-  -- Signals to connect to UUT
-  signal s_opcode           : std_logic_vector(6 downto 0) := (others => '0');
-  signal s_funct3           : std_logic_vector(2 downto 0) := (others => '0');
-  signal s_funct7           : std_logic_vector(6 downto 0) := (others => '0');
-  signal s_reg_write_enable : std_logic;
+  signal instruction_bits_i :  std_logic_vector(24 downto 0) := (others => '0'); --! Instruction bits
+  signal imm_sel_i          :  std_logic_vector(2 downto 0) := (others => '0');  --! Immediate select
+  signal imm_o              :  std_logic_vector(31 downto 0);  --! 32-bit immediate output
+  
+  constant c_SEL_I_TYPE : std_logic_vector(2 downto 0) := "001";
+  constant c_SEL_S_TYPE : std_logic_vector(2 downto 0) := "010";
 
 begin
-  -- Instantiate the Unit Under Test (UUT)
-  uut: entity design_lib.control
+
+  uut_imm_gen : entity design_lib.imm_gen
     port map (
-      opcode_i           => s_opcode,
-      funct3_i           => s_funct3,
-      funct7_i           => s_funct7,
-      reg_write_enable_o => s_reg_write_enable
+	  instruction_bits_i => instruction_bits_i,
+	  imm_sel_i          => imm_sel_i,
+	  imm_o              => imm_o
     );
 
-  -- Stimulus process
-  stim_proc: process
+  main : process
   begin
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
-      if run("test_add_instr") then
-        info("Testing add instruction");
-        s_opcode <= "0110011";
-        s_funct3 <= "000";
-        s_funct7 <= "0000000";
+	  if run("test_imm_gen") then 
+	    instruction_bits_i <= (others => '0');
+        instruction_bits_i(24 downto 13) <= std_logic_vector(to_signed(100, 12));
+        imm_sel_i <= c_SEL_I_TYPE;
         
         wait for 10 ns;
-        if s_reg_write_enable /= '1' then
-          failure("Output should be 1");
-        end if;
-      end if;
-    end loop;
+        check_equal(to_integer(signed(imm_o)), 100, "I-Type Positive failed");
+		
+        instruction_bits_i <= (others => '0');
+        instruction_bits_i(24 downto 13) <= std_logic_vector(to_signed(-5, 12));
+        imm_sel_i <= c_SEL_I_TYPE;
 
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), -5, "I-Type Negative failed");
+		
+		    instruction_bits_i <= (others => '0');
+        instruction_bits_i(24 downto 18) <= "0111111"; 
+        instruction_bits_i(4 downto 0)   <= "11111";  
+        imm_sel_i <= c_SEL_S_TYPE;
+        
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), 2047, "S-positive failed");
+
+        instruction_bits_i(24 downto 18) <= "1111111";
+        instruction_bits_i(4 downto 0)   <= "11111";
+        imm_sel_i <= c_SEL_S_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), -1, "S-Negative failed");
+		
+		    imm_sel_i <= "000"; 
+		
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), 0, "Default case should output zero");
+		
+		end if;
+	end loop;
+	
     test_runner_cleanup(runner);
-  end process stim_proc;
+  end process main;
 end arch;
