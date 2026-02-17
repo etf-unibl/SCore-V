@@ -64,7 +64,7 @@ begin
     imm_o <= (others => '0');
 
     case imm_sel_i is
-      when "001" => 
+      when "001" =>
         imm_o(11 downto 0)  <= instruction_bits_i(24 downto 13);
         imm_o(31 downto 12) <= (others => instruction_bits_i(24));
       when "010" =>
