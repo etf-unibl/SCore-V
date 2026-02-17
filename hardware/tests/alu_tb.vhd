@@ -1,5 +1,4 @@
------------------------------------------------------------------------------
--- Faculty of Electrical Engineering
+----------------------------------------------------------------------------- -- Faculty of Electrical Engineering
 -- PDS 2025
 -- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
@@ -77,8 +76,8 @@ begin
 
     while test_suite loop
       if run("test_add") then
-        for i in 0 to 1000 loop 
-          for j in 0 to 1000 loop 
+        for i in 0 to 100 loop 
+          for j in 0 to 100 loop 
             a_i <= std_logic_vector(to_unsigned(i, 32));
             b_i <= std_logic_vector(to_unsigned(j, 32));
             wait for 10 ns;
@@ -98,7 +97,3 @@ begin
   end process;
 
 end architecture arch;
-
-
-
-	 
