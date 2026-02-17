@@ -35,6 +35,9 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+library vunit_lib;  
+context vunit_lib.vunit_context;
+library design_lib;
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -43,6 +46,7 @@ use ieee.numeric_std.all;
 --! @brief Testbench for the Register File module.
 --! @details Verifies synchronous write and dual-port asynchronous read operations.
 entity reg_file_tb is
+  generic (runner_cfg : string);
 end entity;
 
 --! @brief RTL Architecture of the Register File Testbench.
@@ -61,24 +65,10 @@ architecture arch of reg_file_tb is
     --! Clock period constant (100 MHz)
     constant clk_period : time := 10 ns;
 
-    --! @brief Component declaration for the Register File module.
-    component reg_file
-        port (
-            clk_i       : in  std_logic;
-            reg_write_i : in  std_logic;
-            rs1_addr_i  : in  std_logic_vector(4 downto 0);
-            rs2_addr_i  : in  std_logic_vector(4 downto 0);
-            rd_addr_i   : in  std_logic_vector(4 downto 0);
-            rd_data_i   : in  std_logic_vector(31 downto 0);
-            rs1_data_o  : out std_logic_vector(31 downto 0);
-            rs2_data_o  : out std_logic_vector(31 downto 0)
-        );
-    end component;
-
 begin
 
     --! @brief Instance of the Unit Under Test (UUT).
-    DUT: reg_file
+    uut_reg_file : entity design_lib.reg_file
         port map(
             clk_i       => clk,
             reg_write_i => reg_write,
@@ -103,61 +93,50 @@ begin
     end process;
 
     --! @brief Main test stimulus process.
-    stim_proc: process
+    main : process
+      constant c_VAL1 : std_logic_vector(31 downto 0) := x"ABCDE123";
+      constant c_VAL2 : std_logic_vector(31 downto 0) := x"5555AAAA";
+      constant c_ZERO : std_logic_vector(31 downto 0) := (others => '0');
+      constant c_DEAD : std_logic_vector(31 downto 0) := x"DEADC0DE";
     begin
-        -- Initial stabilization
-        wait for 20 ns;
+      test_runner_setup(runner, runner_cfg);
+        while test_suite loop
+          if run("test_reg_write") then
+            rd_addr   <= "00101"; --! dec 5
+            rd_data   <= x"ABCDE123";
+            reg_write <= '1';
+            rs1_addr <= "00101";
+            wait for clk_period;
+            reg_write <= '0';
+            check_equal(rs1_data, c_VAL1, "Basic write to rg_addr = 5 failed");
 
-        --! TEST 1: Basic write operation to register x5
-        rd_addr   <= "00101";
-        rd_data   <= x"ABCDE123";
-        reg_write <= '1';
-        wait for clk_period;
-        reg_write <= '0';
+            rd_addr   <= "01010";
+            rd_data   <= x"5555AAAA";
+            reg_write <= '1';
+            rs1_addr  <= "01010";
+            wait for clk_period;
+            reg_write <= '0';
+            check_equal(rs1_data, c_VAL2 ,"Write to x10 failed");
 
-        --! TEST 2: Asynchronous read verification (rs1)
-        rs1_addr <= "00101";
-        wait for 10 ns;
+            rd_addr   <= "00000";
+            rd_data   <= x"FFFFFFFF";
+            reg_write <= '1';
+            wait for clk_period;
+            reg_write <= '0';
+            check_equal(rs2_data, c_ZERO ,"x0 register should remain zero");
 
-        --! TEST 3: Hardwired zero check - attempt write to x0
-        rd_addr   <= "00000";
-        rd_data   <= x"FFFFFFFF";
-        reg_write <= '1';
-        wait for clk_period;
-        reg_write <= '0';
+            rd_addr   <= "01100"; 
+            rd_data   <= x"DEADC0DE";
+            reg_write <= '1';
+            rs1_addr  <= "01100"; 
+            wait for clk_period;
+            reg_write <= '0';
+            check_equal(rs1_data, c_DEAD,"Deadcode test failed");
 
-        --! TEST 4: Verify x0 content (should be all zeros)
-        rs2_addr <= "00000";
-        wait for 10 ns;
+          end if;
+        end loop;
 
-        --! TEST 5: Write to register x10
-        rd_addr   <= "01010";
-        rd_data   <= x"5555AAAA";
-        reg_write <= '1';
-        wait for clk_period;
-        reg_write <= '0';
-        rs1_addr  <= "01010";
-          
-        --! TEST 6: Read-After-Write (RAW) in the same cycle check
-        rd_addr   <= "01100"; 
-        rd_data   <= x"DEADC0DE";
-        reg_write <= '1';
-        rs1_addr  <= "01100"; 
-        wait for clk_period;
-        reg_write <= '0';
-        
-        --! TEST 7: Verify write disable (reg_write = '0')
-        rd_addr   <= "00101"; 
-        rd_data   <= x"00000000";
-        reg_write <= '0'; 
-        wait for clk_period;
-
-        --! TEST 8: Dual-port simultaneous read (x5 and x10)
-        rs1_addr <= "00101"; -- x5: ABCDE123
-        rs2_addr <= "01010"; -- x10: 5555AAAA
-        wait for 10 ns;
-
-        wait;
+        test_runner_cleanup(runner);
     end process;
 
 end arch;
