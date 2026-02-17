@@ -48,10 +48,23 @@ package mem_pkg is
 
   end record t_instruction_rec;
 
+  --! @brief Array type representing the registers storage.
+  type t_regs is array (0 to 31) of std_logic_vector(31 downto 0);
+  signal regs : t_regs := (
+    0      => x"00000000",
+    1      => x"00000003",
+    2      => x"00000005",
+    others => (others => '0')
+  );
 
   --! @brief Array type representing the instruction memory storage.
   subtype t_byte  is std_logic_vector(7 downto 0);
   type t_bytes is array (0 to 200) of t_byte;
+
+  --! @brief Array representing the data memory storage.
+  signal DMEM : t_bytes := (
+    others => (others => '0')
+  );
 
   --! @brief Constant array containing the program to be executed.
   --! @details This serves as the ROM for the instruction fetch unit.
