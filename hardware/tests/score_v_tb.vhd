@@ -44,32 +44,19 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.mem_pkg.all;
+
+library vunit_lib;  
+context vunit_lib.vunit_context;
+library design_lib;
+
+library design_lib;
+use design_lib.mem_pkg.all;
 
 entity score_v_tb is
+  generic (runner_cfg : string);
 end entity score_v_tb;
 
 architecture sim of score_v_tb is
-
-  component score_v is
-    port (
-      clk_i        : in  std_logic;
-      rst_i        : in  std_logic;
-
-      instr_addr_o : out std_logic_vector(31 downto 0);
-      instr_data_i : in  t_instruction_rec;
-
-      pc_o         : out std_logic_vector(31 downto 0);
-      opcode_o     : out std_logic_vector(6 downto 0);
-      rd_o         : out std_logic_vector(4 downto 0);
-      rs1_o        : out std_logic_vector(4 downto 0);
-      rs2_o        : out std_logic_vector(4 downto 0);
-      rs1_data_o   : out std_logic_vector(31 downto 0);
-      rs2_data_o   : out std_logic_vector(31 downto 0);
-      alu_result_o : out std_logic_vector(31 downto 0);
-      reg_we_o     : out std_logic
-    );
-  end component;
 
   signal clk_s        : std_logic := '0';
   signal rst_s        : std_logic := '1';
@@ -88,13 +75,6 @@ architecture sim of score_v_tb is
   signal reg_we_s     : std_logic;
 
   constant CLK_PERIOD : time := 10 ns;
-
-  component fetch_instruction is
-    port (
-      instruction_count_i : in  std_logic_vector(31 downto 0);
-      instruction_bits_o  : out t_instruction_rec
-    );
-  end component;
 
   signal fetch_instr_s : t_instruction_rec;
 
@@ -132,7 +112,7 @@ architecture sim of score_v_tb is
 
 begin
 
-  uut : score_v
+  uut : entity design_lib.score_v
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
@@ -149,7 +129,7 @@ begin
       reg_we_o     => reg_we_s
     );
 
-  u_fetch : fetch_instruction
+  u_fetch : entity design_lib.fetch_instruction
     port map(
       instruction_count_i => instr_addr_s,
       instruction_bits_o  => fetch_instr_s
@@ -168,71 +148,59 @@ begin
     wait;
   end process;
 
-  stim_proc : process
-  begin
-    rst_s <= '1';
-    wait for CLK_PERIOD;
-    rst_s <= '0';
-    wait;
-  end process;
-
   monitor_proc : process
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
   begin
-    while sim_done_s = '0' loop
-      wait until rising_edge(clk_s);
+    test_runner_setup(runner, runner_cfg);
 
-      if rst_s = '0' then
-        full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
+    while test_suite loop
+      if run("test_reset") then
+        info("Testing reset function of score_v");
+        rst_s <= '1';
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        check_equal(pc_s, std_logic_vector(to_unsigned(0, 32)), "pc should be 0 after reset");
 
-        if step <= res'high then
-          assert to_integer(unsigned(pc_s)) = res(step).pc
-            report "PC ERROR at step " & integer'image(step)
-            severity failure;
+      elsif run("test_score_v") then
+        rst_s <= '1';
+        wait until rising_edge(clk_s);
+        rst_s <= '0';
+        for i in 0 to 7 loop
+          wait until rising_edge(clk_s);
+          full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
-          assert opcode_s = res(step).opcode
-            report "OPCODE ERROR at step " & integer'image(step)
-            severity failure;
+          if step <= res'high then
+            check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
 
-          assert full_instr(14 downto 12) = res(step).funct3
-            report "FUNCT3 ERROR at step " & integer'image(step)
-            severity failure;
+            check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
 
-          assert full_instr(31 downto 25) = res(step).funct7
-            report "FUNCT7 ERROR at step " & integer'image(step)
-            severity failure;
+            check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
 
-          assert to_integer(unsigned(rd_addr_s)) = res(step).rd
-            report "RD ERROR at step " & integer'image(step)
-            severity failure;
+            check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
 
-          assert to_integer(unsigned(rs1_addr_s)) = res(step).rs1
-            report "RS1 ERROR at step " & integer'image(step)
-            severity failure;
+            check_equal(to_integer(unsigned(rd_addr_s)), res(step).rd, "RD Error at step " & integer'image(step));
 
-          assert to_integer(unsigned(rs2_addr_s)) = res(step).rs2
-            report "RS2 ERROR at step " & integer'image(step) &
-                   " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
-                   " | expected = " & integer'image(res(step).rs2)
-            severity failure;
+            check_equal(to_integer(unsigned(rs1_addr_s)), res(step).rs1, "RS1 Error at step " & integer'image(step));
 
-          assert to_integer(unsigned(alu_result_s)) = res(step).alu_out
-            report "ALU ERROR at step " & integer'image(step)
-            severity failure;
+            check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2, "RS2 Error at step " & integer'image(step) &
+                                                                        " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
+                                                                        " | expected = " & integer'image(res(step).rs2));
+            check_equal(to_integer(unsigned(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
-          assert reg_we_s = res(step).we
-            report "WE ERROR at step " & integer'image(step)
-            severity failure;
+            check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
 
-          step := step + 1;
-        else
-          assert false report "All tests passed!" severity note;
-          sim_done_s <= '1';
-        end if;
+            step := step + 1;
+          else
+            assert false report "All tests passed!" severity note;
+            test_runner_cleanup(runner);
+            sim_done_s <= '1';
+          end if;
+        end loop;
       end if;
     end loop;
 
+    test_runner_cleanup(runner);
     wait;
   end process;
 
