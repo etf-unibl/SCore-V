@@ -47,7 +47,7 @@ use ieee.numeric_std.all;
 entity imm_gen is
   port (
     instruction_bits_i : in  std_logic_vector(24 downto 0); --! Instruction bits
-    imm_sel_i          : in  std_logic;                     --! Immediate select
+    imm_sel_i          : in  std_logic_vector(2 downto 0);  --! Immediate select
     imm_o              : out std_logic_vector(31 downto 0)  --! 32-bit immediate output
   );
 end entity imm_gen;
@@ -57,16 +57,23 @@ architecture arch of imm_gen is
 begin
 
   --! @brief Immediate generation process
-  --! @details Extracts instr[31:20] and performs sign extension.
+  --! @details Extracts instr[31:20] and performs sign extension
+  --!          based on the Immediate select signal.
   imm_gen_p : process(instruction_bits_i, imm_sel_i)
   begin
     imm_o <= (others => '0');
 
-    if imm_sel_i = '1' then
-      imm_o(11 downto 0)  <= instruction_bits_i(24 downto 13);
-      imm_o(31 downto 12) <= (others => instruction_bits_i(24));
-    end if;
-
+    case imm_sel_i is
+      when "001" => 
+        imm_o(11 downto 0)  <= instruction_bits_i(24 downto 13);
+        imm_o(31 downto 12) <= (others => instruction_bits_i(24));
+      when "010" =>
+        imm_o(11 downto 5)  <= instruction_bits_i(24 downto 18);
+        imm_o(4 downto 0)   <= instruction_bits_i(4 downto 0);
+        imm_o(31 downto 12) <= (others => instruction_bits_i(24));
+      when others =>
+        imm_o <= (others => '0');
+    end case;
   end process imm_gen_p;
 
 end arch;
