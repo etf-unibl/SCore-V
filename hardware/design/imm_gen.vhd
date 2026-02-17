@@ -4,7 +4,7 @@
 -- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
--- unit name: instruction fetch unit
+-- unit name: imm_gen
 --
 -- description:
 --
