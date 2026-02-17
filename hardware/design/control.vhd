@@ -70,9 +70,9 @@ entity control is
     funct3_i           : in  std_logic_vector(2 downto 0); --! Instruction funct3 field
     funct7_i           : in  std_logic_vector(6 downto 0); --! Instruction funct7 field
     reg_write_enable_o : out std_logic;  --! Register write enable signal
-    imm_sel_o          : out std_logic;  --! Immediate select/qualifier (1=use I-type imm path, 0=inactive)
-    b_sel_o            : out std_logic;  --! ALU operand B select (0=rs2_data, 1=immediate)
-    alu_op_o           : out t_alu_op    --! ALU operation select (e.g. ALU_ADD, ALU_NOP)
+    imm_sel_o          : out std_logic_vector(2 downto 0);  --! Immediate select/qualifier
+    b_sel_o            : out std_logic;                     --! ALU operand B select (0=rs2_data, 1=immediate)
+    alu_op_o           : out t_alu_op                       --! ALU operation select (e.g. ALU_ADD, ALU_NOP)
   );
 end entity control;
 
@@ -88,7 +88,7 @@ begin
     reg_write_enable_o <= '0';
     b_sel_o            <= '0';
     alu_op_o           <= ALU_NOP;
-    imm_sel_o          <= '0';
+    imm_sel_o          <= "000";
 
     if (opcode_i = "0110011") and (funct3_i = "000") and (funct7_i = "0000000") then
       reg_write_enable_o <= '1';
@@ -96,7 +96,7 @@ begin
       alu_op_o           <= ALU_ADD;  --! R-type ADD
 
     elsif (opcode_i = "0010011") and (funct3_i = "000") then
-      imm_sel_o          <= '1';
+      imm_sel_o          <= "001";
       reg_write_enable_o <= '1';
       b_sel_o            <= '1';
       alu_op_o           <= ALU_ADD; --! I-type ADDI (OP-IMM)
