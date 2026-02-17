@@ -1,5 +1,4 @@
------------------------------------------------------------------------------
--- Faculty of Electrical Engineering
+----------------------------------------------------------------------------- -- Faculty of Electrical Engineering
 -- PDS 2025
 -- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
@@ -35,22 +34,19 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+library vunit_lib;  
+context vunit_lib.vunit_context;
+library design_lib;
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity alu_tb is
+  generic (runner_cfg : string);
 end alu_tb;
 
 architecture arch of alu_tb is
-
-  component alu is
-    port (
-      a_i : in  std_logic_vector(31 downto 0);
-      b_i : in  std_logic_vector(31 downto 0);
-      y_o : out std_logic_vector(31 downto 0)
-    );
-  end component;
 
   signal a_i : std_logic_vector(31 downto 0) := (others => '0');
   signal b_i : std_logic_vector(31 downto 0) := (others => '0');
@@ -64,87 +60,40 @@ architecture arch of alu_tb is
     return std_logic_vector(s);
   end function;
 
-  -- VHDL-93 HEX helpers (zamjena za to_hstring)
-  function hex_char(n : std_logic_vector(3 downto 0)) return character is
-  begin
-    case n is
-      when "0000" => return '0';
-      when "0001" => return '1';
-      when "0010" => return '2';
-      when "0011" => return '3';
-      when "0100" => return '4';
-      when "0101" => return '5';
-      when "0110" => return '6';
-      when "0111" => return '7';
-      when "1000" => return '8';
-      when "1001" => return '9';
-      when "1010" => return 'A';
-      when "1011" => return 'B';
-      when "1100" => return 'C';
-      when "1101" => return 'D';
-      when "1110" => return 'E';
-      when others => return 'F';
-    end case;
-  end function;
-
-  function slv_to_hex(v : std_logic_vector(31 downto 0)) return string is
-    variable s : string(1 to 8);
-    variable nib : std_logic_vector(3 downto 0);
-  begin
-    for i in 0 to 7 loop
-      nib := v(31 - 4*i downto 28 - 4*i);
-      s(i+1) := hex_char(nib);
-    end loop;
-    return s;
-  end function;
-
 begin
 
-  uut : alu
+  uut_alu : entity design_lib.alu
     port map (
       a_i => a_i,
       b_i => b_i,
       y_o => y_o
     );
 
-  stim_proc : process
-    procedure apply_and_check(
-      constant a : std_logic_vector(31 downto 0);
-      constant b : std_logic_vector(31 downto 0)
-    ) is
-      variable exp : std_logic_vector(31 downto 0);
-    begin
-      a_i <= a;
-      b_i <= b;
-      wait for 1 ns;
-
-      exp := exp_add(a, b);
-
-      assert y_o = exp
-        report "ALU ADD mismatch: a=" & slv_to_hex(a) &
-               " b=" & slv_to_hex(b) &
-               " y=" & slv_to_hex(y_o) &
-               " exp=" & slv_to_hex(exp)
-        severity error;
-    end procedure;
+  main : process
+    variable exp : std_logic_vector(31 downto 0);
   begin
+    test_runner_setup(runner, runner_cfg);
 
-    apply_and_check(x"00000000", x"00000000");
-    apply_and_check(x"00000001", x"00000001");
-    apply_and_check(x"00000002", x"00000003");
+    while test_suite loop
+      if run("test_add") then
+        for i in 0 to 100 loop 
+          for j in 0 to 100 loop 
+            a_i <= std_logic_vector(to_unsigned(i, 32));
+            b_i <= std_logic_vector(to_unsigned(j, 32));
+            wait for 10 ns;
+            exp := exp_add(a_i, b_i);
+            check_equal(y_o, exp, "Loop add failed!");
+          end loop;
+        end loop;
+        a_i <= x"FFFFFFFF";
+        b_i <= x"FFFFFFFF";
+        wait for 10 ns;
+        exp := exp_add(a_i, b_i);
+        check_equal(y_o, exp, "Overflow failed!");
+      end if;
+    end loop;
 
-    apply_and_check(x"FFFFFFFF", x"00000001");
-    apply_and_check(x"7FFFFFFF", x"00000001");
-    apply_and_check(x"80000000", x"80000000");
-    apply_and_check(x"55555555", x"AAAAAAAA");
-	 apply_and_check(x"FFFFFFFF", x"00000002");
-
-    wait for 5 ns;
-    assert false report "ALU TB finished." severity failure;
+    test_runner_cleanup(runner);
   end process;
 
 end architecture arch;
-
-
-
-	 

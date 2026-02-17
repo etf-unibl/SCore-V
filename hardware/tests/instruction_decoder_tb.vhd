@@ -42,28 +42,18 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.mem_pkg.all;
+library vunit_lib;
+context vunit_lib.vunit_context;
+
+library design_lib;
+use design_lib.mem_pkg.all;
 
 entity instruction_decoder_tb is
+  generic (runner_cfg : string);
 end instruction_decoder_tb;
 
 architecture arch of instruction_decoder_tb
 is
-
-  component instruction_decoder is
-    port (
-      instr_i        : in  t_instruction_rec;
-      opcode_o       : out std_logic_vector(6 downto 0);
-      rs1_o          : out std_logic_vector(4 downto 0);
-      rs2_o          : out std_logic_vector(4 downto 0);
-      rd_o           : out std_logic_vector(4 downto 0);
-      funct3_o       : out std_logic_vector(2 downto 0);
-      funct7_o       : out std_logic_vector(6 downto 0);
-      imm_i_type_o   : out std_logic_vector(11 downto 0);
-      imm_s_type_h_o : out std_logic_vector(6 downto 0);
-      imm_s_type_l_o : out std_logic_vector(4 downto 0)
-    );
-  end component instruction_decoder;
 
   signal instr_rec_s    : t_instruction_rec;
   signal opcode_s       : std_logic_vector(6 downto 0);
@@ -109,7 +99,7 @@ is
 
 begin
 
-  uut : instruction_decoder
+  uut : entity design_lib.instruction_decoder
     port map (
       instr_i        => instr_rec_s,
       opcode_o       => opcode_s,
@@ -125,49 +115,51 @@ begin
 
   stimulus_check : process
   begin
-    for i in c_TEST_VECTORS'range loop
-      instr_rec_s.opcode <= c_TEST_VECTORS(i).instr_32(6 downto 0);
-      instr_rec_s.other_instruction_bits <= c_TEST_VECTORS(i).instr_32(31 downto 7);
+    test_runner_setup(runner, runner_cfg);
 
-      wait for c_CLK_PERIOD;
+    while test_suite loop
 
-      assert opcode_s = c_TEST_VECTORS(i).exp_opcode
-        report "Opcode mismatch at index " & integer'image(i)
-        severity error;
+      if run("test_instructions") then
+        info("Testing instructions");
+        for i in c_TEST_VECTORS'range loop
+          instr_rec_s.opcode <= c_TEST_VECTORS(i).instr_32(6 downto 0);
+          instr_rec_s.other_instruction_bits <= c_TEST_VECTORS(i).instr_32(31 downto 7);
 
-      assert rs1_s = c_TEST_VECTORS(i).exp_rs1
-        report "RS1 mismatch at index " & integer'image(i)
-        severity error;
+          wait for c_CLK_PERIOD;
 
-      assert rs2_s = c_TEST_VECTORS(i).exp_rs2
-        report "RS2 mismatch at index " & integer'image(i)
-        severity error;
+          if opcode_s /= c_TEST_VECTORS(i).exp_opcode then
+            failure("Opcode mismatch at index " & integer'image(i));
+          end if;
 
-      assert rd_s = c_TEST_VECTORS(i).exp_rd
-        report "RD mismatch at index " & integer'image(i)
-        severity error;
+          if rs1_s /= c_TEST_VECTORS(i).exp_rs1 then
+            failure("RS1 mismatch at index " & integer'image(i));
+          end if;
 
-      assert funct3_s = c_TEST_VECTORS(i).exp_f3
-        report "Funct3 mismatch at index " & integer'image(i)
-        severity error;
+          if rs2_s /= c_TEST_VECTORS(i).exp_rs2 then
+            failure("RS2 mismatch at index " & integer'image(i));
+          end if;
 
-      assert funct7_s = c_TEST_VECTORS(i).exp_f7
-        report "Funct7 mismatch at index " & integer'image(i)
-        severity error;
+          if rd_s /= c_TEST_VECTORS(i).exp_rd then
+            failure("RD mismatch at index " & integer'image(i));
+          end if;
 
-      assert imm_i_type_s = c_TEST_VECTORS(i).exp_imm_i
-        report "Imm_I mismatch at index " & integer'image(i)
-        severity error;
+          if funct3_s /= c_TEST_VECTORS(i).exp_f3 then
+            failure("Funct3 mismatch at index " & integer'image(i));
+          end if;
 
-      report "Test " & integer'image(i) & " completed successfully."
-        severity note;
+          if funct7_s /= c_TEST_VECTORS(i).exp_f7 then
+            failure("Funct7 mismatch at index " & integer'image(i));
+          end if;
+
+          if imm_i_type_s /= c_TEST_VECTORS(i).exp_imm_i then
+            failure("Imm_I mismatch at index" & integer'image(i));
+          end if;
+
+        end loop;
+      end if;
     end loop;
 
-    assert false
-      report "Simulation successfully completed."
-      severity note;
-
+    test_runner_cleanup(runner);
     wait;
   end process stimulus_check;
-
 end architecture arch;
