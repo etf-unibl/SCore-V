@@ -39,6 +39,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.mem_pkg.all;
 
 --! @brief Register File module for RV32I processor.
 --! @details This module implements 32 general-purpose 32-bit registers.
@@ -58,15 +59,8 @@ entity reg_file is
 end reg_file;
 
 --! @brief RTL implementation of the Register File.
+--! @details Accesses the regs defined in mem_pkg.
 architecture arch of reg_file is
-  --! Internal array type for 32x32-bit registers.
-  type reg_array is array (0 to 31) of std_logic_vector(31 downto 0);
-  signal regs : reg_array := (
-    1 => x"00000003",
-    2 => x"00000005",
-    others => (others => '0')
-  );
-
 begin
 
   --! Read logic for rs1: returns zero if address is 0, otherwise returns register value.
