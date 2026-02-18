@@ -105,9 +105,9 @@ architecture sim of score_v_tb is
     2 => (8,  "0110011", "000", "0000000", 15, 7, 1, 6, '1'),
     3 => (12, "0110011", "000", "0000000", 15, 15,1, 9, '1'),
     4 => (16, "0110011", "000", "0000000", 15, 31,1, 3, '1'),
-    5 => (20, "0000000", "000", "1011001", 0,  0, 0, 0, '0'),
-    6 => (24, "0000000", "000", "1011001", 0,  0, 0, 0, '0'),
-    7 => (28, "0000000", "000", "1011001", 0,  0, 0, 0, '0')
+    5 => (20, "0010011", "000", "0000000", 1, 0, 0, 10, '1'),
+    6 => (24, "0010011", "000", "0000000", 2, 0, 0, -5, '1'),
+    7 => (28, "0010011", "000", "0000000", 3, 1, 0,  12, '1')
   );
 
 begin
@@ -177,7 +177,9 @@ begin
 
             check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
 
-            check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
+            if opcode_s = "0110011" then 
+              check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
+            end if;
 
             check_equal(to_integer(unsigned(rd_addr_s)), res(step).rd, "RD Error at step " & integer'image(step));
 
@@ -186,13 +188,12 @@ begin
             check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2, "RS2 Error at step " & integer'image(step) &
                                                                         " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
                                                                         " | expected = " & integer'image(res(step).rs2));
-            check_equal(to_integer(unsigned(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
+            check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
             check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
 
             step := step + 1;
           else
-            assert false report "All tests passed!" severity note;
             test_runner_cleanup(runner);
             sim_done_s <= '1';
           end if;

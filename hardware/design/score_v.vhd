@@ -12,7 +12,7 @@
 --   Integrates Program Counter, Instruction Fetch, Decoder, Control Unit,
 --   Register File, and ALU. Provides instruction execution
 --   with register read/write and ALU computation.
---   Currently, this implementation only supports the ADD datapath.
+--   Currently, this implementation only supports the ADD, ADDI datapath.
 --   Support for other instructions will be added in future expansions.
 --
 -----------------------------------------------------------------------------
@@ -44,10 +44,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.mem_pkg.all;
+use work.alu_pkg.all;
 
 --! @file score_v.vhd
 --! @brief Top-level SCore-V module
---! @details Implements a simple SCore-V CPU for the ADD datapath.
+--! @details Implements a simple SCore-V CPU for the ADD datapath and ADDI.
 --!   Integrates Program Counter, instruction fetch, decoder, control unit,
 --!   register file, and ALU. Provides register read/write and ALU computation.
 --!   Currently supports only ADD instruction; other instructions will be added in future.
@@ -101,6 +102,13 @@ architecture arch of score_v is
   signal alu_result_sig : std_logic_vector(31 downto 0); --! ALU computation result
   signal reg_we_sig   : std_logic := '0';                --! Register write enable
 
+  --! @brief Datapath integration and control signals
+  signal imm_sig       : std_logic_vector(31 downto 0); --! Immediate value output from the Immediate Generator
+  signal alu_b_sig     : std_logic_vector(31 downto 0); --! ALU operand B input, selected between rs2_data and imm_sig
+  signal imm_sel_sig   : std_logic_vector(2 downto 0);  --! Selection signal for Immediate Generator to define instruction format
+  signal b_sel_sig     : std_logic;                     --! Control signal for ALU operand B source selection
+  signal alu_op_sig    : t_alu_op;                      --! Operation selection signal for the ALU controller
+
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
   --!   the next PC input and clock/reset signals.
@@ -148,7 +156,27 @@ architecture arch of score_v is
       opcode_i           : in  std_logic_vector(6 downto 0);
       funct3_i           : in  std_logic_vector(2 downto 0);
       funct7_i           : in  std_logic_vector(6 downto 0);
-      reg_write_enable_o : out std_logic
+      reg_write_enable_o : out std_logic;
+      imm_sel_o          : out std_logic_vector(2 downto 0);
+      b_sel_o            : out std_logic;
+      alu_op_o           : out t_alu_op
+    );
+  end component;
+
+  component imm_gen is
+    port (
+      instruction_bits_i : in  std_logic_vector(24 downto 0);
+      imm_sel_i          : in  std_logic_vector(2 downto 0);
+      imm_o              : out std_logic_vector(31 downto 0)
+    );
+  end component;
+
+  component alu_operand_b_mux is
+    port (
+      in0_i : in  std_logic_vector(31 downto 0);
+      in1_i : in  std_logic_vector(31 downto 0);
+      sel_i : in  std_logic;
+      out_o : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -212,13 +240,23 @@ begin
       imm_s_type_l_o  => open
     );
 
-  --! @brief Control unit
+  --! @brief Control unit instance
   u_control : control
     port map (
       opcode_i           => opcode_sig,
       funct3_i           => funct3_sig,
       funct7_i           => funct7_sig,
-      reg_write_enable_o => reg_we_sig
+      reg_write_enable_o => reg_we_sig,
+      imm_sel_o          => imm_sel_sig,
+      b_sel_o            => b_sel_sig,
+      alu_op_o           => alu_op_sig
+    );
+
+  u_imm_gen : imm_gen
+    port map (
+      instruction_bits_i => instr_data_i.other_instruction_bits,
+      imm_sel_i          => imm_sel_sig,
+      imm_o              => imm_sig
     );
 
   --! @brief Register file
@@ -234,11 +272,20 @@ begin
       rs2_data_o  => rs2_data_sig
     );
 
+  --! @brief ALU Operand B Multiplexer
+  u_alu_mux : alu_operand_b_mux
+    port map (
+      in0_i => rs2_data_sig,
+      in1_i => imm_sig,
+      sel_i => b_sel_sig,
+      out_o => alu_b_sig
+    );
+
   --! @brief ALU
   u_alu : alu
     port map (
       a_i => rs1_data_sig,
-      b_i => rs2_data_sig,
+      b_i => alu_b_sig,
       y_o => alu_result_sig
     );
 
