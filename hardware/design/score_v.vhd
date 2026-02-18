@@ -102,7 +102,7 @@ architecture arch of score_v is
   signal alu_result_sig : std_logic_vector(31 downto 0); --! ALU computation result
   signal reg_we_sig   : std_logic := '0';                --! Register write enable
 
-  --! @brief Datapath integration and control signals
+  --! @brief Datapath integration and control signals for addi
   signal imm_sig       : std_logic_vector(31 downto 0); --! Immediate value output from the Immediate Generator
   signal alu_b_sig     : std_logic_vector(31 downto 0); --! ALU operand B input, selected between rs2_data and imm_sig
   signal imm_sel_sig   : std_logic_vector(2 downto 0);  --! Selection signal for Immediate Generator to define instruction format
