@@ -197,7 +197,6 @@ begin
 
             step := step + 1;
           else
-            assert false report "All tests passed!" severity note;
             test_runner_cleanup(runner);
             sim_done_s <= '1';
           end if;
