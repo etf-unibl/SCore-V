@@ -36,14 +36,15 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+library vunit_lib;
+context vunit_lib.vunit_context;
+library design_lib;
+use design_lib.alu_pkg.all;
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library vunit_lib;
-context vunit_lib.vunit_context;
-
-library design_lib;
 
 entity control_tb is
   generic (runner_cfg : string);
@@ -56,6 +57,9 @@ architecture arch of control_tb is
   signal s_funct3           : std_logic_vector(2 downto 0) := (others => '0');
   signal s_funct7           : std_logic_vector(6 downto 0) := (others => '0');
   signal s_reg_write_enable : std_logic;
+  signal s_imm_sel          : std_logic_vector(2 downto 0);
+  signal s_b_sel            : std_logic;
+  signal s_alu_op           : t_alu_op;
 
 begin
   -- Instantiate the Unit Under Test (UUT)
@@ -64,7 +68,10 @@ begin
       opcode_i           => s_opcode,
       funct3_i           => s_funct3,
       funct7_i           => s_funct7,
-      reg_write_enable_o => s_reg_write_enable
+      reg_write_enable_o => s_reg_write_enable,
+      imm_sel_o          => s_imm_sel,
+      b_sel_o            => s_b_sel,         
+      alu_op_o           => s_alu_op
     );
 
   -- Stimulus process
@@ -74,15 +81,31 @@ begin
 
     while test_suite loop
       if run("test_add_instr") then
-        info("Testing add instruction");
         s_opcode <= "0110011";
-        s_funct3 <= "000";
-        s_funct7 <= "0000000";
+        s_funct3 <= (others => '0');
+        s_funct7 <= (others => '0');
+
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('1'), "ADD should enable register write");
+        check_equal(s_b_sel, '0', "ADD should select rs2 (b_sel=0)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADD should perform addition");
+
+        s_opcode <= "0010011";
+        s_funct3 <= (others => '0');
+        s_funct7 <= (others => '0');
+
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('1'), "ADDI should enable register write");
+        check_equal(s_b_sel, std_logic'('1'), "ADDI should select rs2 (b_sel=1)");
+        check_equal(to_integer(unsigned(s_imm_sel)), 1, "ADDI should use I-type immediate selection");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADDI should perform addition");
+
+        s_opcode <= (others => '0');
         
-        wait for 10 ns;
-        if s_reg_write_enable /= '1' then
-          failure("Output should be 1");
-        end if;
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('0'), "Default should disable write");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Default should be NOP");
+
       end if;
     end loop;
 
