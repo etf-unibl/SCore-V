@@ -71,7 +71,7 @@ entity wb_mux is
     wb_select_i   : in  std_logic;                     --! Selection input
     wb_data_o     : out std_logic_vector(31 downto 0)  --! Final write-back data to be written into destination register (rd)
   );
-end entity;
+end entity wb_mux;
 
 architecture arch of wb_mux is
 begin
