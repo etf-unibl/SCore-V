@@ -120,6 +120,14 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
         
+        -- Test reading a word from DMEM that hasn't been defined in DMEM of mem_pkg
+        addr_s <= std_logic_vector(to_unsigned(30, 32));
+        expected := (others => '0');
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
         info("Load test passed");
 
       elsif run("test_store") then
