@@ -102,6 +102,7 @@ Libraries</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Use_20Clauses" name="Use_20Clauses"></a>
 Use Clauses</h2></td></tr>
  <tr class="memitem:acd03516902501cd1c7296a98e22c6fcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#acd03516902501cd1c7296a98e22c6fcb">std_logic_1164</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
+<tr class="memitem:a9021b1cfffc858cd17368b24b6418fd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classalu__pkg.html"> &lt;alu_pkg&gt;</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="3"><h2 class="groupheader"><a id="Ports" name="Ports"></a>
 Ports</h2></td></tr>
@@ -113,10 +114,86 @@ Ports</h2></td></tr>
 <tr class="memdesc:aabd361775f0d0be60c41f2d1e5716f90"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction funct7 field.  <a href="#aabd361775f0d0be60c41f2d1e5716f90"></a><br /></td></tr>
 <tr class="memitem:a6e84d3cf2be401a779fe4a3a5432446a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a6e84d3cf2be401a779fe4a3a5432446a">reg_write_enable_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a6e84d3cf2be401a779fe4a3a5432446a"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Register write enable signal.  <a href="#a6e84d3cf2be401a779fe4a3a5432446a"></a><br /></td></tr>
+<tr class="memitem:a20dd1cdb773fe5738f892cbe078ffa8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a20dd1cdb773fe5738f892cbe078ffa8a">imm_sel_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">2</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a20dd1cdb773fe5738f892cbe078ffa8a"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediate select/qualifier.  <a href="#a20dd1cdb773fe5738f892cbe078ffa8a"></a><br /></td></tr>
+<tr class="memitem:a0545a9166f797f726f6c8f9d3392b088"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a0545a9166f797f726f6c8f9d3392b088">b_sel_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a0545a9166f797f726f6c8f9d3392b088"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">ALU operand B select (0=rs2_data, 1=immediate)  <a href="#a0545a9166f797f726f6c8f9d3392b088"></a><br /></td></tr>
+<tr class="memitem:aeb4575df23ac8d6f59bf1fa5145b7057"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#aeb4575df23ac8d6f59bf1fa5145b7057">alu_op_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><b><a class="el" href="classalu__pkg.html#a8767a7f1309101f342c951fb1d295b0d">t_alu_op</a></b> <span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:aeb4575df23ac8d6f59bf1fa5145b7057"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">ALU operation select (e.g. ALU_ADD, ALU_NOP)  <a href="#aeb4575df23ac8d6f59bf1fa5145b7057"></a><br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Entity definition of control unit. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="aeb4575df23ac8d6f59bf1fa5145b7057" name="aeb4575df23ac8d6f59bf1fa5145b7057"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb4575df23ac8d6f59bf1fa5145b7057">&#9670;&#160;</a></span>alu_op_o</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcontrol.html#aeb4575df23ac8d6f59bf1fa5145b7057">alu_op_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><b><a class="el" href="classalu__pkg.html#a8767a7f1309101f342c951fb1d295b0d">t_alu_op</a></b> <span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ALU operation select (e.g. ALU_ADD, ALU_NOP) </p>
+
+</div>
+</div>
+<a id="a9021b1cfffc858cd17368b24b6418fd3" name="a9021b1cfffc858cd17368b24b6418fd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9021b1cfffc858cd17368b24b6418fd3">&#9670;&#160;</a></span>alu_pkg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcontrol.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">use clause</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0545a9166f797f726f6c8f9d3392b088" name="a0545a9166f797f726f6c8f9d3392b088"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0545a9166f797f726f6c8f9d3392b088">&#9670;&#160;</a></span>b_sel_o</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcontrol.html#a0545a9166f797f726f6c8f9d3392b088">b_sel_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ALU operand B select (0=rs2_data, 1=immediate) </p>
+
+</div>
+</div>
 <a id="a4366f8bc4b1a135079267afc88b8057c" name="a4366f8bc4b1a135079267afc88b8057c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4366f8bc4b1a135079267afc88b8057c">&#9670;&#160;</a></span>funct3_i</h2>
 
@@ -184,6 +261,30 @@ Ports</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20dd1cdb773fe5738f892cbe078ffa8a" name="a20dd1cdb773fe5738f892cbe078ffa8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20dd1cdb773fe5738f892cbe078ffa8a">&#9670;&#160;</a></span>imm_sel_o</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcontrol.html#a20dd1cdb773fe5738f892cbe078ffa8a">imm_sel_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">2</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Immediate select/qualifier. </p>
 
 </div>
 </div>

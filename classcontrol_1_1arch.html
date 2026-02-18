@@ -73,6 +73,8 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#Processes">Processes</a>  </div>
   <div class="headertitle"><div class="title">arch Architecture Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -80,10 +82,61 @@ $(function() {
 <p>Architecture implementation of control logic.  
  <a href="classcontrol_1_1arch.html#details">More...</a></p>
 <b>Architecture &gt;&gt; </b><a class="el" href="classcontrol_1_1arch.html">arch</a><br />
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Processes" name="Processes"></a>
+Processes</h2></td></tr>
+ <tr class="memitem:aa1842b4ac950c2d03361a017a3d43c1b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol_1_1arch.html#aa1842b4ac950c2d03361a017a3d43c1b">comb_proc</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classcontrol.html#ab9b1f1464a61a4f11c5f18227b29b570">opcode_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classcontrol.html#a4366f8bc4b1a135079267afc88b8057c">funct3_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classcontrol.html#aabd361775f0d0be60c41f2d1e5716f90">funct7_i</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
+<tr class="memdesc:aa1842b4ac950c2d03361a017a3d43c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">R-type ADD.  <a href="#aa1842b4ac950c2d03361a017a3d43c1b"></a><br /></td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Architecture implementation of control logic. </p>
-<p >Asserts reg_write_enable_o when the instruction encoding corresponds to the R-type ADD instruction: opcode = 0110011 funct3 = 000 funct7 = 0000000 </p>
-</div><hr/>The documentation for this design unit was generated from the following file:<ul>
+<p >Provides safe defaults first, then overrides them when a supported instruction encoding is detected. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa1842b4ac950c2d03361a017a3d43c1b" name="aa1842b4ac950c2d03361a017a3d43c1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1842b4ac950c2d03361a017a3d43c1b">&#9670;&#160;</a></span>comb_proc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"> <b><span class="vhdlchar"> </span></b> comb_proc</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classcontrol.html#ab9b1f1464a61a4f11c5f18227b29b570">opcode_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classcontrol.html#a4366f8bc4b1a135079267afc88b8057c">funct3_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classcontrol.html#aabd361775f0d0be60c41f2d1e5716f90">funct7_i</a></b> <span class="vhdlchar"> </span></b> <em></em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Process</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>R-type ADD. </p>
+
+</div>
+</div>
+<hr/>The documentation for this design unit was generated from the following file:<ul>
 <li><a class="el" href="control_8vhd.html">control.vhd</a></li>
 </ul>
 </div><!-- contents -->

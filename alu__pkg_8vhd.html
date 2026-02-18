@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDS-PROJECT: control.vhd File Reference</title>
+<title>PDS-PROJECT: alu_pkg.vhd File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,39 +70,24 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Entities</a>  </div>
-  <div class="headertitle"><div class="title">control.vhd File Reference</div></div>
+<a href="#nested-classes">Entities</a> &#124;
+<a href="#namespaces">Namespaces</a>  </div>
+  <div class="headertitle"><div class="title">alu_pkg.vhd File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Combinational control unit for the RISC-V core.  
+<p>ALU shared type definitions.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Entities</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html">control</a> &#160;</td><td class="memItemRight" valign="bottom">entity</td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entity definition of control unit.  <a href="classcontrol.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol_1_1arch.html">arch</a> &#160;</td><td class="memItemRight" valign="bottom">architecture</td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Architecture implementation of control logic.  <a href="classcontrol_1_1arch.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu__pkg.html">alu_pkg</a> &#160;</td><td class="memItemRight" valign="bottom">package</td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerated ALU operation type.  <a href="classalu__pkg.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Combinational control unit for the RISC-V core. </p>
-<p >This module decodes the instruction fields provided by the instruction decoder (opcode/funct3/funct7) and generates datapath control signals.</p>
-<p >Currently supported instructions:</p><ul>
-<li>R-type ADD (opcode=0110011, funct3=000, funct7=0000000)</li>
-<li>I-type ADDI (opcode=0010011 (OP-IMM), funct3=000)</li>
-</ul>
-<p >Generated control signals (current scope):</p><ul>
-<li>reg_write_enable_o : Enables writeback into rd.</li>
-<li>b_sel_o : Selects ALU operand B source (0=rs2, 1=imm32).</li>
-<li>imm_sel_o : Selects immediate generation path for I-type immediate.</li>
-<li>alu_op_o : Selects ALU operation (ALU_ADD / ALU_NOP).</li>
-</ul>
-<p >Notes:</p><ul>
-<li>For unsupported instructions all outputs are driven to safe defaults: no register write, ALU_NOP, operand B defaults to rs2, imm_sel_o deasserted. </li>
-</ul>
+<div class="textblock"><p >ALU shared type definitions. </p>
+<p >Provides enumerated ALU operation type used by both control and ALU. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
