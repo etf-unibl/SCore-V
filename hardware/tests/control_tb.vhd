@@ -1,110 +1,114 @@
+-----------------------------------------------------------------------------
+-- Faculty of Electrical Engineering
+-- PDS 2025
+-- https://github.com/etf-unibl/SCore-V/
+-----------------------------------------------------------------------------
+--
+-- unit name:     control_tb
+--
+-- description:
+--
+--   This file implements self-checking testbench for control unit
+--
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2025 Faculty of Electrical Engineering
+-----------------------------------------------------------------------------
+-- The MIT License
+-----------------------------------------------------------------------------
+-- Copyright 2025 Faculty of Electrical Engineering
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a
+-- copy of this software and associated documentation files (the "Software"),
+-- to deal in the Software without restriction, including without limitation
+-- the rights to use, copy, modify, merge, publish, distribute, sublicense,
+-- and/or sell copies of the Software, and to permit persons to whom
+-- the Software is furnished to do so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in
+-- all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+-- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+-- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+-- OTHER DEALINGS IN THE SOFTWARE
+-----------------------------------------------------------------------------
+library vunit_lib;
+context vunit_lib.vunit_context;
+library design_lib;
+use design_lib.alu_pkg.all;
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity control_tb is
 
+entity control_tb is
+  generic (runner_cfg : string);
 end control_tb;
 
 architecture arch of control_tb is
 
-    -- Component Declaration for the Unit Under Test (UUT)
-    component control
-    port(
-        opcode_i           : in  std_logic_vector(6 downto 0);
-        funct3_i           : in  std_logic_vector(2 downto 0);
-        funct7_i           : in  std_logic_vector(6 downto 0);
-        reg_write_enable_o : out std_logic
-    );
-    end component;
-
-    -- Signals to connect to UUT
-    signal s_opcode           : std_logic_vector(6 downto 0) := (others => '0');
-    signal s_funct3           : std_logic_vector(2 downto 0) := (others => '0');
-    signal s_funct7           : std_logic_vector(6 downto 0) := (others => '0');
-    signal s_reg_write_enable : std_logic;
+  -- Signals to connect to UUT
+  signal s_opcode           : std_logic_vector(6 downto 0) := (others => '0');
+  signal s_funct3           : std_logic_vector(2 downto 0) := (others => '0');
+  signal s_funct7           : std_logic_vector(6 downto 0) := (others => '0');
+  signal s_reg_write_enable : std_logic;
+  signal s_imm_sel          : std_logic_vector(2 downto 0);
+  signal s_b_sel            : std_logic;
+  signal s_alu_op           : t_alu_op;
 
 begin
-
-    -- Instantiate the Unit Under Test (UUT)
-    uut: control port map (
-        opcode_i           => s_opcode,
-        funct3_i           => s_funct3,
-        funct7_i           => s_funct7,
-        reg_write_enable_o => s_reg_write_enable
+  -- Instantiate the Unit Under Test (UUT)
+  uut: entity design_lib.control
+    port map (
+      opcode_i           => s_opcode,
+      funct3_i           => s_funct3,
+      funct7_i           => s_funct7,
+      reg_write_enable_o => s_reg_write_enable,
+      imm_sel_o          => s_imm_sel,
+      b_sel_o            => s_b_sel,         
+      alu_op_o           => s_alu_op
     );
 
-    -- Stimulus process
-    stim_proc: process
-    begin
-        -- wait for global reset if needed
-        wait for 100 ns;
+  -- Stimulus process
+  stim_proc: process
+  begin
+    test_runner_setup(runner, runner_cfg);
 
-        ------------------------------------------------------------
-        -- TEST CASE 1: Valid ADD Instruction
-        -- Opcode = 0110011
-        -- funct3 = 0x0 (000)
-        -- funct7 = 0x00 (0000000)
-        ------------------------------------------------------------
-        report "Test Case 1: Testing ADD instruction...";
+    while test_suite loop
+      if run("test_add_instr") then
         s_opcode <= "0110011";
-        s_funct3 <= "000";
-        s_funct7 <= "0000000";
-        wait for 10 ns;
-        
-        assert s_reg_write_enable = '1'
-        report "FAILURE: ADD instruction did not assert reg_write_enable!"
-        severity error;
+        s_funct3 <= (others => '0');
+        s_funct7 <= (others => '0');
 
-        ------------------------------------------------------------
-        -- TEST CASE 2: SUB Instruction (Negative Test)
-        -- Same Opcode, Same Funct3, but different Funct7 (0x20)
-        ------------------------------------------------------------
-        report "Test Case 2: Testing SUB instruction (should differ by funct7)...";
-        s_opcode <= "0110011";
-        s_funct3 <= "000";
-        s_funct7 <= "0100000"; 
-        wait for 10 ns;
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('1'), "ADD should enable register write");
+        check_equal(s_b_sel, '0', "ADD should select rs2 (b_sel=0)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADD should perform addition");
 
-        assert s_reg_write_enable = '0'
-        report "FAILURE: SUB instruction asserted reg_write_enable incorrectly (Check Funct7 logic)!"
-        severity error;
-
-        ------------------------------------------------------------
-        -- TEST CASE 3: ADDI Instruction (Negative Test)
-        -- Different Opcode (I-type), should not trigger logic targeted at R-type ADD
-        -- Opcode = 0010011 
-        ------------------------------------------------------------
-        report "Test Case 3: Testing ADDI instruction (different opcode)...";
         s_opcode <= "0010011";
-        s_funct3 <= "000";
-        s_funct7 <= "0000000";
-        wait for 10 ns;
+        s_funct3 <= (others => '0');
+        s_funct7 <= (others => '0');
 
-        assert s_reg_write_enable = '0'
-        report "FAILURE: ADDI instruction asserted reg_write_enable incorrectly (Check Opcode logic)!"
-        severity error;
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('1'), "ADDI should enable register write");
+        check_equal(s_b_sel, std_logic'('1'), "ADDI should select rs2 (b_sel=1)");
+        check_equal(to_integer(unsigned(s_imm_sel)), 1, "ADDI should use I-type immediate selection");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADDI should perform addition");
 
-        ------------------------------------------------------------
-        -- TEST CASE 4: SLL Instruction (Negative Test)
-        -- Same Opcode (R-type), Same Funct7, but different Funct3
-        -- Funct3 = 0x1 (001) 
-        ------------------------------------------------------------
-        report "Test Case 4: Testing SLL instruction (different funct3)...";
-        s_opcode <= "0110011";
-        s_funct3 <= "001";
-        s_funct7 <= "0000000";
-        wait for 10 ns;
+        s_opcode <= (others => '0');
+        
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('0'), "Default should disable write");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Default should be NOP");
 
-        assert s_reg_write_enable = '0'
-        report "FAILURE: SLL instruction asserted reg_write_enable incorrectly (Check Funct3 logic)!"
-        severity error;
+      end if;
+    end loop;
 
-        ------------------------------------------------------------
-        -- End of simulation
-        ------------------------------------------------------------
-        report "Simulation Completed Successfully. If no failures reported above, design is correct.";
-        wait;
-    end process;
-
+    test_runner_cleanup(runner);
+  end process stim_proc;
 end arch;

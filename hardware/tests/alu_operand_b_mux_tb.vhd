@@ -4,11 +4,13 @@
 -- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
--- unit name: instruction fetch testbench unit
+-- unit name:     alu_operand_b_mux_tb
 --
 -- description:
 --
---   This file implements a simple testbench file for the instruction fetch logic.
+--   This file implements self-checking testbench for ALU B-operand 
+--   mux module.
+--
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -35,63 +37,73 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
-library vunit_lib;  
-context vunit_lib.vunit_context;
-library design_lib;
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use design_lib.mem_pkg.all;
 
---! @brief Top-level entity for the fetch instruction testbench.
---! @details As a testbench, this entity has no ports.
-entity fetch_instruction_tb is
+library vunit_lib;
+context vunit_lib.vunit_context;
+
+library design_lib;
+
+entity alu_operand_b_mux_tb is
   generic (runner_cfg : string);
-end fetch_instruction_tb;
+end alu_operand_b_mux_tb;
 
---! @brief Architecture implementing the stimulus and verification logic.
-architecture arch of fetch_instruction_tb is
+architecture arch of alu_operand_b_mux_tb is
 
-  signal test_in  : std_logic_vector(31 downto 0);
-  signal test_out : t_instruction_rec;
+  signal in0_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal in1_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal sel_i : std_logic := '0';
+  signal out_o : std_logic_vector(31 downto 0);
 
 begin
-  --! @brief UUT instantiation and port mapping.
-  uut_fetch_instruction : entity design_lib.fetch_instruction
-    port map(
-    instruction_count_i => test_in,
-    instruction_bits_o  => test_out
-    );
-  
-  main : process
-    variable full_instruction : std_logic_vector(31 downto 0);
-    variable addr_int         : integer;
 
+  uut_alu_operand_b_mux: entity design_lib.alu_operand_b_mux
+  port map (
+    in0_i => in0_i,
+    in1_i => in1_i,
+    sel_i => sel_i,
+    out_o => out_o
+  );
+
+  main : process
   begin
     test_runner_setup(runner, runner_cfg);
-    
+
     while test_suite loop
-      if run("test_fetch_instruction") then
-        for i in 0 to 16 loop
-          if i mod 4 = 0 then 
-            test_in <= std_logic_vector(to_unsigned(i, 32));
-            wait for 100 ns;
-          end if;
-          addr_int := to_integer(unsigned(test_in));
-          full_instruction := c_IMEM(addr_int + 3) &
-                        c_IMEM(addr_int + 2) &
-                        c_IMEM(addr_int + 1) &
-                        c_IMEM(addr_int);
-        end loop;
-        check_equal(test_out.opcode, full_instruction(6 downto 0), 
-                    "Opcode mismatch at index " & integer'image(addr_int));
+	  if run("test_b_mux") then 
+	    in0_i <= std_logic_vector(to_signed(100, 32));
+        in1_i <= std_logic_vector(to_signed(200, 32));
+        sel_i <= '0';
 
-        check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7), 
-                    "Data bits mismatch at index " & integer'image(addr_int));
-      end if;
-    end loop;
+        wait for 5 ns;
+        check_equal(to_integer(signed(out_o)), 100, "Failed to select in0_i");
 
+	    in0_i <= std_logic_vector(to_signed(100, 32));
+        in1_i <= std_logic_vector(to_signed(200, 32));
+        sel_i <= '1';
+
+        wait for 5 ns;
+        check_equal(to_integer(signed(out_o)), 200, "Failed to select in1_i");
+
+        in0_i <= x"00000000";
+        in1_i <= x"FFFFFFFF";
+        sel_i <= '1';
+
+        wait for 5 ns;
+        check_equal(to_integer(signed(out_o)), -1, "Failed to select in1_i for FFFFFFFF case");
+
+        in0_i <= std_logic_vector(to_signed(101, 32));
+        in1_i <= std_logic_vector(to_signed(102, 32));
+        sel_i <= 'U';
+
+        wait for 5 ns;
+        check_equal(to_integer(signed(out_o)), 102 , "Failed to select in1_i for sel_i = U case");
+
+	  end if;
+	end loop;
+	
     test_runner_cleanup(runner);
-  end process;
+  end process main;
 end arch;
