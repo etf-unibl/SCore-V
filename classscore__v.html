@@ -82,12 +82,14 @@ Inheritance diagram for score_v:</div>
  <div class="center">
   <img src="classscore__v.png" usemap="#score_5Fv_map" alt=""/>
   <map id="score_5Fv_map" name="score_5Fv_map">
-<area href="classpc.html" alt="pc" shape="rect" coords="0,0,124,24"/>
-<area href="classpc__next__instruction.html" alt="pc_next_instruction" shape="rect" coords="134,0,258,24"/>
-<area href="classinstruction__decoder.html" title="Instruction decoder entity." alt="instruction_decoder" shape="rect" coords="268,0,392,24"/>
-<area href="classcontrol.html" title="Entity definition of control unit." alt="control" shape="rect" coords="402,0,526,24"/>
-<area href="classreg__file.html" title="Register File module for RV32I processor." alt="reg_file" shape="rect" coords="536,0,660,24"/>
-<area href="classalu.html" title="Entity definition of alu." alt="alu" shape="rect" coords="670,0,794,24"/>
+<area href="classalu.html" title="Entity definition of alu." alt="alu" shape="rect" coords="136,392,262,416"/>
+<area href="classalu__operand__b__mux.html" title="2:1 32-bit multiplexer entity" alt="alu_operand_b_mux" shape="rect" coords="136,336,262,360"/>
+<area href="classreg__file.html" title="Register File module for RV32I processor." alt="reg_file" shape="rect" coords="136,280,262,304"/>
+<area href="classimm__gen.html" title="Immediate Generation Unit." alt="imm_gen" shape="rect" coords="136,224,262,248"/>
+<area href="classcontrol.html" title="Entity definition of control unit." alt="control" shape="rect" coords="136,168,262,192"/>
+<area href="classinstruction__decoder.html" title="Instruction decoder entity." alt="instruction_decoder" shape="rect" coords="136,112,262,136"/>
+<area href="classpc__next__instruction.html" alt="pc_next_instruction" shape="rect" coords="136,56,262,80"/>
+<area href="classpc.html" alt="pc" shape="rect" coords="136,0,262,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -106,6 +108,7 @@ Use Clauses</h2></td></tr>
  <tr class="memitem:acd03516902501cd1c7296a98e22c6fcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#acd03516902501cd1c7296a98e22c6fcb">std_logic_1164</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
 <tr class="memitem:a2edc34402b573437d5f25fa90ba4013e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a2edc34402b573437d5f25fa90ba4013e">numeric_std</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
 <tr class="memitem:abafacda428d973c04eff9cb53862d2c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#abafacda428d973c04eff9cb53862d2c8">mem_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classmem__pkg.html"> &lt;mem_pkg&gt;</a></td></tr>
+<tr class="memitem:a9021b1cfffc858cd17368b24b6418fd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classalu__pkg.html"> &lt;alu_pkg&gt;</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="3"><h2 class="groupheader"><a id="Ports" name="Ports"></a>
 Ports</h2></td></tr>
@@ -115,7 +118,7 @@ Ports</h2></td></tr>
 <tr class="memdesc:ab86c7a8eec3a8327e506892977f85708"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset input.  <a href="#ab86c7a8eec3a8327e506892977f85708"></a><br /></td></tr>
 <tr class="memitem:ad655edd095eba6b4c45159f3c5cfef63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63">instr_addr_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:ad655edd095eba6b4c45159f3c5cfef63"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">PC output to memory.  <a href="#ad655edd095eba6b4c45159f3c5cfef63"></a><br /></td></tr>
-<tr class="memitem:a4560f5fc7c432d16115166623cbcd5d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">instr_data_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><b><a class="el" href="classmem__pkg.html#a3347bc436dedb097d5c7e8fd57707c3a">t_instruction_rec</a></b> <span class="vhdlchar"> </span></b></td></tr>
+<tr class="memitem:a4560f5fc7c432d16115166623cbcd5d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">instr_data_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="vhdlchar">t_instruction_rec</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a4560f5fc7c432d16115166623cbcd5d9"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction input from <a class="el" href="classfetch__instruction.html" title="Entity for fetching instructions from memory.">fetch_instruction</a>.  <a href="#a4560f5fc7c432d16115166623cbcd5d9"></a><br /></td></tr>
 <tr class="memitem:a3b1dd06064836b982a39318569cd4bad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a3b1dd06064836b982a39318569cd4bad">pc_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a3b1dd06064836b982a39318569cd4bad"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Program counter value output.  <a href="#a3b1dd06064836b982a39318569cd4bad"></a><br /></td></tr>
@@ -137,6 +140,28 @@ Ports</h2></td></tr>
 <tr class="memdesc:a023ef4f05e555c83ff1efe287ccf2d7d"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Register write enable output.  <a href="#a023ef4f05e555c83ff1efe287ccf2d7d"></a><br /></td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a9021b1cfffc858cd17368b24b6418fd3" name="a9021b1cfffc858cd17368b24b6418fd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9021b1cfffc858cd17368b24b6418fd3">&#9670;&#160;</a></span>alu_pkg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">use clause</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a006be26d73d93e955b7bcba2d6bf8c78" name="a006be26d73d93e955b7bcba2d6bf8c78"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a006be26d73d93e955b7bcba2d6bf8c78">&#9670;&#160;</a></span>alu_result_o</h2>
 
@@ -241,7 +266,7 @@ Ports</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">instr_data_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><b><a class="el" href="classmem__pkg.html#a3347bc436dedb097d5c7e8fd57707c3a">t_instruction_rec</a></b> <span class="vhdlchar"> </span></b> </td>
+          <td class="memname"><a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">instr_data_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><span class="vhdlchar">t_instruction_rec</span><span class="vhdlchar"> </span></b> </td>
         </tr>
       </table>
   </td>

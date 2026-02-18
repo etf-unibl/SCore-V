@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['ieee_0',['ieee',['../classscore__v.html#a0a6af6eef40212dbaf130d57ce711256',1,'score_v.ieee()'],['../classreg__file.html#a0a6af6eef40212dbaf130d57ce711256',1,'reg_file.ieee()'],['../classpc__next__instruction.html#a0a6af6eef40212dbaf130d57ce711256',1,'pc_next_instruction.ieee()'],['../classalu.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu.ieee()'],['../classalu__operand__b__mux.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu_operand_b_mux.ieee()'],['../classalu__pkg.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu_pkg.ieee()'],['../classcontrol.html#a0a6af6eef40212dbaf130d57ce711256',1,'control.ieee()'],['../classcounter__vunit__example.html#a0a6af6eef40212dbaf130d57ce711256',1,'counter_vunit_example.ieee()'],['../classfetch__instruction.html#a0a6af6eef40212dbaf130d57ce711256',1,'fetch_instruction.ieee()'],['../classimm__gen.html#a0a6af6eef40212dbaf130d57ce711256',1,'imm_gen.ieee()'],['../classinstruction__decoder.html#a0a6af6eef40212dbaf130d57ce711256',1,'instruction_decoder.ieee()'],['../classmem__pkg.html#a0a6af6eef40212dbaf130d57ce711256',1,'mem_pkg.ieee()'],['../classpc.html#a0a6af6eef40212dbaf130d57ce711256',1,'pc.ieee()']]],
-  ['imm_5fgen_1',['imm_gen',['../classimm__gen.html',1,'']]],
+  ['ieee_0',['ieee',['../classscore__v.html#a0a6af6eef40212dbaf130d57ce711256',1,'score_v.ieee()'],['../classreg__file.html#a0a6af6eef40212dbaf130d57ce711256',1,'reg_file.ieee()'],['../classalu.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu.ieee()'],['../classalu__operand__b__mux.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu_operand_b_mux.ieee()'],['../classalu__pkg.html#a0a6af6eef40212dbaf130d57ce711256',1,'alu_pkg.ieee()'],['../classcontrol.html#a0a6af6eef40212dbaf130d57ce711256',1,'control.ieee()'],['../classcounter__vunit__example.html#a0a6af6eef40212dbaf130d57ce711256',1,'counter_vunit_example.ieee()'],['../classfetch__instruction.html#a0a6af6eef40212dbaf130d57ce711256',1,'fetch_instruction.ieee()'],['../classimm__gen.html#a0a6af6eef40212dbaf130d57ce711256',1,'imm_gen.ieee()'],['../classinstruction__decoder.html#a0a6af6eef40212dbaf130d57ce711256',1,'instruction_decoder.ieee()'],['../classmem__pkg.html#a0a6af6eef40212dbaf130d57ce711256',1,'mem_pkg.ieee()'],['../classpc.html#a0a6af6eef40212dbaf130d57ce711256',1,'pc.ieee()'],['../classpc__next__instruction.html#a0a6af6eef40212dbaf130d57ce711256',1,'pc_next_instruction.ieee()']]],
+  ['imm_5fgen_1',['imm_gen',['../classimm__gen.html',1,'imm_gen'],['../classscore__v_1_1arch.html#aba21fcecf90edab9d46ae20839860ae9',1,'score_v.arch.imm_gen()']]],
   ['imm_5fgen_2evhd_2',['imm_gen.vhd',['../imm__gen_8vhd.html',1,'']]],
   ['imm_5fgen_5fp_3',['imm_gen_p',['../classimm__gen_1_1arch.html#a9f89d26d4b00535f120fcf35739fa1ae',1,'imm_gen::arch']]],
   ['imm_5fi_5ftype_5fo_4',['imm_i_type_o',['../classinstruction__decoder.html#a3b13f5148a5fa14c77239b25f2fd6cda',1,'instruction_decoder']]],
@@ -10,15 +10,17 @@ var searchData=
   ['imm_5fs_5ftype_5fl_5fo_7',['imm_s_type_l_o',['../classinstruction__decoder.html#a97384b7c938badda6f94992008bc9974',1,'instruction_decoder']]],
   ['imm_5fsel_5fi_8',['imm_sel_i',['../classimm__gen.html#aaabbcebe08646acba4dde21ba73480a3',1,'imm_gen']]],
   ['imm_5fsel_5fo_9',['imm_sel_o',['../classcontrol.html#a20dd1cdb773fe5738f892cbe078ffa8a',1,'control']]],
-  ['in0_5fi_10',['in0_i',['../classalu__operand__b__mux.html#aace2c1013a838e2181d50b898eb22817',1,'alu_operand_b_mux']]],
-  ['in1_5fi_11',['in1_i',['../classalu__operand__b__mux.html#a648c472386f1914b102b641e13716afc',1,'alu_operand_b_mux']]],
-  ['instr_5faddr_5fo_12',['instr_addr_o',['../classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63',1,'score_v']]],
-  ['instr_5fdata_5fi_13',['instr_data_i',['../classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9',1,'score_v']]],
-  ['instr_5fi_14',['instr_i',['../classinstruction__decoder.html#a73c0454814fcb76c7cb649b537ef249f',1,'instruction_decoder']]],
-  ['instr_5fsig_15',['instr_sig',['../classscore__v_1_1arch.html#ac8b2b6e26ca6ab2685888526237d1dc6',1,'score_v::arch']]],
-  ['instruction_5fbits_5fi_16',['instruction_bits_i',['../classimm__gen.html#abfa29c049a4754662d7f4655cbe246c5',1,'imm_gen']]],
-  ['instruction_5fbits_5fo_17',['instruction_bits_o',['../classfetch__instruction.html#abdce7358176852bf67f503fc459762e0',1,'fetch_instruction']]],
-  ['instruction_5fcount_5fi_18',['instruction_count_i',['../classfetch__instruction.html#a902662b755e48cb5eba9eaa9d241c378',1,'fetch_instruction']]],
-  ['instruction_5fdecoder_19',['instruction_decoder',['../classscore__v_1_1arch.html#ad66c4a131e4d6b27190696c497f40f16',1,'score_v.arch.instruction_decoder()'],['../classinstruction__decoder.html',1,'instruction_decoder']]],
-  ['instruction_5fdecoder_2evhd_20',['instruction_decoder.vhd',['../instruction__decoder_8vhd.html',1,'']]]
+  ['imm_5fsel_5fsig_10',['imm_sel_sig',['../classscore__v_1_1arch.html#a3c7aadd7bf2de86b899b47124cac9c36',1,'score_v::arch']]],
+  ['imm_5fsig_11',['imm_sig',['../classscore__v_1_1arch.html#a916e108a40e006caded6e9b5e513eb6e',1,'score_v::arch']]],
+  ['in0_5fi_12',['in0_i',['../classalu__operand__b__mux.html#aace2c1013a838e2181d50b898eb22817',1,'alu_operand_b_mux']]],
+  ['in1_5fi_13',['in1_i',['../classalu__operand__b__mux.html#a648c472386f1914b102b641e13716afc',1,'alu_operand_b_mux']]],
+  ['instr_5faddr_5fo_14',['instr_addr_o',['../classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63',1,'score_v']]],
+  ['instr_5fdata_5fi_15',['instr_data_i',['../classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9',1,'score_v']]],
+  ['instr_5fi_16',['instr_i',['../classinstruction__decoder.html#a73c0454814fcb76c7cb649b537ef249f',1,'instruction_decoder']]],
+  ['instr_5fsig_17',['instr_sig',['../classscore__v_1_1arch.html#ac8b2b6e26ca6ab2685888526237d1dc6',1,'score_v::arch']]],
+  ['instruction_5fbits_5fi_18',['instruction_bits_i',['../classimm__gen.html#abfa29c049a4754662d7f4655cbe246c5',1,'imm_gen']]],
+  ['instruction_5fbits_5fo_19',['instruction_bits_o',['../classfetch__instruction.html#abdce7358176852bf67f503fc459762e0',1,'fetch_instruction']]],
+  ['instruction_5fcount_5fi_20',['instruction_count_i',['../classfetch__instruction.html#a902662b755e48cb5eba9eaa9d241c378',1,'fetch_instruction']]],
+  ['instruction_5fdecoder_21',['instruction_decoder',['../classscore__v_1_1arch.html#ad66c4a131e4d6b27190696c497f40f16',1,'score_v.arch.instruction_decoder()'],['../classinstruction__decoder.html',1,'instruction_decoder']]],
+  ['instruction_5fdecoder_2evhd_22',['instruction_decoder.vhd',['../instruction__decoder_8vhd.html',1,'']]]
 ];
