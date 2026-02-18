@@ -120,13 +120,15 @@ $(function() {
 
 
 <h3><a id="index_i" name="index_i"></a>- i -</h3><ul>
-<li>ieee&#160;:&#160;<a class="el" href="classalu.html#a0a6af6eef40212dbaf130d57ce711256">alu</a>, <a class="el" href="classcontrol.html#a0a6af6eef40212dbaf130d57ce711256">control</a>, <a class="el" href="classcounter__vunit__example.html#a0a6af6eef40212dbaf130d57ce711256">counter_vunit_example</a>, <a class="el" href="classfetch__instruction.html#a0a6af6eef40212dbaf130d57ce711256">fetch_instruction</a>, <a class="el" href="classimm__gen.html#a0a6af6eef40212dbaf130d57ce711256">imm_gen</a>, <a class="el" href="classinstruction__decoder.html#a0a6af6eef40212dbaf130d57ce711256">instruction_decoder</a>, <a class="el" href="classmem__pkg.html#a0a6af6eef40212dbaf130d57ce711256">mem_pkg</a>, <a class="el" href="classpc.html#a0a6af6eef40212dbaf130d57ce711256">pc</a>, <a class="el" href="classpc__next__instruction.html#a0a6af6eef40212dbaf130d57ce711256">pc_next_instruction</a>, <a class="el" href="classreg__file.html#a0a6af6eef40212dbaf130d57ce711256">reg_file</a>, <a class="el" href="classscore__v.html#a0a6af6eef40212dbaf130d57ce711256">score_v</a></li>
+<li>ieee&#160;:&#160;<a class="el" href="classalu.html#a0a6af6eef40212dbaf130d57ce711256">alu</a>, <a class="el" href="classalu__operand__b__mux.html#a0a6af6eef40212dbaf130d57ce711256">alu_operand_b_mux</a>, <a class="el" href="classcontrol.html#a0a6af6eef40212dbaf130d57ce711256">control</a>, <a class="el" href="classcounter__vunit__example.html#a0a6af6eef40212dbaf130d57ce711256">counter_vunit_example</a>, <a class="el" href="classfetch__instruction.html#a0a6af6eef40212dbaf130d57ce711256">fetch_instruction</a>, <a class="el" href="classimm__gen.html#a0a6af6eef40212dbaf130d57ce711256">imm_gen</a>, <a class="el" href="classinstruction__decoder.html#a0a6af6eef40212dbaf130d57ce711256">instruction_decoder</a>, <a class="el" href="classmem__pkg.html#a0a6af6eef40212dbaf130d57ce711256">mem_pkg</a>, <a class="el" href="classpc.html#a0a6af6eef40212dbaf130d57ce711256">pc</a>, <a class="el" href="classpc__next__instruction.html#a0a6af6eef40212dbaf130d57ce711256">pc_next_instruction</a>, <a class="el" href="classreg__file.html#a0a6af6eef40212dbaf130d57ce711256">reg_file</a>, <a class="el" href="classscore__v.html#a0a6af6eef40212dbaf130d57ce711256">score_v</a></li>
 <li>imm_gen_p()&#160;:&#160;<a class="el" href="classimm__gen_1_1arch.html#a9f89d26d4b00535f120fcf35739fa1ae">imm_gen.arch</a></li>
 <li>imm_i_type_o&#160;:&#160;<a class="el" href="classinstruction__decoder.html#a3b13f5148a5fa14c77239b25f2fd6cda">instruction_decoder</a></li>
 <li>imm_o&#160;:&#160;<a class="el" href="classimm__gen.html#a70e7d5509fe3527a7e2845b5c87ae6e0">imm_gen</a></li>
 <li>imm_s_type_h_o&#160;:&#160;<a class="el" href="classinstruction__decoder.html#ae79fab76a42a3d1576d2fd02da090400">instruction_decoder</a></li>
 <li>imm_s_type_l_o&#160;:&#160;<a class="el" href="classinstruction__decoder.html#a97384b7c938badda6f94992008bc9974">instruction_decoder</a></li>
 <li>imm_sel_i&#160;:&#160;<a class="el" href="classimm__gen.html#aaabbcebe08646acba4dde21ba73480a3">imm_gen</a></li>
+<li>in0_i&#160;:&#160;<a class="el" href="classalu__operand__b__mux.html#aace2c1013a838e2181d50b898eb22817">alu_operand_b_mux</a></li>
+<li>in1_i&#160;:&#160;<a class="el" href="classalu__operand__b__mux.html#a648c472386f1914b102b641e13716afc">alu_operand_b_mux</a></li>
 <li>instr_addr_o&#160;:&#160;<a class="el" href="classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63">score_v</a></li>
 <li>instr_data_i&#160;:&#160;<a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">score_v</a></li>
 <li>instr_i&#160;:&#160;<a class="el" href="classinstruction__decoder.html#a73c0454814fcb76c7cb649b537ef249f">instruction_decoder</a></li>
@@ -155,6 +157,7 @@ $(function() {
 <li>opcode_sig&#160;:&#160;<a class="el" href="classscore__v_1_1arch.html#aeb6454c269613639c7bb21b51e7cc0b4">score_v.arch</a></li>
 <li>opcode&#160;:&#160;<a class="el" href="classmem__pkg.html#a7332976f975cf87bc30a666091905726">mem_pkg</a></li>
 <li>other_instruction_bits&#160;:&#160;<a class="el" href="classmem__pkg.html#a185ebe26758bb8c6995d6c5a95983950">mem_pkg</a></li>
+<li>out_o&#160;:&#160;<a class="el" href="classalu__operand__b__mux.html#a13040791fea65831b53b9530f79fe48c">alu_operand_b_mux</a></li>
 </ul>
 
 
@@ -200,7 +203,8 @@ $(function() {
 
 
 <h3><a id="index_s" name="index_s"></a>- s -</h3><ul>
-<li>std_logic_1164&#160;:&#160;<a class="el" href="classalu.html#acd03516902501cd1c7296a98e22c6fcb">alu</a>, <a class="el" href="classcontrol.html#acd03516902501cd1c7296a98e22c6fcb">control</a>, <a class="el" href="classcounter__vunit__example.html#acd03516902501cd1c7296a98e22c6fcb">counter_vunit_example</a>, <a class="el" href="classfetch__instruction.html#acd03516902501cd1c7296a98e22c6fcb">fetch_instruction</a>, <a class="el" href="classimm__gen.html#acd03516902501cd1c7296a98e22c6fcb">imm_gen</a>, <a class="el" href="classinstruction__decoder.html#acd03516902501cd1c7296a98e22c6fcb">instruction_decoder</a>, <a class="el" href="classmem__pkg.html#acd03516902501cd1c7296a98e22c6fcb">mem_pkg</a>, <a class="el" href="classpc.html#acd03516902501cd1c7296a98e22c6fcb">pc</a>, <a class="el" href="classpc__next__instruction.html#acd03516902501cd1c7296a98e22c6fcb">pc_next_instruction</a>, <a class="el" href="classreg__file.html#acd03516902501cd1c7296a98e22c6fcb">reg_file</a>, <a class="el" href="classscore__v.html#acd03516902501cd1c7296a98e22c6fcb">score_v</a></li>
+<li>sel_i&#160;:&#160;<a class="el" href="classalu__operand__b__mux.html#a2a4b64cb4083e6f15f1e071fd4e47d3c">alu_operand_b_mux</a></li>
+<li>std_logic_1164&#160;:&#160;<a class="el" href="classalu.html#acd03516902501cd1c7296a98e22c6fcb">alu</a>, <a class="el" href="classalu__operand__b__mux.html#acd03516902501cd1c7296a98e22c6fcb">alu_operand_b_mux</a>, <a class="el" href="classcontrol.html#acd03516902501cd1c7296a98e22c6fcb">control</a>, <a class="el" href="classcounter__vunit__example.html#acd03516902501cd1c7296a98e22c6fcb">counter_vunit_example</a>, <a class="el" href="classfetch__instruction.html#acd03516902501cd1c7296a98e22c6fcb">fetch_instruction</a>, <a class="el" href="classimm__gen.html#acd03516902501cd1c7296a98e22c6fcb">imm_gen</a>, <a class="el" href="classinstruction__decoder.html#acd03516902501cd1c7296a98e22c6fcb">instruction_decoder</a>, <a class="el" href="classmem__pkg.html#acd03516902501cd1c7296a98e22c6fcb">mem_pkg</a>, <a class="el" href="classpc.html#acd03516902501cd1c7296a98e22c6fcb">pc</a>, <a class="el" href="classpc__next__instruction.html#acd03516902501cd1c7296a98e22c6fcb">pc_next_instruction</a>, <a class="el" href="classreg__file.html#acd03516902501cd1c7296a98e22c6fcb">reg_file</a>, <a class="el" href="classscore__v.html#acd03516902501cd1c7296a98e22c6fcb">score_v</a></li>
 <li>sum_s&#160;:&#160;<a class="el" href="classalu_1_1arch.html#aa66b22dc06e8e0ba965f04b8d7f777aa">alu.arch</a></li>
 </ul>
 
