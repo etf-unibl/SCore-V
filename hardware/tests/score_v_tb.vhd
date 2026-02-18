@@ -107,7 +107,10 @@ architecture sim of score_v_tb is
     4 => (16, "0110011", "000", "0000000", 15, 31,1, 3, '1'),
     5 => (20, "0000000", "000", "1011001", 0,  0, 0, 0, '0'),
     6 => (24, "0000000", "000", "1011001", 0,  0, 0, 0, '0'),
-    7 => (28, "0000000", "000", "1011001", 0,  0, 0, 0, '0')
+    7 => (28, "0000000", "000", "1011001", 0,  0, 0, 0, '0'),
+    8 => (32, "0000000", "000", "0000000", 0,  0, 0, 0, '0'),
+    9 => (36, "0010011", "000", "0000000", 1, 0, 0, 10, '1'),
+    10 => (40, "0010011", "000", "0000000", 2, 0, 0, -5, '1')
   );
 
 begin
@@ -166,7 +169,7 @@ begin
         rst_s <= '1';
         wait until rising_edge(clk_s);
         rst_s <= '0';
-        for i in 0 to 7 loop
+        for i in 0 to 10 loop
           wait until rising_edge(clk_s);
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
@@ -177,7 +180,9 @@ begin
 
             check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
 
-            check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
+            if opcode_s = "0110011" then 
+              check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
+            end if;
 
             check_equal(to_integer(unsigned(rd_addr_s)), res(step).rd, "RD Error at step " & integer'image(step));
 
@@ -186,7 +191,7 @@ begin
             check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2, "RS2 Error at step " & integer'image(step) &
                                                                         " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
                                                                         " | expected = " & integer'image(res(step).rs2));
-            check_equal(to_integer(unsigned(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
+            check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
             check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
 
