@@ -59,7 +59,7 @@ package mem_pkg is
 
   --! @brief Array type representing the instruction memory storage.
   subtype t_byte  is std_logic_vector(7 downto 0);
-  type t_bytes is array (0 to 200) of t_byte;
+  type t_bytes is array (0 to 255) of t_byte;
 
   --! @brief Array representing the data memory storage.
   signal DMEM : t_bytes := (
