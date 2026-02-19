@@ -136,6 +136,14 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
+        -- Test reading a word out of negative address of DMEM
+        addr_s <= std_logic_vector(to_signed(-199, 32));
+        expected := (others => '0');
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
         info("Load test passed");
 
       elsif run("test_store") then
@@ -175,6 +183,11 @@ begin
 
         -- Test storing word on byte 1000 that is out of bounds of DMEM
         addr_s <= std_logic_vector(to_unsigned(1000, 32));
+        data_write_s <= std_logic_vector(to_unsigned(63, 32));
+        mem_RW_s <= '1';
+
+        -- Test storing word on negative address
+        addr_s <= std_logic_vector(to_signed(-10, 32));
         data_write_s <= std_logic_vector(to_unsigned(63, 32));
         mem_RW_s <= '1';
 
