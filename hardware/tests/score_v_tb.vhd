@@ -73,6 +73,8 @@ architecture sim of score_v_tb is
   signal rs2_data_s   : std_logic_vector(31 downto 0);
   signal alu_result_s : std_logic_vector(31 downto 0);
   signal reg_we_s     : std_logic;
+  signal mem_data_s   : std_logic_vector(31 downto 0);
+  signal wb_data_s    : std_logic_vector(31 downto 0);
 
   constant CLK_PERIOD : time := 10 ns;
 
@@ -128,7 +130,9 @@ begin
       rs1_data_o   => rs1_data_s,
       rs2_data_o   => rs2_data_s,
       alu_result_o => alu_result_s,
-      reg_we_o     => reg_we_s
+      reg_we_o     => reg_we_s,
+      mem_data_o   => mem_data_s,
+      wb_data_o    => wb_data_s
     );
 
   u_fetch : entity design_lib.fetch_instruction
