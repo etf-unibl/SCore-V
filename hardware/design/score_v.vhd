@@ -103,14 +103,14 @@ architecture arch of score_v is
   signal rs2_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 2
   signal alu_result_sig : std_logic_vector(31 downto 0); --! ALU computation result
   signal reg_we_sig   : std_logic;                       --! Register write enable
-  
+
   --! @brief Datapath integration and control signals
   signal imm_sig       : std_logic_vector(31 downto 0); --! Immediate value output from the Immediate Generator
   signal alu_b_sig     : std_logic_vector(31 downto 0); --! ALU operand B input, selected between rs2_data and imm_sig
   signal imm_sel_sig   : std_logic_vector(2 downto 0);  --! Selection signal for Immediate Generator to define instruction format
   signal b_sel_sig     : std_logic;                     --! Control signal for ALU operand B source selection
   signal alu_op_sig    : t_alu_op;                      --! Operation selection signal for the ALU controller
-  
+
   --! @brief Data memory and Write-back signals
   signal mem_data_sig   : std_logic_vector(31 downto 0); --! Data read from LSU
   signal final_wb_sig   : std_logic_vector(31 downto 0); --! Data to be written back to RegFile
@@ -174,7 +174,7 @@ architecture arch of score_v is
   end component;
 
   --! @brief Immediate Generator
-  --! @details Sign-extends immediate values from the instruction based on the format.  
+  --! @details Sign-extends immediate values from the instruction based on the format.
   component imm_gen is
     port (
       instruction_bits_i : in  std_logic_vector(24 downto 0);
@@ -184,7 +184,7 @@ architecture arch of score_v is
   end component;
 
   --! @brief ALU Operand B Multiplexer
-  --! @details Selects between register data and immediate value for ALU input.  
+  --! @details Selects between register data and immediate value for ALU input.
   component alu_operand_b_mux is
     port (
       in0_i : in  std_logic_vector(31 downto 0);
@@ -195,7 +195,7 @@ architecture arch of score_v is
   end component;
 
   --! @brief Load Store Unit
-  --! @details Interface for memory access, managing address and R/W signals. 
+  --! @details Interface for memory access, managing address and R/W signals.
   component load_store_unit is
     port (
       clk_i        : in  std_logic;
@@ -292,7 +292,7 @@ begin
       wb_select_o        => wb_select_sig
     );
 
-  --! @brief Immediate Generator unit instance	
+  --! @brief Immediate Generator unit instance
   u_imm_gen : imm_gen
     port map (
       instruction_bits_i => instr_data_i.other_instruction_bits,
