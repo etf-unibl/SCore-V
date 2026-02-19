@@ -107,7 +107,9 @@ architecture sim of score_v_tb is
     4 => (16, "0110011", "000", "0000000", 15, 31,1, 3, '1'),
     5 => (20, "0010011", "000", "0000000", 1, 0, 0, 10, '1'),
     6 => (24, "0010011", "000", "0000000", 2, 0, 0, -5, '1'),
-    7 => (28, "0010011", "000", "0000000", 3, 1, 0,  12, '1')
+    7 => (28, "0010011", "000", "0000000", 3, 1, 0, 12, '1'),
+    8 => (32, "0000011", "010", "0000000", 2, 0, 0,  0, '1'),
+    9 => (36, "0000011", "010", "0000000", 1, 0, 0,  8, '1')
   );
 
 begin
@@ -166,7 +168,7 @@ begin
         rst_s <= '1';
         wait until rising_edge(clk_s);
         rst_s <= '0';
-        for i in 0 to 7 loop
+        for i in 0 to 9 loop
           wait until rising_edge(clk_s);
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
@@ -191,7 +193,6 @@ begin
             check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
             check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
-
             step := step + 1;
           else
             test_runner_cleanup(runner);
