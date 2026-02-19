@@ -5,7 +5,7 @@ var indexSectionsWithContent =
   2: "am",
   3: "acfilmprsw",
   4: "cimp",
-  5: "abcdefgimnoprstwy"
+  5: "abcdefgilmnoprstwy"
 };
 
 var indexSectionNames =

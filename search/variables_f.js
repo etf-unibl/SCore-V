@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['wb_5fdata_5fo_0',['wb_data_o',['../classwb__mux.html#a7d43c92a865fb38d542c38613760be82',1,'wb_mux']]],
-  ['wb_5fselect_5fi_1',['wb_select_i',['../classwb__mux.html#a188d9be40d0be06fd36e40a7ae4d224c',1,'wb_mux']]],
-  ['wb_5fselect_5fo_2',['wb_select_o',['../classcontrol.html#aa6b14173bc56533a5239c2e5ee1c3fce',1,'control']]],
-  ['word_5fto_5fread_3',['word_to_read',['../classload__store__unit_1_1arch.html#a0bb2f49b566bca88f682e41793a98002',1,'load_store_unit::arch']]]
+  ['t_5falu_5fop_0',['t_alu_op',['../classalu__pkg.html#a8767a7f1309101f342c951fb1d295b0d',1,'alu_pkg']]],
+  ['t_5fbyte_1',['t_byte',['../classmem__pkg.html#a035297a06be6a2436d6945dbc434cd9e',1,'mem_pkg']]],
+  ['t_5fbytes_2',['t_bytes',['../classmem__pkg.html#a80d20e2384c52749579a21659c8b9250',1,'mem_pkg']]],
+  ['t_5finstruction_5frec_3',['t_instruction_rec',['../classmem__pkg.html#a3347bc436dedb097d5c7e8fd57707c3a',1,'mem_pkg']]],
+  ['t_5fregs_4',['t_regs',['../classmem__pkg.html#a8aeecb866f1b1cb57a74f4081333bd1e',1,'mem_pkg']]]
 ];
