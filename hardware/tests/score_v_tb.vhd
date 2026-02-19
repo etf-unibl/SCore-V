@@ -173,7 +173,6 @@ begin
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
           if step <= res'high then
-            wait for 10 ns;
             check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
 
             check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
