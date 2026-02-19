@@ -60,6 +60,8 @@ architecture arch of control_tb is
   signal s_imm_sel          : std_logic_vector(2 downto 0);
   signal s_b_sel            : std_logic;
   signal s_alu_op           : t_alu_op;
+  signal s_mem_rw_o         : std_logic;
+  signal s_wb_select_o      : std_logic;
 
 begin
   -- Instantiate the Unit Under Test (UUT)
@@ -71,7 +73,9 @@ begin
       reg_write_enable_o => s_reg_write_enable,
       imm_sel_o          => s_imm_sel,
       b_sel_o            => s_b_sel,         
-      alu_op_o           => s_alu_op
+      alu_op_o           => s_alu_op,
+      mem_rw_o           => s_mem_rw_o,
+      wb_select_o        => s_wb_select_o
     );
 
   -- Stimulus process
@@ -105,6 +109,40 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, std_logic'('0'), "Default should disable write");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Default should be NOP");
+
+      elsif run("test_load_store_instr") then
+        s_opcode <= "0000011"; -- LW
+        s_funct3 <= "010";
+        s_funct7 <= (others => '0');
+
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('1'), "LOAD should write to register");
+        check_equal(s_mem_rw_o, std_logic'('0'), "LOAD should read from memory");
+        check_equal(s_wb_select_o, std_logic'('0'), "LOAD should read data from memory");
+        check_equal(s_b_sel, std_logic'('1'), "LOAD uses immediate ADD");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "Address is calculated using ALU_ADD");
+
+        s_opcode <= "0100011"; -- SW
+        s_funct3 <= "010";
+        s_funct7 <= (others => '0');
+
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('0'), "STORE should read from register");
+        check_equal(s_mem_rw_o, std_logic'('1'), "STORE should write to memory");
+        check_equal(s_wb_select_o, std_logic'('0'), "STORE should write data to memory");
+        check_equal(s_b_sel, std_logic'('1'), "STORE uses immediate ADD");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "Address is calculated using ALU_ADD");
+
+        s_opcode <= "1111111"; -- Undefined opcode
+        s_funct3 <= "111";
+        s_funct7 <= (others => '1');
+
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, std_logic'('0'), "Undefined op should have all zeros");
+        check_equal(s_mem_rw_o, std_logic'('0'), "Undefined op should have all zeros");
+        check_equal(s_wb_select_o, std_logic'('0'), "Undefined op should have all zeros");
+        check_equal(s_b_sel, std_logic'('0'), "Undefined op should have all zeros");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "When undefined opcode NOP is used");        
 
       end if;
     end loop;
