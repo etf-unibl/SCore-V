@@ -1,8 +1,25 @@
 var searchData=
 [
-  ['score_5fv_0',['score_v',['../classscore__v.html',1,'']]],
-  ['score_5fv_2evhd_1',['score_v.vhd',['../score__v_8vhd.html',1,'']]],
-  ['sel_5fi_2',['sel_i',['../classalu__operand__b__mux.html#a2a4b64cb4083e6f15f1e071fd4e47d3c',1,'alu_operand_b_mux']]],
-  ['std_5flogic_5f1164_3',['std_logic_1164',['../classimm__gen.html#acd03516902501cd1c7296a98e22c6fcb',1,'imm_gen.std_logic_1164()'],['../classwb__mux.html#acd03516902501cd1c7296a98e22c6fcb',1,'wb_mux.std_logic_1164()'],['../classscore__v.html#acd03516902501cd1c7296a98e22c6fcb',1,'score_v.std_logic_1164()'],['../classreg__file.html#acd03516902501cd1c7296a98e22c6fcb',1,'reg_file.std_logic_1164()'],['../classpc__next__instruction.html#acd03516902501cd1c7296a98e22c6fcb',1,'pc_next_instruction.std_logic_1164()'],['../classpc.html#acd03516902501cd1c7296a98e22c6fcb',1,'pc.std_logic_1164()'],['../classmem__pkg.html#acd03516902501cd1c7296a98e22c6fcb',1,'mem_pkg.std_logic_1164()'],['../classinstruction__decoder.html#acd03516902501cd1c7296a98e22c6fcb',1,'instruction_decoder.std_logic_1164()'],['../classfetch__instruction.html#acd03516902501cd1c7296a98e22c6fcb',1,'fetch_instruction.std_logic_1164()'],['../classcounter__vunit__example.html#acd03516902501cd1c7296a98e22c6fcb',1,'counter_vunit_example.std_logic_1164()'],['../classcontrol.html#acd03516902501cd1c7296a98e22c6fcb',1,'control.std_logic_1164()'],['../classalu__pkg.html#acd03516902501cd1c7296a98e22c6fcb',1,'alu_pkg.std_logic_1164()'],['../classalu__operand__b__mux.html#acd03516902501cd1c7296a98e22c6fcb',1,'alu_operand_b_mux.std_logic_1164()'],['../classalu.html#acd03516902501cd1c7296a98e22c6fcb',1,'alu.std_logic_1164()']]],
-  ['sum_5fs_4',['sum_s',['../classalu_1_1arch.html#aa66b22dc06e8e0ba965f04b8d7f777aa',1,'alu::arch']]]
+  ['rd_5faddr_5fi_0',['rd_addr_i',['../classreg__file.html#a5e6b353cbeacab1589daee7fbd530005',1,'reg_file']]],
+  ['rd_5fdata_5fi_1',['rd_data_i',['../classreg__file.html#a31b73ac032eee7dd08f01d4fecee504d',1,'reg_file']]],
+  ['rd_5fo_2',['rd_o',['../classinstruction__decoder.html#aa7c99d73898bf89bf201ff204e3a567d',1,'instruction_decoder.rd_o()'],['../classscore__v.html#aa7c99d73898bf89bf201ff204e3a567d',1,'score_v.rd_o()']]],
+  ['rd_5fsig_3',['rd_sig',['../classscore__v_1_1arch.html#a6cc8f0f12a4fe59fd990014602bd2e37',1,'score_v::arch']]],
+  ['reg_5ffile_4',['reg_file',['../classscore__v_1_1arch.html#ad2c653f0e637ddfbcf83b2efe8e40556',1,'score_v.arch.reg_file()'],['../classreg__file.html',1,'reg_file']]],
+  ['reg_5ffile_2evhd_5',['reg_file.vhd',['../reg__file_8vhd.html',1,'']]],
+  ['reg_5fwe_5fo_6',['reg_we_o',['../classscore__v.html#a023ef4f05e555c83ff1efe287ccf2d7d',1,'score_v']]],
+  ['reg_5fwe_5fsig_7',['reg_we_sig',['../classscore__v_1_1arch.html#afd1efc54d5f45bf9229c6794518eaba7',1,'score_v::arch']]],
+  ['reg_5fwrite_5fenable_5fo_8',['reg_write_enable_o',['../classcontrol.html#a6e84d3cf2be401a779fe4a3a5432446a',1,'control']]],
+  ['reg_5fwrite_5fi_9',['reg_write_i',['../classreg__file.html#a61f4592267a733ccc60e8502552dc03d',1,'reg_file']]],
+  ['regs_10',['regs',['../classmem__pkg.html#af1966cb7cd8720d363f28357ebcfa56b',1,'mem_pkg']]],
+  ['rs1_5faddr_5fi_11',['rs1_addr_i',['../classreg__file.html#a619a7c8fffa9bf56e343253ef1fda868',1,'reg_file']]],
+  ['rs1_5fdata_5fo_12',['rs1_data_o',['../classscore__v.html#a08f2b01bb7e45773bb3a61c3d6a2c81d',1,'score_v.rs1_data_o()'],['../classreg__file.html#a08f2b01bb7e45773bb3a61c3d6a2c81d',1,'reg_file.rs1_data_o()']]],
+  ['rs1_5fdata_5fsig_13',['rs1_data_sig',['../classscore__v_1_1arch.html#a50a10e17e5c743538c8578682d23e02c',1,'score_v::arch']]],
+  ['rs1_5fo_14',['rs1_o',['../classinstruction__decoder.html#ae07aba5b1bec511c0c5488f7a3dd43fa',1,'instruction_decoder.rs1_o()'],['../classscore__v.html#ae07aba5b1bec511c0c5488f7a3dd43fa',1,'score_v.rs1_o()']]],
+  ['rs1_5fsig_15',['rs1_sig',['../classscore__v_1_1arch.html#a735b435e88a2a703106fbfe1edfa0606',1,'score_v::arch']]],
+  ['rs2_5faddr_5fi_16',['rs2_addr_i',['../classreg__file.html#a79562ccb18c95a2b51c0d82d6dab0a52',1,'reg_file']]],
+  ['rs2_5fdata_5fo_17',['rs2_data_o',['../classreg__file.html#a69539a218d2ec8d3ee9c2c2324bc6913',1,'reg_file.rs2_data_o()'],['../classscore__v.html#a69539a218d2ec8d3ee9c2c2324bc6913',1,'score_v.rs2_data_o()']]],
+  ['rs2_5fdata_5fsig_18',['rs2_data_sig',['../classscore__v_1_1arch.html#a1a231c547bf8ec05d1fd94590dcbf1fe',1,'score_v::arch']]],
+  ['rs2_5fo_19',['rs2_o',['../classinstruction__decoder.html#a2c0ca28c959e96b26f2eeb65ac70b4e0',1,'instruction_decoder.rs2_o()'],['../classscore__v.html#a2c0ca28c959e96b26f2eeb65ac70b4e0',1,'score_v.rs2_o()']]],
+  ['rs2_5fsig_20',['rs2_sig',['../classscore__v_1_1arch.html#a391b99a9d11429b0fcf1ed0ff2b4277c',1,'score_v::arch']]],
+  ['rst_5fi_21',['rst_i',['../classcounter__vunit__example.html#ab86c7a8eec3a8327e506892977f85708',1,'counter_vunit_example.rst_i()'],['../classload__store__unit.html#ab86c7a8eec3a8327e506892977f85708',1,'load_store_unit.rst_i()'],['../classpc.html#ab86c7a8eec3a8327e506892977f85708',1,'pc.rst_i()'],['../classscore__v.html#ab86c7a8eec3a8327e506892977f85708',1,'score_v.rst_i()']]]
 ];

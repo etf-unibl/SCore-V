@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['dmem_0',['DMEM',['../classmem__pkg.html#ae8c5f68f141bee4bd88c44118090fbb5',1,'mem_pkg']]]
+  ['data_5fread_5fo_0',['data_read_o',['../classload__store__unit.html#ab6dfbf878ab7db3f37d91e12d73f37cd',1,'load_store_unit']]],
+  ['data_5fwrite_5fi_1',['data_write_i',['../classload__store__unit.html#af5d9c7872d2ce20e9d206b92e28003dd',1,'load_store_unit']]],
+  ['dmem_2',['DMEM',['../classmem__pkg.html#a645cbf889d999630909c4592eb52b0e5',1,'mem_pkg']]]
 ];

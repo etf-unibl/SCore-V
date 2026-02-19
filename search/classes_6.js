@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['reg_5ffile_0',['reg_file',['../classreg__file.html',1,'']]]
+  ['pc_0',['pc',['../classpc.html',1,'']]],
+  ['pc_5fnext_5finstruction_1',['pc_next_instruction',['../classpc__next__instruction.html',1,'']]]
 ];

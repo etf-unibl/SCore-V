@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['pc_0',['pc',['../classpc.html',1,'']]],
-  ['pc_5fnext_5finstruction_1',['pc_next_instruction',['../classpc__next__instruction.html',1,'']]]
+  ['mem_5fpkg_0',['mem_pkg',['../classmem__pkg.html',1,'']]]
 ];
