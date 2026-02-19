@@ -128,6 +128,14 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
+        -- Test reading a word out of bounds for DMEM
+        addr_s <= std_logic_vector(to_unsigned(1000, 32));
+        expected := (others => '0');
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
         info("Load test passed");
 
       elsif run("test_store") then
@@ -151,6 +159,22 @@ begin
 
         -- Test storing word on byte 4
         addr_s <= std_logic_vector(to_unsigned(4, 32));
+        data_write_s <= std_logic_vector(to_unsigned(64, 32));
+        mem_RW_s <= '1';
+
+        wait until clk_s;
+        wait until clk_s;
+        expected := DMEM(to_integer(unsigned(addr_s)) + 3) &
+                    DMEM(to_integer(unsigned(addr_s)) + 2) &
+                    DMEM(to_integer(unsigned(addr_s)) + 1) &
+                    DMEM(to_integer(unsigned(addr_s)));
+
+        if expected /= data_write_s then
+          error("Expected " & to_string(data_write_s) & ", got " & to_string(expected));
+        end if;
+
+        -- Test storing word on byte 1000 that is out of bounds of DMEM
+        addr_s <= std_logic_vector(to_unsigned(1000, 32));
         data_write_s <= std_logic_vector(to_unsigned(64, 32));
         mem_RW_s <= '1';
 
