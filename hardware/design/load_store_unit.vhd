@@ -68,7 +68,7 @@ begin
   --! @details Performs an asynchronous read from DMEM.
   --! @warning Checks if address is within safe bounds (Max Index - 3) to prevent simulation crashes.
   word_to_read <=
-  x"00000000" when address > 252 else
+  x"00000000" when address > 252 and address < 0 else
   DMEM(address + 3) &
   DMEM(address + 2) &
   DMEM(address + 1) &
