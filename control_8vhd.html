@@ -90,18 +90,25 @@ Entities</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Combinational control unit for the RISC-V core. </p>
 <p >This module decodes the instruction fields provided by the instruction decoder (opcode/funct3/funct7) and generates datapath control signals.</p>
-<p >Currently supported instructions:</p><ul>
-<li>R-type ADD (opcode=0110011, funct3=000, funct7=0000000)</li>
-<li>I-type ADDI (opcode=0010011 (OP-IMM), funct3=000)</li>
+<p >Supported instructions:</p>
+<p >R-type:</p><ul>
+<li>ADD (opcode=0110011, funct3=000, funct7=0000000)</li>
 </ul>
-<p >Generated control signals (current scope):</p><ul>
-<li>reg_write_enable_o : Enables writeback into rd.</li>
-<li>b_sel_o : Selects ALU operand B source (0=rs2, 1=imm32).</li>
-<li>imm_sel_o : Selects immediate generation path for I-type immediate.</li>
-<li>alu_op_o : Selects ALU operation (ALU_ADD / ALU_NOP).</li>
+<p >I-type:</p><ul>
+<li>ADDI (opcode=0010011, funct3=000)</li>
+<li>LW (opcode=0000011, funct3=010)</li>
 </ul>
-<p >Notes:</p><ul>
-<li>For unsupported instructions all outputs are driven to safe defaults: no register write, ALU_NOP, operand B defaults to rs2, imm_sel_o deasserted. </li>
+<p >S-type:</p><ul>
+<li>SW (opcode=0100011, funct3=010)</li>
+</ul>
+<p >Generated control signals:</p>
+<ul>
+<li>reg_write_enable_o: Enables writeback into register file (rd).</li>
+<li>imm_sel_o: Immediate format selector for ImmGen. "001" = I-type immediate "010" = S-type immediate</li>
+<li>b_sel_o: Selects ALU operand B source. '0' = rs2_data '1' = imm32</li>
+<li>alu_op_o: Selects ALU operation (e.g. ALU_ADD, ALU_NOP).</li>
+<li>mem_rw_o: Data memory control. '0' = Read '1' = Write</li>
+<li>wb_select_o: Write-back multiplexer select. '0' = Data memory output (DataR) '1' = ALU result </li>
 </ul>
 </div></div><!-- contents -->
 <!-- start footer part -->
