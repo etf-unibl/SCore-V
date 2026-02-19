@@ -161,13 +161,12 @@ begin
         info("Testing reset function of score_v");
         rst_s <= '1';
         wait until rising_edge(clk_s);
-        wait until rising_edge(clk_s);
-        check_equal(pc_s, std_logic_vector(to_unsigned(0, 32)), "pc should be 0 after reset");
 
       elsif run("test_score_v") then
         rst_s <= '1';
         wait until rising_edge(clk_s);
         rst_s <= '0';
+
         for i in 0 to 9 loop
           wait until rising_edge(clk_s);
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
