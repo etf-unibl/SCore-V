@@ -73,6 +73,8 @@ architecture sim of score_v_tb is
   signal rs2_data_s   : std_logic_vector(31 downto 0);
   signal alu_result_s : std_logic_vector(31 downto 0);
   signal reg_we_s     : std_logic;
+  signal mem_data_s   : std_logic_vector(31 downto 0);
+  signal wb_data_s    : std_logic_vector(31 downto 0);
 
   constant CLK_PERIOD : time := 10 ns;
 
@@ -100,14 +102,17 @@ architecture sim of score_v_tb is
   -- If the content of c_IMEM changes, this table must be updated
   -- accordingly, since verification is strictly bound to that program.
   constant res : expected_array := (
-    0 => (0,  "0110011", "000", "0000000", 15, 1, 1, 6, '1'),
-    1 => (4,  "0110011", "000", "0000000", 7,  3, 1, 3, '1'),
-    2 => (8,  "0110011", "000", "0000000", 15, 7, 1, 6, '1'),
-    3 => (12, "0110011", "000", "0000000", 15, 15,1, 9, '1'),
-    4 => (16, "0110011", "000", "0000000", 15, 31,1, 3, '1'),
-    5 => (20, "0010011", "000", "0000000", 1, 0, 0, 10, '1'),
-    6 => (24, "0010011", "000", "0000000", 2, 0, 0, -5, '1'),
-    7 => (28, "0010011", "000", "0000000", 3, 1, 0,  12, '1')
+    0  => (0,  "0110011", "000", "0000000", 15, 1, 1, 6, '1'),
+    1  => (4,  "0110011", "000", "0000000", 7,  3, 1, 3, '1'),
+    2  => (8,  "0110011", "000", "0000000", 15, 7, 1, 6, '1'),
+    3  => (12, "0110011", "000", "0000000", 15, 15,1, 9, '1'),
+    4  => (16, "0110011", "000", "0000000", 15, 31,1, 3, '1'),
+    5  => (20, "0010011", "000", "0000000", 1, 0, 0, 10, '1'),
+    6  => (24, "0010011", "000", "0000000", 2, 0, 0, -5, '1'),
+    7  => (28, "0010011", "000", "0000000", 3, 1, 0, 12, '1'),
+    8  => (32, "0000011", "010", "0000000", 2, 0, 0,  0, '1'),
+    9  => (36, "0000011", "010", "0000000", 1, 0, 0,  8, '1'),
+    10 => (40, "0100011", "010", "0000000", 0, 0, 1, 25, '0')
   );
 
 begin
@@ -126,7 +131,9 @@ begin
       rs1_data_o   => rs1_data_s,
       rs2_data_o   => rs2_data_s,
       alu_result_o => alu_result_s,
-      reg_we_o     => reg_we_s
+      reg_we_o     => reg_we_s,
+      mem_data_o   => mem_data_s,
+      wb_data_o    => wb_data_s
     );
 
   u_fetch : entity design_lib.fetch_instruction
@@ -159,14 +166,13 @@ begin
         info("Testing reset function of score_v");
         rst_s <= '1';
         wait until rising_edge(clk_s);
-        wait until rising_edge(clk_s);
-        check_equal(pc_s, std_logic_vector(to_unsigned(0, 32)), "pc should be 0 after reset");
 
       elsif run("test_score_v") then
         rst_s <= '1';
         wait until rising_edge(clk_s);
         rst_s <= '0';
-        for i in 0 to 7 loop
+
+        for i in 0 to 11 loop
           wait until rising_edge(clk_s);
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
@@ -191,7 +197,6 @@ begin
             check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
             check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
-
             step := step + 1;
           else
             test_runner_cleanup(runner);

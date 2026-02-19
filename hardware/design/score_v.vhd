@@ -12,7 +12,7 @@
 --   Integrates Program Counter, Instruction Fetch, Decoder, Control Unit,
 --   Register File, and ALU. Provides instruction execution
 --   with register read/write and ALU computation.
---   Currently, this implementation only supports the ADD, ADDI datapath.
+--   Currently, this implementation only supports ADD, ADDI, LW/SW operations.
 --   Support for other instructions will be added in future expansions.
 --
 -----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ use work.alu_pkg.all;
 
 --! @file score_v.vhd
 --! @brief Top-level SCore-V module
---! @details Implements a simple SCore-V CPU for the ADD datapath and ADDI.
+--! @details Implements a simple SCore-V CPU for the ADD, ADDI and LW/SW.
 --!   Integrates Program Counter, instruction fetch, decoder, control unit,
 --!   register file, and ALU. Provides register read/write and ALU computation.
 --!   Currently supports only ADD instruction; other instructions will be added in future.
@@ -72,14 +72,16 @@ entity score_v is
     rs1_data_o   : out std_logic_vector(31 downto 0); --! Source register 1 data output
     rs2_data_o   : out std_logic_vector(31 downto 0); --! Source register 2 data output
     alu_result_o : out std_logic_vector(31 downto 0); --! ALU result output
-    reg_we_o     : out std_logic                      --! Register write enable output
+    reg_we_o     : out std_logic;                     --! Register write enable output
+    mem_data_o   : out std_logic_vector(31 downto 0); --! Data read from memory output
+    wb_data_o    : out std_logic_vector(31 downto 0)  --! Final write-back data output
   );
 end score_v;
 
 --! @brief Architecture arch for top-level SCore-V CPU
 --! @details Instantiates and connects all CPU submodules:
---!   PC, PC next, instruction fetch, instruction decoder, control unit,
---!   register file, and ALU. Handles the ADD datapath for now.
+--!          PC, PC next, instruction fetch, instruction decoder, control unit,
+--!          register file, and ALU. Handles the ADD datapath for now.
 architecture arch of score_v is
 
   --! @brief Internal PC signals
@@ -100,7 +102,7 @@ architecture arch of score_v is
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
   signal rs2_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 2
   signal alu_result_sig : std_logic_vector(31 downto 0); --! ALU computation result
-  signal reg_we_sig   : std_logic := '0';                --! Register write enable
+  signal reg_we_sig   : std_logic;                       --! Register write enable
 
   --! @brief Datapath integration and control signals
   signal imm_sig       : std_logic_vector(31 downto 0); --! Immediate value output from the Immediate Generator
@@ -108,6 +110,12 @@ architecture arch of score_v is
   signal imm_sel_sig   : std_logic_vector(2 downto 0);  --! Selection signal for Immediate Generator to define instruction format
   signal b_sel_sig     : std_logic;                     --! Control signal for ALU operand B source selection
   signal alu_op_sig    : t_alu_op;                      --! Operation selection signal for the ALU controller
+
+  --! @brief Data memory and Write-back signals
+  signal mem_data_sig   : std_logic_vector(31 downto 0); --! Data read from LSU
+  signal final_wb_sig   : std_logic_vector(31 downto 0); --! Data to be written back to RegFile
+  signal mem_rw_sig     : std_logic;                     --! Control signal for memory R/W
+  signal wb_select_sig  : std_logic;                     --! Control signal for WB Mux
 
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
@@ -159,10 +167,14 @@ architecture arch of score_v is
       reg_write_enable_o : out std_logic;
       imm_sel_o          : out std_logic_vector(2 downto 0);
       b_sel_o            : out std_logic;
-      alu_op_o           : out t_alu_op
+      alu_op_o           : out t_alu_op;
+      mem_rw_o           : out std_logic;
+      wb_select_o        : out std_logic
     );
   end component;
 
+  --! @brief Immediate Generator
+  --! @details Sign-extends immediate values from the instruction based on the format.
   component imm_gen is
     port (
       instruction_bits_i : in  std_logic_vector(24 downto 0);
@@ -171,6 +183,8 @@ architecture arch of score_v is
     );
   end component;
 
+  --! @brief ALU Operand B Multiplexer
+  --! @details Selects between register data and immediate value for ALU input.
   component alu_operand_b_mux is
     port (
       in0_i : in  std_logic_vector(31 downto 0);
@@ -180,9 +194,33 @@ architecture arch of score_v is
     );
   end component;
 
+  --! @brief Load Store Unit
+  --! @details Interface for memory access, managing address and R/W signals.
+  component load_store_unit is
+    port (
+      clk_i        : in  std_logic;
+      rst_i        : in  std_logic;
+      addr_i       : in  std_logic_vector(31 downto 0);
+      mem_RW_i     : in  std_logic;
+      data_write_i : in  std_logic_vector(31 downto 0);
+      data_read_o  : out std_logic_vector(31 downto 0)
+    );
+  end component;
+
+  --! @brief Write-Back Multiplexer
+  --! @details Selects data source for writing back to registers.
+  component wb_mux is
+    port (
+      alu_result_i : in  std_logic_vector(31 downto 0);
+      mem_data_i   : in  std_logic_vector(31 downto 0);
+      wb_select_i  : in  std_logic;
+      wb_data_o    : out std_logic_vector(31 downto 0)
+    );
+  end component;
+
   --! @brief Register file
   --! @details Contains CPU registers. Supports reading two source registers
-  --!   and writing to a destination register on write enable signal.
+  --!          and writing to a destination register on write enable signal.
   component reg_file is
     port (
       clk_i        : in  std_logic;
@@ -198,7 +236,7 @@ architecture arch of score_v is
 
   --! @brief Arithmetic Logic Unit (ALU)
   --! @details Performs arithmetic and logic operations on input operands
-  --!   and provides the result as output.
+  --!          and provides the result as output.
   component alu is
     port (
       a_i : in  std_logic_vector(31 downto 0);
@@ -249,9 +287,12 @@ begin
       reg_write_enable_o => reg_we_sig,
       imm_sel_o          => imm_sel_sig,
       b_sel_o            => b_sel_sig,
-      alu_op_o           => alu_op_sig
+      alu_op_o           => alu_op_sig,
+      mem_rw_o           => mem_rw_sig,
+      wb_select_o        => wb_select_sig
     );
 
+  --! @brief Immediate Generator unit instance
   u_imm_gen : imm_gen
     port map (
       instruction_bits_i => instr_data_i.other_instruction_bits,
@@ -267,7 +308,7 @@ begin
       rs1_addr_i  => rs1_sig,
       rs2_addr_i  => rs2_sig,
       rd_addr_i   => rd_sig,
-      rd_data_i   => alu_result_sig,
+      rd_data_i   => final_wb_sig,
       rs1_data_o  => rs1_data_sig,
       rs2_data_o  => rs2_data_sig
     );
@@ -288,6 +329,25 @@ begin
       b_i => alu_b_sig,
       y_o => alu_result_sig
     );
+  --! @brief Load Store Unit
+  u_lsu : load_store_unit
+    port map (
+      clk_i        => clk_i,
+      rst_i        => rst_i,
+      addr_i       => alu_result_sig,
+      mem_RW_i     => mem_rw_sig,
+      data_write_i => rs2_data_sig,
+      data_read_o  => mem_data_sig
+    );
+
+  --! @brief Write-Back Multiplexer
+  u_wb_mux : wb_mux
+    port map (
+      alu_result_i => alu_result_sig,
+      mem_data_i   => mem_data_sig,
+      wb_select_i  => wb_select_sig,
+      wb_data_o    => final_wb_sig
+    );
 
   --! @brief Output assignments
   instr_addr_o <= pc_sig;
@@ -300,5 +360,6 @@ begin
   rs2_data_o   <= rs2_data_sig;
   alu_result_o <= alu_result_sig;
   reg_we_o     <= reg_we_sig;
-
+  wb_data_o    <= final_wb_sig;
+  mem_data_o   <= mem_data_sig;
 end arch;
