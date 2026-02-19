@@ -58,22 +58,29 @@ end load_store_unit;
 architecture arch of load_store_unit is
   --! Internal signal to hold the 32-bit word assembled from byte-addressable DMEM.
   signal word_to_read : std_logic_vector(31 downto 0);
+  signal address : integer;
 begin
 
-  --! @brief Combinatorial assembly of a 32-bit word from byte-addressable memory.
-  --! @details Combines four consecutive bytes from DMEM based on addr_i (Little-endian).
-  word_to_read <= DMEM(to_integer(unsigned(addr_i)) + 3) &
-                  DMEM(to_integer(unsigned(addr_i)) + 2) &
-                  DMEM(to_integer(unsigned(addr_i)) + 1) &
-                  DMEM(to_integer(unsigned(addr_i)));
+  --! @brief Concurrent address conversion.
+  address <= to_integer(unsigned(addr_i));
 
-  --! @brief Synchronous process for memory write operations.
-  --! @details Updates DMEM on the rising edge of clk_i when mem_RW_i is high.
-  process(rst_i, clk_i) is
+  --! @brief 32-bit Word Reconstruction logic.
+  --! @details Performs an asynchronous read from DMEM.
+  --! @warning Checks if address is within safe bounds (Max Index - 3) to prevent simulation crashes.
+  word_to_read <=
+  x"00000000" when address > 252 else
+  DMEM(address + 3) &
+  DMEM(address + 2) &
+  DMEM(address + 1) &
+  DMEM(address);
+
+  --! @brief Synchronous Store Process.
+  --! @details Handles writing 32-bit words into the byte-oriented DMEM array.
+  --! The operation is only performed on the rising edge of clk_i when mem_RW_i is active.
+  --! @param clk_i Sensitivity to the system clock.
+  process(clk_i) is
   begin
-    if rst_i = '1' then
-      --! Note: DMEM initialization is handled in the package
-    elsif rising_edge(clk_i) then
+    if rising_edge(clk_i) then
       if mem_RW_i = '1' then
         DMEM(to_integer(unsigned(addr_i)))     <= data_write_i(7 downto 0);
         DMEM(to_integer(unsigned(addr_i)) + 1) <= data_write_i(15 downto 8);
@@ -84,6 +91,6 @@ begin
   end process;
 
   --! @brief Output multiplexer.
-  --! @details Drives data_read_o with the loaded word if reading, or zero if writing/reset.
+  --! @details Drives data_read_o with the loaded word if reading, or zero if writing.
   data_read_o <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
 end arch;
