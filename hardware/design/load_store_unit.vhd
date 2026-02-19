@@ -28,7 +28,7 @@
 -- all copies or substantial portions of the Software.
 --
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCANTABILITY,
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 -- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 -- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
@@ -58,7 +58,7 @@ end load_store_unit;
 architecture arch of load_store_unit is
   --! Internal signal to hold the 32-bit word assembled from byte-addressable DMEM.
   signal word_to_read : std_logic_vector(31 downto 0);
-  signal address : integer;
+  signal address      : integer;
 begin
 
   --! @brief Concurrent address conversion.
@@ -68,7 +68,7 @@ begin
   --! @details Performs an asynchronous read from DMEM.
   --! @warning Checks if address is within safe bounds (Max Index - 3) to prevent simulation crashes.
   word_to_read <=
-  x"00000000" when address > 252 and address < 0 else
+  x"00000000" when address > 252 or address < 0 else
   DMEM(address + 3) &
   DMEM(address + 2) &
   DMEM(address + 1) &
@@ -78,14 +78,16 @@ begin
   --! @details Handles writing 32-bit words into the byte-oriented DMEM array.
   --! The operation is only performed on the rising edge of clk_i when mem_RW_i is active.
   --! @param clk_i Sensitivity to the system clock.
-  process(clk_i) is
+  process(rst_i, clk_i) is
   begin
-    if rising_edge(clk_i) then
-      if mem_RW_i = '1' then
-        DMEM(to_integer(unsigned(addr_i)))     <= data_write_i(7 downto 0);
-        DMEM(to_integer(unsigned(addr_i)) + 1) <= data_write_i(15 downto 8);
-        DMEM(to_integer(unsigned(addr_i)) + 2) <= data_write_i(23 downto 16);
-        DMEM(to_integer(unsigned(addr_i)) + 3) <= data_write_i(31 downto 24);
+    if rst_i = '1' then
+    --! Empty
+    elsif rising_edge(clk_i) then
+      if mem_RW_i = '1' and address >= 0 and address <= 252 then
+        DMEM(address)     <= data_write_i(7 downto 0);
+        DMEM(address + 1) <= data_write_i(15 downto 8);
+        DMEM(address + 2) <= data_write_i(23 downto 16);
+        DMEM(address + 3) <= data_write_i(31 downto 24);
       end if;
     end if;
   end process;
