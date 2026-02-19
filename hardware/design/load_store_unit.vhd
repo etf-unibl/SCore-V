@@ -62,7 +62,7 @@ architecture arch of load_store_unit is
 begin
 
   --! @brief Concurrent address conversion.
-  address <= to_integer(unsigned(addr_i));
+  address <= to_integer(signed(addr_i));
 
   --! @brief 32-bit Word Reconstruction logic.
   --! @details Performs an asynchronous read from DMEM.
