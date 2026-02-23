@@ -9,7 +9,9 @@
 -- description:
 --
 --   Shared ALU type definitions.
---   Current stage supports only ALU_ADD (used by ADD and ADDI).
+--   Current stage supports:
+--     - ALU_ADD : used by ADD/ADDI and address calculation for loads/stores
+--     - ALU_SUB : used by SUB (R-type)
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -40,7 +42,9 @@
 --! @file alu_pkg.vhd
 --! @brief ALU shared type definitions
 --! @details
---! Provides enumerated ALU operation type used by both control and ALU.
+--! Defines the ALU operation selector type `t_alu_op`.
+--! The control unit drives an `alu_op` signal of this type to select
+--! the operation performed by the ALU.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -50,7 +54,8 @@ package alu_pkg is
   --! @brief Enumerated ALU operation type
   type t_alu_op is (
     ALU_NOP,
-   ALU_ADD
+    ALU_ADD,
+    ALU_SUB
   );
 
 end package alu_pkg;
