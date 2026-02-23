@@ -1,14 +1,15 @@
------------------------------------------------------------------------------ -- Faculty of Electrical Engineering
+-----------------------------------------------------------------------------
+-- Faculty of Electrical Engineering
 -- PDS 2025
 -- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
 -- unit name:     alu_tb
 --
--- description:   
+-- description:
 --
 --                Self-checking testbench for alu
---   
+--
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
 -----------------------------------------------------------------------------
@@ -34,9 +35,10 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
-library vunit_lib;  
+library vunit_lib;
 context vunit_lib.vunit_context;
 library design_lib;
+use design_lib.alu_pkg.all;
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -50,6 +52,7 @@ architecture arch of alu_tb is
 
   signal a_i : std_logic_vector(31 downto 0) := (others => '0');
   signal b_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal alu_op_i : t_alu_op := ALU_NOP;
   signal y_o : std_logic_vector(31 downto 0);
 
   -- expected = (a + b) mod 2^32
@@ -64,8 +67,9 @@ begin
 
   uut_alu : entity design_lib.alu
     port map (
-      a_i => a_i,
-      b_i => b_i,
+      a_i      => a_i,
+      b_i      => b_i,
+      alu_op_i => alu_op_i,
       y_o => y_o
     );
 
@@ -76,8 +80,8 @@ begin
 
     while test_suite loop
       if run("test_add") then
-        for i in 0 to 100 loop 
-          for j in 0 to 100 loop 
+        for i in 0 to 100 loop
+          for j in 0 to 100 loop
             a_i <= std_logic_vector(to_unsigned(i, 32));
             b_i <= std_logic_vector(to_unsigned(j, 32));
             wait for 10 ns;
