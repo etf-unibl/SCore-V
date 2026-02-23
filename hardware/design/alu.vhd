@@ -64,7 +64,7 @@ entity alu is
   port (
     a_i      : in  std_logic_vector(31 downto 0); --! First operand
     b_i      : in  std_logic_vector(31 downto 0); --! Second operand
-    alu_op_i : in  t_alu_op;                      --! Operation select
+    alu_op_i : in  t_alu_op;           --! Operation select
     y_o      : out std_logic_vector(31 downto 0)  --! Result
   );
 end entity alu;
