@@ -45,18 +45,6 @@
 --! This module decodes the instruction fields provided by the instruction decoder
 --! (opcode/funct3/funct7) and generates datapath control signals.
 --!
---! Supported instructions:
---!
---! R-type:
---!   - ADD  (opcode=0110011, funct3=000, funct7=0000000)
---!
---! I-type:
---!   - ADDI (opcode=0010011, funct3=000)
---!   - LW   (opcode=0000011, funct3=010)
---!
---! S-type:
---!   - SW   (opcode=0100011, funct3=010)
---!
 --! Generated control signals:
 --!
 --! - reg_write_enable_o:
@@ -92,13 +80,13 @@ use work.alu_pkg.all;
 --! @brief Entity definition of control unit
 entity control is
   port (
-    opcode_i           : in  std_logic_vector(6 downto 0); --! Instruction opcode
-    funct3_i           : in  std_logic_vector(2 downto 0); --! Instruction funct3 field
-    funct7_i           : in  std_logic_vector(6 downto 0); --! Instruction funct7 field
+    opcode_i           : in  std_logic_vector(6 downto 0);  --! Instruction opcode
+    funct3_i           : in  std_logic_vector(2 downto 0);  --! Instruction funct3 field
+    funct7_i           : in  std_logic_vector(6 downto 0);  --! Instruction funct7 field
     reg_write_enable_o : out std_logic;                     --! Register write enable signal
     imm_sel_o          : out std_logic_vector(2 downto 0);  --! Immediate select/qualifier
     b_sel_o            : out std_logic;                     --! ALU operand B select (0=rs2_data, 1=immediate)
-    alu_op_o           : out t_alu_op;                      --! ALU operation select (e.g. ALU_ADD, ALU_NOP)
+    alu_op_o           : out t_alu_op;                      --! ALU operation select
     mem_rw_o           : out std_logic;                     --! Data memory control
     wb_select_o        : out std_logic                      --! Write-back multiplexer select
   );
@@ -120,28 +108,47 @@ begin
     mem_rw_o           <= '0';
     wb_select_o        <= '0';
 
-    if (opcode_i = "0110011") and (funct3_i = "000") and (funct7_i = "0000000") then
+-- =========================================================
+--                 R-type ALU instructions
+-- =========================================================
+    if opcode_i = "0110011" then
       reg_write_enable_o <= '1';
-      alu_op_o           <= ALU_ADD;  --! R-type ADD
       wb_select_o        <= '1';
 
-    elsif (opcode_i = "0010011") and (funct3_i = "000") then
+      if funct3_i = "000" then
+        if funct7_i = "0000000" then
+          alu_op_o <= ALU_ADD;  -- ADD
+        elsif funct7_i = "0100000" then
+          alu_op_o <= ALU_SUB;  -- SUB
+        end if;
+      end if;
+
+-- =========================================================
+--            I-type ALU immediate instructions
+-- =========================================================
+    elsif opcode_i = "0010011" then
       imm_sel_o          <= "001";
       reg_write_enable_o <= '1';
       b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; --! I-type ADDI
       wb_select_o        <= '1';
 
+      if funct3_i = "000" then
+        alu_op_o <= ALU_ADD;    -- ADDI
+      end if;
+
+-- =========================================================
+--               LOAD and STORE instructions
+-- =========================================================
     elsif (opcode_i = "0000011") and (funct3_i = "010") then
       imm_sel_o          <= "001";
       reg_write_enable_o <= '1';
       b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; --! I-type LOAD WORD
+      alu_op_o           <= ALU_ADD; -- LW address calc
 
     elsif (opcode_i = "0100011") and (funct3_i = "010") then
       imm_sel_o          <= "010";
       b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; --! S-type STORE WORD
+      alu_op_o           <= ALU_ADD; -- SW address calc
       mem_rw_o           <= '1';
 
     end if;
