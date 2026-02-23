@@ -52,7 +52,7 @@ architecture arch of alu_tb is
 
   signal a_i : std_logic_vector(31 downto 0) := (others => '0');
   signal b_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal alu_op_i : t_alu_op := ALU_NOP;
+  signal alu_op_i : t_alu_op := ALU_ADD;
   signal y_o : std_logic_vector(31 downto 0);
 
   -- expected = (a + b) mod 2^32
