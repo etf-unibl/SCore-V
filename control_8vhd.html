@@ -90,17 +90,6 @@ Entities</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Combinational control unit for the RISC-V core. </p>
 <p >This module decodes the instruction fields provided by the instruction decoder (opcode/funct3/funct7) and generates datapath control signals.</p>
-<p >Supported instructions:</p>
-<p >R-type:</p><ul>
-<li>ADD (opcode=0110011, funct3=000, funct7=0000000)</li>
-</ul>
-<p >I-type:</p><ul>
-<li>ADDI (opcode=0010011, funct3=000)</li>
-<li>LW (opcode=0000011, funct3=010)</li>
-</ul>
-<p >S-type:</p><ul>
-<li>SW (opcode=0100011, funct3=010)</li>
-</ul>
 <p >Generated control signals:</p>
 <ul>
 <li>reg_write_enable_o: Enables writeback into register file (rd).</li>
