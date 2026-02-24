@@ -1,16 +1,19 @@
 -----------------------------------------------------------------------------
 -- Faculty of Electrical Engineering
 -- PDS 2025
--- https://github.com/etf-unibl/SCore-V
+-- https://github.com/etf-unibl/pds-2025/
 -----------------------------------------------------------------------------
 --
 -- unit name:     alu
 --
 -- description:
 --
---   This file implements a 32-bit combinational ALU for the RISC-V core.
---   The current implementation supports only the ADD operation and produces
---   the sum of two 32-bit input operands.
+--   32-bit combinational ALU for the RISC-V core.
+--   Operation is selected by alu_op_i.
+--
+--   Supported operations in this task:
+--     - ALU_ADD : y_o = a_i + b_i (mod 2^32)
+--     - ALU_SUB : y_o = a_i - b_i (mod 2^32)
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -39,34 +42,63 @@
 -----------------------------------------------------------------------------
 
 --! @file alu.vhd
---! @brief Arithmetic Logic Unit
+--! @brief 32-bit combinational ALU
 --! @details
---! Implements the execution unit of the RISC-V datapath.
---! In the current development stage, the ALU performs
---! unsigned addition of two 32-bit operands.
+--! This unit implements a combinational ALU used in the RISC-V datapath.
+--! The output is determined by the operation selector `alu_op_i`.
+--!
+--! Supported operations:
+--! - `ALU_NOP`: output is forced to 0
+--! - `ALU_ADD`: unsigned addition of a_i and b_i (wrap-around modulo 2^32)
+--! - `ALU_SUB`: unsigned subtraction of a_i and b_i (wrap-around modulo 2^32)
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.alu_pkg.all;
+
 --! @brief Entity definition of alu
+--! @details Combinational ALU with two 32-bit operands and one 32-bit result.
 entity alu is
   port (
-    a_i : in  std_logic_vector(31 downto 0); --! First operand
-    b_i : in  std_logic_vector(31 downto 0); --! Second operand
-    y_o : out std_logic_vector(31 downto 0)  --! ALU result (a_i + b_i)
+    a_i      : in  std_logic_vector(31 downto 0); --! First operand
+    b_i      : in  std_logic_vector(31 downto 0); --! Second operand
+    alu_op_i : in  t_alu_op;           --! Operation select
+    y_o      : out std_logic_vector(31 downto 0)  --! Result
   );
 end entity alu;
 
 --! @brief Architecture implementation of the ALU
---! @details
---! Performs combinational unsigned addition:
---! y_o = a_i + b_i
+--! @details Pure combinational logic.
 architecture arch of alu is
-  signal sum_s : unsigned(31 downto 0);
+  signal res_s : std_logic_vector(31 downto 0);
 begin
 
-  sum_s <= unsigned(a_i) + unsigned(b_i);
-  y_o   <= std_logic_vector(sum_s);
+  --! @brief Combinational ALU process
+  --! @details Computes the ALU result based on alu_op_i.
+  process(a_i, b_i, alu_op_i)
+  begin
+    -- Default assignment (safe value for unsupported operations)
+    res_s <= (others => '0');
+
+    case alu_op_i is
+      when ALU_NOP =>
+        res_s <= (others => '0');
+
+      when ALU_ADD =>
+        res_s <= std_logic_vector(unsigned(a_i) + unsigned(b_i));
+
+      when ALU_SUB =>
+        res_s <= std_logic_vector(unsigned(a_i) - unsigned(b_i));
+
+      when others =>
+        res_s <= (others => '0');
+    end case;
+  end process;
+
+  --! @brief Result output
+  --! @details Drives the ALU result to the output port.
+  y_o <= res_s;
 
 end architecture arch;

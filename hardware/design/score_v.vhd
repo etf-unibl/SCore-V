@@ -239,9 +239,10 @@ architecture arch of score_v is
   --!          and provides the result as output.
   component alu is
     port (
-      a_i : in  std_logic_vector(31 downto 0);
-      b_i : in  std_logic_vector(31 downto 0);
-      y_o : out std_logic_vector(31 downto 0)
+      a_i      : in  std_logic_vector(31 downto 0);
+      b_i      : in  std_logic_vector(31 downto 0);
+      alu_op_i : in  t_alu_op;
+      y_o      : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -325,9 +326,10 @@ begin
   --! @brief ALU
   u_alu : alu
     port map (
-      a_i => rs1_data_sig,
-      b_i => alu_b_sig,
-      y_o => alu_result_sig
+      a_i      => rs1_data_sig,
+      b_i      => alu_b_sig,
+      alu_op_i => alu_op_sig,
+      y_o      => alu_result_sig
     );
   --! @brief Load Store Unit
   u_lsu : load_store_unit
