@@ -84,7 +84,7 @@ begin
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
-      if run("test_add_instr") then
+      if run("test_arithmetic_instr") then
         s_opcode <= "0110011";
         s_funct3 <= (others => '0');
         s_funct7 <= (others => '0');
@@ -93,6 +93,15 @@ begin
         check_equal(s_reg_write_enable, std_logic'('1'), "ADD should enable register write");
         check_equal(s_b_sel, '0', "ADD should select rs2 (b_sel=0)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADD should perform addition");
+
+        s_opcode <= "0110011";
+        s_funct3 <= "000";
+        s_funct7 <= "0100000";
+
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "SUB should enable register write");
+        check_equal(s_b_sel, '0', "SUB should select rs2 (b_sel=0)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SUB), "SUB should perform subtraction");
 
         s_opcode <= "0010011";
         s_funct3 <= (others => '0');
