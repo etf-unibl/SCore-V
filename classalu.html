@@ -103,6 +103,7 @@ Libraries</h2></td></tr>
 Use Clauses</h2></td></tr>
  <tr class="memitem:acd03516902501cd1c7296a98e22c6fcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu.html#acd03516902501cd1c7296a98e22c6fcb">std_logic_1164</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
 <tr class="memitem:a2edc34402b573437d5f25fa90ba4013e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu.html#a2edc34402b573437d5f25fa90ba4013e">numeric_std</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
+<tr class="memitem:a9021b1cfffc858cd17368b24b6418fd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classalu__pkg.html"> &lt;alu_pkg&gt;</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="3"><h2 class="groupheader"><a id="Ports" name="Ports"></a>
 Ports</h2></td></tr>
@@ -110,11 +111,14 @@ Ports</h2></td></tr>
 <tr class="memdesc:a392051ce70fdb6bdf162d8d49ff942d3"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">First operand.  <a href="#a392051ce70fdb6bdf162d8d49ff942d3"></a><br /></td></tr>
 <tr class="memitem:a6dd3c8a9210700e2533265bc1a926de6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu.html#a6dd3c8a9210700e2533265bc1a926de6">b_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a6dd3c8a9210700e2533265bc1a926de6"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Second operand.  <a href="#a6dd3c8a9210700e2533265bc1a926de6"></a><br /></td></tr>
+<tr class="memitem:aa531aa0c20fbfbd511fb40d9f709c529"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu.html#aa531aa0c20fbfbd511fb40d9f709c529">alu_op_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><b><a class="el" href="classalu__pkg.html#a400fb7cfd6b766411d269ec6530adc86">t_alu_op</a></b> <span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:aa531aa0c20fbfbd511fb40d9f709c529"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Operation select.  <a href="#aa531aa0c20fbfbd511fb40d9f709c529"></a><br /></td></tr>
 <tr class="memitem:afaf0e316277f711142c598694ee337df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu.html#afaf0e316277f711142c598694ee337df">y_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:afaf0e316277f711142c598694ee337df"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">ALU result (a_i + b_i)  <a href="#afaf0e316277f711142c598694ee337df"></a><br /></td></tr>
+<tr class="memdesc:afaf0e316277f711142c598694ee337df"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Result.  <a href="#afaf0e316277f711142c598694ee337df"></a><br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Entity definition of alu. </p>
+<p >Combinational ALU with two 32-bit operands and one 32-bit result. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a392051ce70fdb6bdf162d8d49ff942d3" name="a392051ce70fdb6bdf162d8d49ff942d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a392051ce70fdb6bdf162d8d49ff942d3">&#9670;&#160;</a></span>a_i</h2>
@@ -137,6 +141,52 @@ Ports</h2></td></tr>
 </div><div class="memdoc">
 
 <p>First operand. </p>
+
+</div>
+</div>
+<a id="aa531aa0c20fbfbd511fb40d9f709c529" name="aa531aa0c20fbfbd511fb40d9f709c529"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa531aa0c20fbfbd511fb40d9f709c529">&#9670;&#160;</a></span>alu_op_i</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classalu.html#aa531aa0c20fbfbd511fb40d9f709c529">alu_op_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><b><a class="el" href="classalu__pkg.html#a400fb7cfd6b766411d269ec6530adc86">t_alu_op</a></b> <span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Operation select. </p>
+
+</div>
+</div>
+<a id="a9021b1cfffc858cd17368b24b6418fd3" name="a9021b1cfffc858cd17368b24b6418fd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9021b1cfffc858cd17368b24b6418fd3">&#9670;&#160;</a></span>alu_pkg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classalu.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">use clause</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -250,7 +300,7 @@ Ports</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>ALU result (a_i + b_i) </p>
+<p>Result. </p>
 
 </div>
 </div>

@@ -74,6 +74,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#Processes">Processes</a> &#124;
 <a href="#Signals">Signals</a>  </div>
   <div class="headertitle"><div class="title">arch Architecture Reference</div></div>
 </div><!--header-->
@@ -83,16 +84,21 @@ $(function() {
  <a href="classalu_1_1arch.html#details">More...</a></p>
 <b>Architecture &gt;&gt; </b><a class="el" href="classalu_1_1arch.html">arch</a><br />
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Processes" name="Processes"></a>
+Processes</h2></td></tr>
+ <tr class="memitem:a63497421ea207460135e0358829155d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu_1_1arch.html#a63497421ea207460135e0358829155d1">PROCESS_0</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classalu.html#a392051ce70fdb6bdf162d8d49ff942d3">a_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classalu.html#a6dd3c8a9210700e2533265bc1a926de6">b_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classalu.html#aa531aa0c20fbfbd511fb40d9f709c529">alu_op_i</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
+<tr class="memdesc:a63497421ea207460135e0358829155d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combinational ALU process.  <a href="#a63497421ea207460135e0358829155d1"></a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Signals" name="Signals"></a>
 Signals</h2></td></tr>
- <tr class="memitem:aa66b22dc06e8e0ba965f04b8d7f777aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu_1_1arch.html#aa66b22dc06e8e0ba965f04b8d7f777aa">sum_s</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">unsigned</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+ <tr class="memitem:a0e30ef7482f170c8527055166872fbcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classalu_1_1arch.html#a0e30ef7482f170c8527055166872fbcf">res_s</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Architecture implementation of the ALU. </p>
-<p >Performs combinational unsigned addition: y_o = a_i + b_i </p>
-</div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="aa66b22dc06e8e0ba965f04b8d7f777aa" name="aa66b22dc06e8e0ba965f04b8d7f777aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa66b22dc06e8e0ba965f04b8d7f777aa">&#9670;&#160;</a></span>sum_s</h2>
+<p >Pure combinational logic. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a63497421ea207460135e0358829155d1" name="a63497421ea207460135e0358829155d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63497421ea207460135e0358829155d1">&#9670;&#160;</a></span>PROCESS_0()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -101,7 +107,53 @@ Signals</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classalu_1_1arch.html#aa66b22dc06e8e0ba965f04b8d7f777aa">sum_s</a> <b><span class="keywordtype">unsigned</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+          <td class="memname"> <b><span class="vhdlchar"> </span></b> PROCESS_0</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classalu.html#a392051ce70fdb6bdf162d8d49ff942d3">a_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classalu.html#a6dd3c8a9210700e2533265bc1a926de6">b_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classalu.html#aa531aa0c20fbfbd511fb40d9f709c529">alu_op_i</a></b> <span class="vhdlchar"> </span></b> <em></em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Process</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Combinational ALU process. </p>
+<p >Computes the ALU result based on alu_op_i. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a0e30ef7482f170c8527055166872fbcf" name="a0e30ef7482f170c8527055166872fbcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e30ef7482f170c8527055166872fbcf">&#9670;&#160;</a></span>res_s</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classalu_1_1arch.html#a0e30ef7482f170c8527055166872fbcf">res_s</a> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
         </tr>
       </table>
   </td>
