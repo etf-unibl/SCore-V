@@ -1,14 +1,16 @@
------------------------------------------------------------------------------ -- Faculty of Electrical Engineering
+-----------------------------------------------------------------------------
+-- Faculty of Electrical Engineering
 -- PDS 2025
 -- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
 -- unit name:     alu_tb
 --
--- description:   
+-- description:
 --
---                Self-checking testbench for alu
---   
+--   Self-checking testbench for ALU.
+--   Verifies ALU_NOP, ALU_ADD and ALU_SUB operations.
+--
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
 -----------------------------------------------------------------------------
@@ -34,9 +36,10 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
-library vunit_lib;  
+library vunit_lib;
 context vunit_lib.vunit_context;
 library design_lib;
+use design_lib.alu_pkg.all;
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -48,8 +51,11 @@ end alu_tb;
 
 architecture arch of alu_tb is
 
+  constant C_ZERO32 : std_logic_vector(31 downto 0) := (others => '0');
+
   signal a_i : std_logic_vector(31 downto 0) := (others => '0');
   signal b_i : std_logic_vector(31 downto 0) := (others => '0');
+  signal alu_op_i : t_alu_op := ALU_NOP;
   signal y_o : std_logic_vector(31 downto 0);
 
   -- expected = (a + b) mod 2^32
@@ -60,13 +66,22 @@ architecture arch of alu_tb is
     return std_logic_vector(s);
   end function;
 
+  -- expected = (a - b) mod 2^32
+  function exp_sub(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+    variable d : unsigned(31 downto 0);
+  begin
+    d := unsigned(a) - unsigned(b);
+    return std_logic_vector(d);
+  end function;
+
 begin
 
   uut_alu : entity design_lib.alu
     port map (
-      a_i => a_i,
-      b_i => b_i,
-      y_o => y_o
+      a_i      => a_i,
+      b_i      => b_i,
+      alu_op_i => alu_op_i,
+      y_o      => y_o
     );
 
   main : process
@@ -75,21 +90,61 @@ begin
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
-      if run("test_add") then
-        for i in 0 to 100 loop 
-          for j in 0 to 100 loop 
+
+      if run("test_nop") then
+        alu_op_i <= ALU_NOP;
+        a_i <= x"FFFFFFFF";
+        b_i <= x"12345678";
+        wait for 10 ns;
+        check_equal(y_o, C_ZERO32, "ALU_NOP should output zero");
+
+      elsif run("test_add") then
+        alu_op_i <= ALU_ADD;
+
+        for i in 0 to 100 loop
+          for j in 0 to 100 loop
             a_i <= std_logic_vector(to_unsigned(i, 32));
             b_i <= std_logic_vector(to_unsigned(j, 32));
             wait for 10 ns;
             exp := exp_add(a_i, b_i);
-            check_equal(y_o, exp, "Loop add failed!");
+            check_equal(y_o, exp, "Loop ADD failed!");
           end loop;
         end loop;
         a_i <= x"FFFFFFFF";
         b_i <= x"FFFFFFFF";
         wait for 10 ns;
         exp := exp_add(a_i, b_i);
-        check_equal(y_o, exp, "Overflow failed!");
+        check_equal(y_o, exp, "ADD overflow wrap-around failed!");
+
+      elsif run("test_sub") then
+        alu_op_i <= ALU_SUB;
+
+        -- Basic cases
+        a_i <= std_logic_vector(to_unsigned(10, 32));
+        b_i <= std_logic_vector(to_unsigned(5, 32));
+        wait for 10 ns;
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB 10-5 failed");
+
+        -- Wrap-around cases
+        a_i <= x"00000000";
+        b_i <= x"00000001";
+        wait for 10 ns;
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB 0-1 wrap-around failed");
+
+        a_i <= x"FFFFFFFF";
+        b_i <= x"FFFFFFFF";
+        wait for 10 ns;
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB FFFFFFFF-FFFFFFFF failed");
+
+        a_i <= x"80000000";
+        b_i <= x"00000001";
+        wait for 10 ns;
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB 80000000-1 failed");
+
       end if;
     end loop;
 
