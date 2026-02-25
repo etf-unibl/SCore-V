@@ -100,6 +100,15 @@ architecture arch of alu_tb is
     end if;
   end function;
 
+  -- expected = a xor b
+  function exp_xor(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+    variable r : unsigned(31 downto 0);
+  begin
+    r := unsigned(a) xor unsigned(b);
+    return std_logic_vector(r);
+  end function;
+
+
 begin
 
   uut_alu : entity design_lib.alu
@@ -179,7 +188,42 @@ begin
 
       elsif run("test_xor") then
         info("Testing XOR operation of ALU");
-        -- Tests for xor operation here
+        alu_op_i <= ALU_XOR;
+
+        -- 0 xor 0 = 0
+        a_i <= "00000000000000000000000000000000";
+        b_i <= "00000000000000000000000000000000";
+        wait for 10 ns;
+        exp := exp_xor(a_i, b_i);
+        check_equal(y_o, exp, "XOR 0^0 failed");
+
+        -- all1 xor 0 = all1
+        a_i <= "11111111111111111111111111111111";
+        b_i <= "00000000000000000000000000000000";
+        wait for 10 ns;
+        exp := exp_xor(a_i, b_i);
+        check_equal(y_o, exp, "XOR all1^0 failed");
+
+        -- all1 xor all1 = 0
+        a_i <= "11111111111111111111111111111111";
+        b_i <= "11111111111111111111111111111111";
+        wait for 10 ns;
+        exp := exp_xor(a_i, b_i);
+        check_equal(y_o, exp, "XOR all1^all1 failed");
+
+        -- mixed pattern
+        a_i <= "00010010001101000101011001111000"; -- 0x12345678
+        b_i <= "10000111011001010100001100100001"; -- 0x87654321
+        wait for 10 ns;
+        exp := exp_xor(a_i, b_i);
+        check_equal(y_o, exp, "XOR mixed pattern failed");
+
+        -- 0xAAAAAAAA xor 0x55555555 = 0xFFFFFFFF
+        a_i <= "10101010101010101010101010101010";
+        b_i <= "01010101010101010101010101010101";
+        wait for 10 ns;
+        exp := exp_xor(a_i, b_i);
+        check_equal(y_o, exp, "XOR alternating bits failed");
 
       elsif run("test_or") then
         info("Testing OR operation of ALU");
