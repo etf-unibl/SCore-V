@@ -92,6 +92,8 @@ begin
     while test_suite loop
 
       if run("test_nop") then
+        info("Testing NOP operation of ALU");
+
         alu_op_i <= ALU_NOP;
         a_i <= x"FFFFFFFF";
         b_i <= x"12345678";
@@ -99,6 +101,8 @@ begin
         check_equal(y_o, C_ZERO32, "ALU_NOP should output zero");
 
       elsif run("test_add") then
+        info("Testing ADD operation of ALU");
+
         alu_op_i <= ALU_ADD;
 
         for i in 0 to 100 loop
@@ -117,6 +121,8 @@ begin
         check_equal(y_o, exp, "ADD overflow wrap-around failed!");
 
       elsif run("test_sub") then
+        info("Testing SUB operation of ALU");
+
         alu_op_i <= ALU_SUB;
 
         -- Basic cases
@@ -144,6 +150,38 @@ begin
         wait for 10 ns;
         exp := exp_sub(a_i, b_i);
         check_equal(y_o, exp, "SUB 80000000-1 failed");
+
+      elsif run("test_xor") then
+        info("Testing XOR operation of ALU")
+        -- Tests for xor operation here
+
+      elsif run("test_or") then
+        info("Testing OR operation of ALU");
+        -- Tests for or operation here
+
+      elsif run("test_and") then
+        info("Testing AND operation of ALU");
+        -- Tests for and operation here
+
+      elsif run("test_sll") then
+        info("Testing SLL operation of ALU");
+        -- Tests for logic shift left operation here
+
+      elsif run("test_srl") then
+        info("Testing SRL operation of ALU");
+        -- Tests for logic shift right operation here
+
+      elsif run("test_sra") then
+        info("Testing SRA operation of ALU");
+        -- Tests for arithmetic shift right operation here
+
+      elsif run("test_slt") then
+        info("Testing SLT operation of ALU");
+        -- Tests for set less then instruction here
+
+      elsif run("test_sltu") then
+        info("Testing SLTU operation of ALU");
+        -- Tests for set less then (unsigned) operation here
 
       end if;
     end loop;
