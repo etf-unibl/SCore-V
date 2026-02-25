@@ -74,6 +74,14 @@ architecture arch of alu_tb is
     return std_logic_vector(d);
   end function;
 
+  -- expected = a and b
+  function exp_and(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+    variable d : unsigned(31 downto 0);
+  begin
+    d := unsigned(a) and unsigned(b);
+    return std_logic_vector(d);
+  end function;
+
 begin
 
   uut_alu : entity design_lib.alu
@@ -161,7 +169,31 @@ begin
 
       elsif run("test_and") then
         info("Testing AND operation of ALU");
-        -- Tests for and operation here
+        alu_op_i <= ALU_AND;
+
+        a_i <= "10101010101010101010101010101010";
+        b_i <= "01010101010101010101010101010101";
+        wait for 10 ns;
+        exp := exp_and(a_i, b_i);
+        check_equal(y_o, exp, "AND fail");
+
+        a_i <= "11111111111111111111111111111111";
+        b_i <= "11111111111111111111111111111111";
+        wait for 10 ns;
+        exp := exp_and(a_i, b_i);
+        check_equal(y_o, exp, "AND fail");
+
+        a_i <= "00000000000000000000000000000000";
+        b_i <= "11111111101111111110111111111111";
+        wait for 10 ns;
+        exp := exp_and(a_i, b_i);
+        check_equal(y_o, exp, "AND fail");
+
+        a_i <= "00000000000000000000000000000000";
+        b_i <= "00000000000000000000000000000000";
+        wait for 10 ns;
+        exp := exp_and(a_i, b_i);
+        check_equal(y_o, exp, "AND fail");
 
       elsif run("test_sll") then
         info("Testing SLL operation of ALU");
