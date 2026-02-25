@@ -327,35 +327,35 @@ begin
         info("Testing SLL operation of ALU");
         alu_op_i <= ALU_SLL;
 
-        -- Case 1: 0 << 0 = 0
+        -- 0 << 0 = 0
         a_i <= "00000000000000000000000000000000";
         b_i <= "00000000000000000000000000000000"; -- sh=0
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 0 << 0 failed");
 
-        -- Case 2: 1 << 1 = 2
+        -- 1 << 1 = 2
         a_i <= "00000000000000000000000000000001";
         b_i <= "00000000000000000000000000000001"; -- sh=1
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 1 << 1 failed");
 
-        -- Case 3: LSB set shifted left by 31 -> MSB set
+        -- LSB set shifted left by 31 -> MSB set
         a_i <= "00000000000000000000000000000001";
         b_i <= "00000000000000000000000000011111"; -- sh=31
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 1 << 31 failed");
 
-        -- Case 4: shift left by 4
+        -- shift left by 4
         a_i <= "00001111000000000000000000000000"; -- 0x0F000000
         b_i <= "00000000000000000000000000000100"; -- sh=4
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 0x0F000000 << 4 failed");
 
-        -- Case 5: SLLI-like: only b(4:0) matters
+        -- only b(4:0) matters
         a_i <= "00000000000000000000000000000001";
         b_i <= "00000000000000000000000000100001"; -- sh=1
         wait for 10 ns;
@@ -366,35 +366,36 @@ begin
         info("Testing SRL operation of ALU");
         alu_op_i <= ALU_SRL;
 
-        -- Case 1: 0 >> 0 = 0
+        -- 0 >> 0 = 0
         a_i <= "00000000000000000000000000000000";
         b_i <= "00000000000000000000000000000000"; -- sh=0
         wait for 10 ns;
         exp := exp_srl(a_i, b_i);
         check_equal(y_o, exp, "SRL 0 >> 0 failed");
 
-       -- Case 2: 1 >> 1 = 0
+       -- 1 >> 1 = 0
        a_i <= "00000000000000000000000000000001";
        b_i <= "00000000000000000000000000000001"; -- sh=1
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL 1 >> 1 failed");
 
-       -- Case 3: 0x80000000 >> 1 = 0x40000000 (MSB becomes 0)
+       -- Logical shift right: fills with zeros on the left
+       -- 0x80000000 >> 1 = 0x40000000
        a_i <= "10000000000000000000000000000000";
        b_i <= "00000000000000000000000000000001"; -- sh=1
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL 1000..0 >> 1 failed");
 
-       -- Case 4: 0xF0000000 >> 4 = 0x0F000000
+       -- 0xF0000000 >> 4 = 0x0F000000
        a_i <= "11110000000000000000000000000000";
        b_i <= "00000000000000000000000000000100"; -- sh=4
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL 1111.... >> 4 failed");
 
-       -- Case 5: SRLI-like: only b(4:0) matters
+       -- SRLI-like: only b_i(4 downto 0) is used as the shift amount
        a_i <= "10000000000000000000000000000000";
        b_i <= "00000000000000000000000000100001"; -- sh=1
        wait for 10 ns;
@@ -405,33 +406,37 @@ begin
         info("Testing SRA operation of ALU");
         alu_op_i <= ALU_SRA;
 
-        -- 0x00000010 (16) >> 2 = 0x00000004 (4)
+        -- Arithmetic shift right behaves like logical shift for positive numbers (MSB=0)
+        -- 0x00000010 >>> 2 = 0x00000004
         a_i <= x"00000010";
         b_i <= x"00000002";
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA positive failed");
 
-        -- 0x80000000 >> 1 => 0xC0000000
+        -- Arithmetic shift right replicates the sign bit (MSB) on the left
+        -- 0x80000000 >>> 1 = 0xC0000000
         a_i <= x"80000000";
         b_i <= x"00000001";
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA sign extension failed (MSB should stay 1)");
 
-        -- 0xF0000000 >> 4 => 0xFF000000
+        -- Negative value example: sign-extension fills with ones
+        -- 0xF0000000 >>> 4 = 0xFF000000
         a_i <= x"F0000000";
         b_i <= x"00000004";
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA shift 4 places failed");
 
-        -- -1 >> 31 => 0xFFFFFFFF (-1)
+        -- Shift by 31 keeps only the sign after extension:
+        -- 0x80000000 >>> 31 = 0xFFFFFFFF (i.e. -1)
         a_i <= x"80000000";
         b_i <= x"0000001F";
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
-        check_equal(y_o, exp, "SRA shift by 31 failed");
+        check_equal(y_o, exp, "SRA shift by 31 failed (sign extension)");
 
       elsif run("test_slt") then
         info("Testing SLT operation of ALU");
