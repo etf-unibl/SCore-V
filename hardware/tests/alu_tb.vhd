@@ -8,8 +8,20 @@
 --
 -- description:
 --
---   Self-checking testbench for ALU.
---   Verifies ALU_NOP, ALU_ADD and ALU_SUB operations.
+--   Self-checking VUnit testbench for the 32-bit combinational ALU.
+--   The testbench instantiates the ALU and verifies that y_o matches the
+--   expected result for each selected operation.
+--
+--   Currently covered operations:
+--     - ALU_NOP
+--     - Arithmetic: ALU_ADD, ALU_SUB
+--     - Logical:   ALU_AND, ALU_OR, ALU_XOR
+--     - Shifts:    ALU_SLL, ALU_SRL, ALU_SRA
+--     - Compare:   ALU_SLT, ALU_SLTU
+--   Notes:
+--     - Shift amount is taken from b_i(4 downto 0), matching RISC-V behavior
+--       for both register and immediate shift instructions.
+--     - SLT uses signed comparison, while SLTU uses unsigned comparison.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
