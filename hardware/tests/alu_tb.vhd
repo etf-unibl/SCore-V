@@ -124,6 +124,16 @@ architecture arch of alu_tb is
     return std_logic_vector(shift_right(unsigned(a), sh));
   end function;
 
+  -- expected = (unsigned(a) < unsigned(b)) ? 1 : 0
+  function exp_sltu(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+  begin
+    if unsigned(a) < unsigned(b) then
+      return x"00000001";
+    else
+      return x"00000000";
+    end if;
+  end function;
+
 begin
 
   uut_alu : entity design_lib.alu
@@ -437,7 +447,42 @@ begin
 
       elsif run("test_sltu") then
         info("Testing SLTU operation of ALU");
-        -- Tests for set less then (unsigned) operation here
+        alu_op_i <= ALU_SLTU;
+
+        -- 3 < 5 => 1
+        a_i <= x"00000003";
+        b_i <= x"00000005";
+        wait for 10 ns;
+        exp := exp_sltu(a_i, b_i);
+        check_equal(y_o, exp, "SLTU 3<5 failed");
+
+        -- 5 < 3 => 0
+        a_i <= x"00000005";
+        b_i <= x"00000003";
+        wait for 10 ns;
+        exp := exp_sltu(a_i, b_i);
+        check_equal(y_o, exp, "SLTU 5<3 failed");
+
+        -- 0xFFFFFFFF < 1 => 0
+        a_i <= x"FFFFFFFF";
+        b_i <= x"00000001";
+        wait for 10 ns;
+        exp := exp_sltu(a_i, b_i);
+        check_equal(y_o, exp, "SLTU 0xFFFFFFFF<1 failed");
+
+        -- 1 < 0xFFFFFFFF => 1
+        a_i <= x"00000001";
+        b_i <= x"FFFFFFFF";
+        wait for 10 ns;
+        exp := exp_sltu(a_i, b_i);
+        check_equal(y_o, exp, "SLTU 1<0xFFFFFFFF failed");
+
+        -- 0 < 0xFFFFFFFF => 1
+        a_i <= x"00000000";
+        b_i <= x"FFFFFFFF";
+        wait for 10 ns;
+        exp := exp_sltu(a_i, b_i);
+        check_equal(y_o, exp, "SLTU 0x00000000<0xFFFFFFFF failed");
 
       end if;
     end loop;
