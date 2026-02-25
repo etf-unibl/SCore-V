@@ -152,7 +152,7 @@ begin
         check_equal(y_o, exp, "SUB 80000000-1 failed");
 
       elsif run("test_xor") then
-        info("Testing XOR operation of ALU")
+        info("Testing XOR operation of ALU");
         -- Tests for xor operation here
 
       elsif run("test_or") then
