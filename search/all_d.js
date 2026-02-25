@@ -10,7 +10,7 @@ var searchData=
   ['reg_5fwe_5fsig_7',['reg_we_sig',['../classscore__v_1_1arch.html#adfa1a43d1e027c83356e3dad5422645d',1,'score_v::arch']]],
   ['reg_5fwrite_5fenable_5fo_8',['reg_write_enable_o',['../classcontrol.html#a6e84d3cf2be401a779fe4a3a5432446a',1,'control']]],
   ['reg_5fwrite_5fi_9',['reg_write_i',['../classreg__file.html#a61f4592267a733ccc60e8502552dc03d',1,'reg_file']]],
-  ['regs_10',['regs',['../classmem__pkg.html#af1966cb7cd8720d363f28357ebcfa56b',1,'mem_pkg']]],
+  ['regs_10',['regs',['../classmem__pkg.html#a779ef06fb8bfb721689f940c72c9adf8',1,'mem_pkg']]],
   ['res_5fs_11',['res_s',['../classalu_1_1arch.html#a0e30ef7482f170c8527055166872fbcf',1,'alu::arch']]],
   ['rs1_5faddr_5fi_12',['rs1_addr_i',['../classreg__file.html#a619a7c8fffa9bf56e343253ef1fda868',1,'reg_file']]],
   ['rs1_5fdata_5fo_13',['rs1_data_o',['../classscore__v.html#a08f2b01bb7e45773bb3a61c3d6a2c81d',1,'score_v.rs1_data_o()'],['../classreg__file.html#a08f2b01bb7e45773bb3a61c3d6a2c81d',1,'reg_file.rs1_data_o()']]],
