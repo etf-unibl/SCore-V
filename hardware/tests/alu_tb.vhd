@@ -82,6 +82,24 @@ architecture arch of alu_tb is
     return std_logic_vector(d);
   end function;
 
+  -- expected = a or b
+  function exp_or(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+    variable r : unsigned(31 downto 0);
+  begin
+    r := unsigned(a) or unsigned(b);
+    return std_logic_vector(r);
+  end function;
+
+  -- expected = (signed(a) < signed(b)) ? 1 : 0
+  function exp_slt(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+  begin
+    if signed(a) < signed(b) then
+      return x"00000001";
+    else
+      return x"00000000";
+    end if;
+  end function;
+
 begin
 
   uut_alu : entity design_lib.alu
@@ -165,7 +183,42 @@ begin
 
       elsif run("test_or") then
         info("Testing OR operation of ALU");
-        -- Tests for or operation here
+        alu_op_i <= ALU_OR;
+
+        -- 0 | 0 = 0
+        a_i <= "00000000000000000000000000000000";
+        b_i <= "00000000000000000000000000000000";
+        wait for 10 ns;
+        exp := exp_or(a_i, b_i);
+        check_equal(y_o, exp, "OR 0|0 failed");
+
+        -- all1 | 0 = all1
+        a_i <= "11111111111111111111111111111111";
+        b_i <= "00000000000000000000000000000000";
+        wait for 10 ns;
+        exp := exp_or(a_i, b_i);
+        check_equal(y_o, exp, "OR all1|0 failed");
+
+        -- mixed pattern(0x12345678 | 0x87654321)
+        a_i <= "00010010001101000101011001111000";
+        b_i <= "10000111011001010100001100100001";
+        wait for 10 ns;
+        exp := exp_or(a_i, b_i);
+        check_equal(y_o, exp, "OR mixed pattern 1 failed");
+
+        -- ORI-like case (immediate style on b_i)
+        a_i <= "00000000000000001111111100000000"; -- 0x0000FF00
+        b_i <= "00000000000000000000000000001111"; -- 0x0000000F
+        wait for 10 ns;
+        exp := exp_or(a_i, b_i);
+        check_equal(y_o, exp, "OR/ORI immediate-style case failed");
+
+        -- mixed pattern(0x00FF00FF | 0x0F0F0F0F)
+        a_i <= "00000000111111110000000011111111";
+        b_i <= "00001111000011110000111100001111";
+        wait for 10 ns;
+        exp := exp_or(a_i, b_i);
+        check_equal(y_o, exp, "OR mixed pattern 2 failed");
 
       elsif run("test_and") then
         info("Testing AND operation of ALU");
@@ -209,7 +262,49 @@ begin
 
       elsif run("test_slt") then
         info("Testing SLT operation of ALU");
-        -- Tests for set less then instruction here
+        alu_op_i <= ALU_SLT;
+
+        -- 3 < 5 => 1
+        a_i <= x"00000003";
+        b_i <= x"00000005";
+        wait for 10 ns;
+        exp := exp_slt(a_i, b_i);
+        check_equal(y_o, exp, "SLT 3<5 failed");
+
+        -- 5 < 3 => 0
+        a_i <= x"00000005";
+        b_i <= x"00000003";
+        wait for 10 ns;
+        exp := exp_slt(a_i, b_i);
+        check_equal(y_o, exp, "SLT 5<3 failed");
+
+        -- -1 < 1 => 1
+        a_i <= x"FFFFFFFF"; -- -1
+        b_i <= x"00000001"; -- 1
+        wait for 10 ns;
+        exp := exp_slt(a_i, b_i);
+        check_equal(y_o, exp, "SLT -1<1 failed");
+
+        -- 1 < -1 => 0
+        a_i <= x"00000001"; -- 1
+        b_i <= x"FFFFFFFF"; -- -1
+        wait for 10 ns;
+        exp := exp_slt(a_i, b_i);
+        check_equal(y_o, exp, "SLT 1<-1 failed");
+
+        -- -10 < -5 => 1  (0xFFFFFFF6 < 0xFFFFFFFB signed)
+        a_i <= x"FFFFFFF6"; -- -10
+        b_i <= x"FFFFFFFB"; -- -5
+        wait for 10 ns;
+        exp := exp_slt(a_i, b_i);
+        check_equal(y_o, exp, "SLT -10<-5 failed");
+
+        -- most negative < 0 => 1
+        a_i <= x"80000000"; -- -2147483648
+        b_i <= x"00000000"; -- 0
+        wait for 10 ns;
+        exp := exp_slt(a_i, b_i);
+        check_equal(y_o, exp, "SLT 0x80000000<0 failed");
 
       elsif run("test_sltu") then
         info("Testing SLTU operation of ALU");
