@@ -134,6 +134,12 @@ architecture arch of alu_tb is
     end if;
   end function;
 
+  -- expected = a >> b
+  function exp_sra(a : std_logic_vector(31 downto 0); shamt : natural) return std_logic_vector is
+  begin
+    return std_logic_vector(shift_right(signed(a), shamt));
+  end function;
+
 begin
 
   uut_alu : entity design_lib.alu
@@ -397,7 +403,35 @@ begin
 
       elsif run("test_sra") then
         info("Testing SRA operation of ALU");
-        -- Tests for arithmetic shift right operation here
+        alu_op_i <= ALU_SRA;
+
+        -- 0x00000010 (16) >> 2 = 0x00000004 (4)
+        a_i <= x"00000010";
+        b_i <= x"00000002";
+        wait for 10 ns;
+        exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
+        check_equal(y_o, exp, "SRA positive failed");
+
+        -- 0x80000000 >> 1 => 0xC0000000
+        a_i <= x"80000000";
+        b_i <= x"00000001";
+        wait for 10 ns;
+        exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
+        check_equal(y_o, exp, "SRA sign extension failed (MSB should stay 1)");
+
+        -- 0xF0000000 >> 4 => 0xFF000000
+        a_i <= x"F0000000";
+        b_i <= x"00000004";
+        wait for 10 ns;
+        exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
+        check_equal(y_o, exp, "SRA shift 4 places failed");
+
+        -- -1 >> 31 => 0xFFFFFFFF (-1)
+        a_i <= x"80000000";
+        b_i <= x"0000001F";
+        wait for 10 ns;
+        exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
+        check_equal(y_o, exp, "SRA shift by 31 failed");
 
       elsif run("test_slt") then
         info("Testing SLT operation of ALU");
