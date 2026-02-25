@@ -12,7 +12,8 @@
 --   Integrates Program Counter, Instruction Fetch, Decoder, Control Unit,
 --   Register File, and ALU. Provides instruction execution
 --   with register read/write and ALU computation.
---   Currently, this implementation only supports ADD, ADDI, LW/SW operations.
+--   Currently, this implementation only supports all arithmetic operations
+--   and LW/SW operations.
 --   Support for other instructions will be added in future expansions.
 --
 -----------------------------------------------------------------------------
@@ -48,12 +49,13 @@ use work.alu_pkg.all;
 
 --! @file score_v.vhd
 --! @brief Top-level SCore-V module
---! @details Implements a simple SCore-V CPU for the ADD, ADDI and LW/SW.
+--! @details Implements a simple SCore-V CPU for arithmetic and LW/SW operations.
 --!   Integrates Program Counter, instruction fetch, decoder, control unit,
 --!   register file, and ALU. Provides register read/write and ALU computation.
 --!   Currently supports only ADD instruction; other instructions will be added in future.
---!   NOTE: The outputs pc_o, opcode_o, rd_o, rs1_o, rs2_o, rs1_data_o, rs2_data_o,
---!         alu_result_o, and reg_we_o are provided primarily for debug and testbench
+--!   NOTE: The outputs pc_o, opcode_o, rd_o, rs1_o, rs2_o, rs1_data_o,
+--!         alu_result_o, reg_we_o, wb_data_o and rs2_data_o
+--!         are provided primarily for debug and testbench
 --!         purposes, allowing detailed monitoring of their states.
 
 entity score_v is
