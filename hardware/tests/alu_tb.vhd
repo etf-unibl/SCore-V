@@ -108,6 +108,14 @@ architecture arch of alu_tb is
     return std_logic_vector(r);
   end function;
 
+  -- expected = logical right shift (a >> shift), shift = b(4 downto 0)
+  function exp_srl(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
+    variable sh : natural range 0 to 31;
+  begin
+    sh := to_integer(unsigned(b(4 downto 0)));
+    return std_logic_vector(shift_right(unsigned(a), sh));
+  end function;
+
 
 begin
 
@@ -298,7 +306,42 @@ begin
 
       elsif run("test_srl") then
         info("Testing SRL operation of ALU");
-        -- Tests for logic shift right operation here
+        alu_op_i <= ALU_SRL;
+
+        -- Case 1: 0 >> 0 = 0
+        a_i <= "00000000000000000000000000000000";
+        b_i <= "00000000000000000000000000000000"; -- sh=0
+        wait for 10 ns;
+        exp := exp_srl(a_i, b_i);
+        check_equal(y_o, exp, "SRL 0 >> 0 failed");
+
+       -- Case 2: 1 >> 1 = 0
+       a_i <= "00000000000000000000000000000001";
+       b_i <= "00000000000000000000000000000001"; -- sh=1
+       wait for 10 ns;
+       exp := exp_srl(a_i, b_i);
+       check_equal(y_o, exp, "SRL 1 >> 1 failed");
+
+       -- Case 3: 0x80000000 >> 1 = 0x40000000 (MSB becomes 0)
+       a_i <= "10000000000000000000000000000000";
+       b_i <= "00000000000000000000000000000001"; -- sh=1
+       wait for 10 ns;
+       exp := exp_srl(a_i, b_i);
+       check_equal(y_o, exp, "SRL 1000..0 >> 1 failed");
+
+       -- Case 4: 0xF0000000 >> 4 = 0x0F000000
+       a_i <= "11110000000000000000000000000000";
+       b_i <= "00000000000000000000000000000100"; -- sh=4
+       wait for 10 ns;
+       exp := exp_srl(a_i, b_i);
+       check_equal(y_o, exp, "SRL 1111.... >> 4 failed");
+
+       -- Case 5: SRLI-like: only b(4:0) matters
+       a_i <= "10000000000000000000000000000000";
+       b_i <= "00000000000000000000000000100001"; -- sh=1
+       wait for 10 ns;
+       exp := exp_srl(a_i, b_i);
+       check_equal(y_o, exp, "SRL sh from b(4:0) failed");
 
       elsif run("test_sra") then
         info("Testing SRA operation of ALU");
