@@ -95,7 +95,7 @@ Signals</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Architecture implementation of the ALU. </p>
-<p >Pure combinational logic. </p>
+<p >Pure combinational logic. The internal signal res_s holds the computed result. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a63497421ea207460135e0358829155d1" name="a63497421ea207460135e0358829155d1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a63497421ea207460135e0358829155d1">&#9670;&#160;</a></span>PROCESS_0()</h2>
@@ -138,7 +138,7 @@ Signals</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Combinational ALU process. </p>
-<p >Computes the ALU result based on alu_op_i. </p>
+<p >Computes res_s based on alu_op_i, a_i and b_i. shift_count is derived from the lower 5 bits of b_i (range 0..31). </p>
 
 </div>
 </div>

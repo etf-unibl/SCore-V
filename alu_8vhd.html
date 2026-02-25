@@ -75,7 +75,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>32-bit combinational ALU  
+<p>Arithmetic Logic Unit (ALU)  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -88,13 +88,8 @@ Entities</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >32-bit combinational ALU </p>
-<p >This unit implements a combinational ALU used in the RISC-V datapath. The output is determined by the operation selector <code>alu_op_i</code>.</p>
-<p >Supported operations:</p><ul>
-<li><code>ALU_NOP</code>: output is forced to 0</li>
-<li><code>ALU_ADD</code>: unsigned addition of a_i and b_i (wrap-around modulo 2^32)</li>
-<li><code>ALU_SUB</code>: unsigned subtraction of a_i and b_i (wrap-around modulo 2^32) </li>
-</ul>
+<div class="textblock"><p >Arithmetic Logic Unit (ALU) </p>
+<p >The operation is selected via alu_op_i (t_alu_op from <a class="el" href="classalu__pkg.html" title="Enumerated ALU operation type.">alu_pkg</a>). Operands are provided as 32-bit vectors (a_i, b_i) and the result is y_o. For shift operations, only b_i(4 downto 0) is used as the shift amount. SLT performs signed comparison, while SLTU performs unsigned comparison. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
