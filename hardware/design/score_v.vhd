@@ -93,12 +93,13 @@ architecture arch of score_v is
   --! @brief Instruction and decoding signals
   signal instr_sig    : t_instruction_rec;             --! Fetched instruction
 
-  signal opcode_sig   : std_logic_vector(6 downto 0);  --! Decoded opcode
-  signal rd_sig       : std_logic_vector(4 downto 0);  --! Decoded destination register
-  signal rs1_sig      : std_logic_vector(4 downto 0);  --! Decoded source register 1
-  signal rs2_sig      : std_logic_vector(4 downto 0);  --! Decoded source register 2
-  signal funct3_sig   : std_logic_vector(2 downto 0);  --! Decoded funct3 field
-  signal funct7_sig   : std_logic_vector(6 downto 0);  --! Decoded funct7 field
+  signal opcode_sig     : std_logic_vector(6 downto 0);  --! Decoded opcode
+  signal rd_sig         : std_logic_vector(4 downto 0);  --! Decoded destination register
+  signal rs1_sig        : std_logic_vector(4 downto 0);  --! Decoded source register 1
+  signal rs2_sig        : std_logic_vector(4 downto 0);  --! Decoded source register 2
+  signal funct3_sig     : std_logic_vector(2 downto 0);  --! Decoded funct3 field
+  signal funct7_sig     : std_logic_vector(6 downto 0);  --! Decoded funct7 field
+  signal imm_i_type_sig : std_logic_vector(11 downto 0); --! Decoded imm_i_type field
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -166,6 +167,7 @@ architecture arch of score_v is
       opcode_i           : in  std_logic_vector(6 downto 0);
       funct3_i           : in  std_logic_vector(2 downto 0);
       funct7_i           : in  std_logic_vector(6 downto 0);
+      imm_i_type_i       : in  std_logic_vector(11 downto 0);
       reg_write_enable_o : out std_logic;
       imm_sel_o          : out std_logic_vector(2 downto 0);
       b_sel_o            : out std_logic;
@@ -276,7 +278,7 @@ begin
       rd_o            => rd_sig,
       funct3_o        => funct3_sig,
       funct7_o        => funct7_sig,
-      imm_i_type_o    => open,
+      imm_i_type_o    => imm_i_type_sig,
       imm_s_type_h_o  => open,
       imm_s_type_l_o  => open
     );
@@ -287,6 +289,7 @@ begin
       opcode_i           => opcode_sig,
       funct3_i           => funct3_sig,
       funct7_i           => funct7_sig,
+      imm_i_type_i       => imm_i_type_sig,
       reg_write_enable_o => reg_we_sig,
       imm_sel_o          => imm_sel_sig,
       b_sel_o            => b_sel_sig,
