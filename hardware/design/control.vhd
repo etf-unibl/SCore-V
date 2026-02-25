@@ -234,7 +234,7 @@ begin
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
           wb_select_o        <= '1';
-          alu_op_o <= ALU_SRA;
+          alu_op_o           <= ALU_SRA;
         end if;
       end if;
 
