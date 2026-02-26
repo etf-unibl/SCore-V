@@ -89,6 +89,8 @@ entity control is
     b_sel_o            : out std_logic;                     --! ALU operand B select (0=rs2_data, 1=immediate)
     alu_op_o           : out t_alu_op;                      --! ALU operation select
     mem_rw_o           : out std_logic;                     --! Data memory control
+    mem_size_o         : out std_logic_vector(1 downto 0);  --! 00=Byte, 01=Half, 10=Word
+    mem_unsigned_o     : out std_logic;                     --! 1=Unsigned (LBU/LHU), 0=Signed
     wb_select_o        : out std_logic                      --! Write-back multiplexer select
   );
 end entity control;
@@ -108,6 +110,8 @@ begin
     imm_sel_o          <= "000";
     mem_rw_o           <= '0';
     wb_select_o        <= '0';
+    mem_size_o         <= "10"; -- Default Word
+    mem_unsigned_o     <= '0';
 
 -- =========================================================
 --                 R-type ALU instructions
@@ -241,17 +245,32 @@ begin
 -- =========================================================
 --               LOAD and STORE instructions
 -- =========================================================
-    elsif (opcode_i = "0000011") and (funct3_i = "010") then
-      imm_sel_o          <= "001";
-      reg_write_enable_o <= '1';
-      b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; -- LW address calc
+    elsif opcode_i = "0000011" then
 
-    elsif (opcode_i = "0100011") and (funct3_i = "010") then
-      imm_sel_o          <= "010";
-      b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; -- SW address calc
-      mem_rw_o           <= '1';
+      if funct3_i = "000" or funct3_i = "001" or funct3_i = "010" or funct3_i = "100" or funct3_i = "101" then
+
+        imm_sel_o   <= "001";
+        b_sel_o     <= '1';
+        alu_op_o    <= ALU_ADD;
+        wb_select_o <= '0';
+
+        reg_write_enable_o <= '1';
+        mem_size_o         <= funct3_i(1 downto 0);
+        mem_unsigned_o     <= funct3_i(2);
+
+      end if;
+
+    elsif opcode_i = "0100011" then
+      if funct3_i = "000" or funct3_i = "001" or funct3_i = "010" then
+
+        imm_sel_o <= "010";
+        b_sel_o   <= '1';
+        alu_op_o  <= ALU_ADD;
+
+        mem_rw_o   <= '1';
+        mem_size_o <= funct3_i(1 downto 0);
+
+      end if;
 
     end if;
 
