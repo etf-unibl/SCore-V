@@ -121,6 +121,8 @@ architecture arch of score_v is
   signal final_wb_sig   : std_logic_vector(31 downto 0); --! Data to be written back to RegFile
   signal mem_rw_sig     : std_logic;                     --! Control signal for memory R/W
   signal wb_select_sig  : std_logic;                     --! Control signal for WB Mux
+  signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
+  signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
@@ -211,6 +213,8 @@ architecture arch of score_v is
       addr_i       : in  std_logic_vector(31 downto 0);
       mem_RW_i     : in  std_logic;
       data_write_i : in  std_logic_vector(31 downto 0);
+      width_i      : in  std_logic_vector(1 downto 0);
+      sign_i       : in std_logic;
       data_read_o  : out std_logic_vector(31 downto 0)
     );
   end component;
@@ -350,7 +354,9 @@ begin
       addr_i       => alu_result_sig,
       mem_RW_i     => mem_rw_sig,
       data_write_i => rs2_data_sig,
-      data_read_o  => mem_data_sig
+      data_read_o  => mem_data_sig,
+      sign_i       => sign_s,
+      width_i      => width_s
     );
 
   --! @brief Write-Back Multiplexer
