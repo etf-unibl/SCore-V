@@ -85,14 +85,13 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Processes" name="Processes"></a>
 Processes</h2></td></tr>
- <tr class="memitem:a9f89d26d4b00535f120fcf35739fa1ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classimm__gen_1_1arch.html#a9f89d26d4b00535f120fcf35739fa1ae">imm_gen_p</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classimm__gen.html#abfa29c049a4754662d7f4655cbe246c5">instruction_bits_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classimm__gen.html#aaabbcebe08646acba4dde21ba73480a3">imm_sel_i</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
-<tr class="memdesc:a9f89d26d4b00535f120fcf35739fa1ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediate generation process.  <a href="#a9f89d26d4b00535f120fcf35739fa1ae"></a><br /></td></tr>
+ <tr class="memitem:a48e3c33ebbb50f79429876b6ca31683b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classimm__gen_1_1arch.html#a48e3c33ebbb50f79429876b6ca31683b">imm_proc</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classimm__gen.html#a63e9614f2cf6954cb488684f1b153c75">imm_i_type_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classimm__gen.html#ad3df004775d0f3abd6fc1f326404feed">imm_s_type_h_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classimm__gen.html#a33c1cdaa823c5a317d5b7239e4890379">imm_s_type_l_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classimm__gen.html#aaabbcebe08646acba4dde21ba73480a3">imm_sel_i</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Architecture for immediate extraction. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9f89d26d4b00535f120fcf35739fa1ae" name="a9f89d26d4b00535f120fcf35739fa1ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f89d26d4b00535f120fcf35739fa1ae">&#9670;&#160;</a></span>imm_gen_p()</h2>
+<a id="a48e3c33ebbb50f79429876b6ca31683b" name="a48e3c33ebbb50f79429876b6ca31683b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48e3c33ebbb50f79429876b6ca31683b">&#9670;&#160;</a></span>imm_proc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -101,10 +100,22 @@ Processes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"> <b><span class="vhdlchar"> </span></b> imm_gen_p</td>
+          <td class="memname"> <b><span class="vhdlchar"> </span></b> imm_proc</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classimm__gen.html#abfa29c049a4754662d7f4655cbe246c5">instruction_bits_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+          <td class="paramname"><b><b><a class="el" href="classimm__gen.html#a63e9614f2cf6954cb488684f1b153c75">imm_i_type_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classimm__gen.html#ad3df004775d0f3abd6fc1f326404feed">imm_s_type_h_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><b><a class="el" href="classimm__gen.html#a33c1cdaa823c5a317d5b7239e4890379">imm_s_type_l_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -124,9 +135,6 @@ Processes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Immediate generation process. </p>
-<p >Extracts instr[31:20] and performs sign extension based on the Immediate select signal. </p>
 
 </div>
 </div>
