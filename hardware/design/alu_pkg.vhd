@@ -9,9 +9,12 @@
 -- description:
 --
 --   Shared ALU type definitions.
---   Current stage supports:
---     - ALU_ADD : used by ADD/ADDI and address calculation for loads/stores
---     - ALU_SUB : used by SUB (R-type)
+--   Defines the enumerated ALU operation selector type (t_alu_op) used by:
+--     - the control unit to select an ALU operation, and
+--     - the ALU to execute the selected operation.
+--
+--   Supported operations include arithmetic, logical, shift, and compare
+--   operations required by the RV32I base integer instruction set.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -55,7 +58,15 @@ package alu_pkg is
   type t_alu_op is (
     ALU_NOP,
     ALU_ADD,
-    ALU_SUB
+    ALU_SUB,
+    ALU_AND,
+    ALU_OR,
+    ALU_XOR,
+    ALU_SLL,
+    ALU_SRL,
+    ALU_SRA,
+    ALU_SLT,
+    ALU_SLTU
   );
 
 end package alu_pkg;

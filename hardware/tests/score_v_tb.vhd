@@ -45,7 +45,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library vunit_lib;  
+library vunit_lib;
 context vunit_lib.vunit_context;
 library design_lib;
 
@@ -112,7 +112,24 @@ architecture sim of score_v_tb is
     7  => (28, "0010011", "000", "0000000", 3, 1, 0, 12, '1'),
     8  => (32, "0000011", "010", "0000000", 2, 0, 0,  0, '1'),
     9  => (36, "0000011", "010", "0000000", 1, 0, 0,  8, '1'),
-    10 => (40, "0100011", "010", "0000000", 0, 0, 1, 25, '0')
+    10 => (40, "0100011", "010", "0000000", 0, 0, 1, 25, '0'),
+    11 => (44, "0110011", "000", "0100000", 16, 4, 5, -4, '1'),
+    12 => (48, "0110011", "100", "0000000", 22, 20, 21, 60, '1'),
+    13 => (52, "0010011", "100", "0000000", 23, 20, 0, 10, '1'),
+    14 => (56, "0110011", "110", "0000000", 22, 20, 21, 63, '1'),
+    15 => (60, "0010011", "110", "0000000", 23, 20, 0, 15, '1'),
+    16 => (64, "0110011", "111", "0000000", 22, 20, 21, 3, '1'),
+    17 => (68, "0010011", "111", "0000000", 23, 20, 0, 5, '1'),
+    18 => (72, "0110011", "001", "0000000", 22, 20, 21, 7864320, '1'),
+    19 => (76, "0010011", "001", "0000000", 23, 20, 0, 480, '1'),
+    20 => (80, "0110011", "101", "0000000", 22, 20, 21, 0, '1'),
+    21 => (84, "0010011", "101", "0000000", 23, 20, 0, 0, '1'),
+    22 => (88, "0110011", "101", "0100000", 22, 16, 21, -1, '1'),
+    23 => (92, "0010011", "101", "0100000", 23, 16, 0, -1, '1'),
+    24 => (96, "0110011", "010", "0000000", 22, 16, 21, 1, '1'),
+    25 => (100, "0010011", "010", "0000000", 23, 20, 0, 0, '1'),
+    26 => (104, "0110011", "011", "0000000", 22, 20, 21, 1, '1'),
+    27 => (108, "0010011", "011", "0000000", 23, 20, 0, 0, '1')
   );
 
 begin
@@ -155,6 +172,7 @@ begin
     wait;
   end process;
 
+
   monitor_proc : process
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
@@ -172,7 +190,7 @@ begin
         wait until rising_edge(clk_s);
         rst_s <= '0';
 
-        for i in 0 to 11 loop
+        for i in 0 to 27 loop
           wait until rising_edge(clk_s);
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
@@ -183,7 +201,7 @@ begin
 
             check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
 
-            if opcode_s = "0110011" then 
+            if opcode_s = "0110011" then
               check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
             end if;
 
@@ -191,12 +209,15 @@ begin
 
             check_equal(to_integer(unsigned(rs1_addr_s)), res(step).rs1, "RS1 Error at step " & integer'image(step));
 
-            check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2, "RS2 Error at step " & integer'image(step) &
-                                                                        " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
-                                                                        " | expected = " & integer'image(res(step).rs2));
+            check_equal(to_integer(unsigned(rs2_addr_s)),res(step).rs2,
+              "RS2 Error at step " & integer'image(step) &
+              " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
+              " | expected = " & integer'image(res(step).rs2));
+
             check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
             check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
+ 
             step := step + 1;
           else
             test_runner_cleanup(runner);
