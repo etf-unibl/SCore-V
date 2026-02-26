@@ -172,6 +172,7 @@ begin
     wait;
   end process;
 
+
   monitor_proc : process
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
