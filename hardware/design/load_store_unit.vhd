@@ -96,7 +96,7 @@ begin
                               DMEM(address + 2) &
                               DMEM(address + 1) &
                               DMEM(address);
-        end case;
+      end case;
     else
       word_to_read_var := (others => '0');
     end if;
