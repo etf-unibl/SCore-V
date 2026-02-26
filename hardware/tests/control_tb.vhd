@@ -63,6 +63,8 @@ architecture arch of control_tb is
   signal s_alu_op           : t_alu_op;
   signal s_mem_rw_o         : std_logic;
   signal s_wb_select_o      : std_logic;
+  signal s_mem_size_o       : std_logic_vector(1 downto 0);
+  signal s_mem_unsigned_o   : std_logic;
 
 begin
   -- Instantiate the Unit Under Test (UUT)
@@ -77,6 +79,8 @@ begin
       b_sel_o            => s_b_sel,         
       alu_op_o           => s_alu_op,
       mem_rw_o           => s_mem_rw_o,
+      mem_size_o         => s_mem_size_o,
+      mem_unsigned_o     => s_mem_unsigned_o,
       wb_select_o        => s_wb_select_o
     );
 
@@ -311,30 +315,127 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRA), "SRAI -> ALU_SRA");
 
       elsif run("test_load_store_instr") then
-        s_opcode <= "0000011"; -- LW
-        s_funct3 <= "010";
-        s_funct7 <= (others => '0');
+
+        -----------------------------------------------------------------------
+        -- LOADS: LB, LH, LW, LBU, LHU  (opcode = 0000011)
+        -- Expected:
+        --  imm_sel = 001, b_sel=1, alu_op=ADD, wb_select=0, mem_rw=0
+        --  reg_write_enable=1
+        --  mem_size = funct3(1 downto 0)
+        --    00 byte
+        --    01 half
+        --    10 word
+        --  mem_unsigned = funct3(2)   (1 for LBU/LHU)
+        -----------------------------------------------------------------------
+        s_opcode     <= "0000011";
+        s_funct7     <= (others => '0');
         s_imm_i_type <= (others => '0');
-        wait for 5 ns;
 
-        check_equal(s_reg_write_enable, std_logic'('1'), "LOAD should write to register");
-        check_equal(s_mem_rw_o, std_logic'('0'), "LOAD should read from memory");
-        check_equal(s_wb_select_o, std_logic'('0'), "LOAD should read data from memory");
-        check_equal(s_b_sel, std_logic'('1'), "LOAD uses immediate ADD");
+        -- LB (funct3=000)
+        s_funct3 <= "000";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LB should write rd");
+        check_equal(s_mem_rw_o,         '0', "LB should read memory");
+        check_equal(s_wb_select_o,      '0', "LB wb from memory");
+        check_equal(s_b_sel,            '1', "LB uses immediate");
         check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "Address is calculated using ALU_ADD");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LB addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("00"), "LB mem_size byte");
+        check_equal(s_mem_unsigned_o,   '0',  "LB signed");
 
-        s_opcode <= "0100011"; -- SW
-        s_funct3 <= "010";
-        s_funct7 <= (others => '0');
+        -- LH (funct3=001)
+        s_funct3 <= "001";
         wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LH should write rd");
+        check_equal(s_mem_rw_o,         '0', "LH should read memory");
+        check_equal(s_wb_select_o,      '0', "LH wb from memory");
+        check_equal(s_b_sel,            '1', "LH uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LH addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("01"), "LH mem_size half");
+        check_equal(s_mem_unsigned_o,   '0',  "LH signed");
 
-        check_equal(s_reg_write_enable, std_logic'('0'), "STORE should read from register");
-        check_equal(s_mem_rw_o, std_logic'('1'), "STORE should write to memory");
-        check_equal(s_b_sel, std_logic'('1'), "STORE uses immediate ADD");
-        check_equal(s_imm_sel, std_logic_vector'("010"), "STORE imm_sel must be 010");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "Address is calculated using ALU_ADD");
-      
+        -- LW (funct3=010)
+        s_funct3 <= "010";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LW should write rd");
+        check_equal(s_mem_rw_o,         '0', "LW should read memory");
+        check_equal(s_wb_select_o,      '0', "LW wb from memory");
+        check_equal(s_b_sel,            '1', "LW uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LW addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("10"), "LW mem_size word");
+        check_equal(s_mem_unsigned_o,   '0',  "LW signed");
+
+        -- LBU (funct3=100)
+        s_funct3 <= "100";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LBU should write rd");
+        check_equal(s_mem_rw_o,         '0', "LBU should read memory");
+        check_equal(s_wb_select_o,      '0', "LBU wb from memory");
+        check_equal(s_b_sel,            '1', "LBU uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LBU addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("00"), "LBU mem_size byte");
+        check_equal(s_mem_unsigned_o,   '1',  "LBU unsigned");
+
+        -- LHU (funct3=101)
+        s_funct3 <= "101";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LHU should write rd");
+        check_equal(s_mem_rw_o,         '0', "LHU should read memory");
+        check_equal(s_wb_select_o,      '0', "LHU wb from memory");
+        check_equal(s_b_sel,            '1', "LHU uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LHU addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("01"), "LHU mem_size half");
+        check_equal(s_mem_unsigned_o,   '1',  "LHU unsigned");
+        
+        -----------------------------------------------------------------------
+        -- STORES: SB, SH, SW (opcode = 0100011)
+        -- Expected:
+        --  imm_sel = 010, b_sel=1, alu_op=ADD, mem_rw=1
+        --  reg_write_enable=0, wb_select stays default (0)
+        --  mem_size = funct3(1 downto 0)
+        --  mem_unsigned should remain default '0' (not used for store)
+        -----------------------------------------------------------------------
+        s_opcode     <= "0100011";
+        s_funct7     <= (others => '0');
+        s_imm_i_type <= (others => '0');
+
+        -- SB (funct3=000)
+        s_funct3 <= "000";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "SB must not write rd");
+        check_equal(s_mem_rw_o,         '1', "SB must write memory");
+        check_equal(s_b_sel,            '1', "SB uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("010"), "LOAD imm_sel must be 010");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "SB addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("00"), "SB mem_size byte");
+        check_equal(s_mem_unsigned_o,   '0',  "SB unsigned flag unused -> default 0");
+
+        -- SH (funct3=001)
+        s_funct3 <= "001";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "SH must not write rd");
+        check_equal(s_mem_rw_o,         '1', "SH must write memory");
+        check_equal(s_b_sel,            '1', "SH uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("010"), "LOAD imm_sel must be 010");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "SH addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("01"), "SH mem_size half");
+        check_equal(s_mem_unsigned_o,   '0',  "SH unsigned flag unused -> default 0");
+
+        -- SW (funct3=010)
+        s_funct3 <= "010";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "SW must not write rd");
+        check_equal(s_mem_rw_o,         '1', "SW must write memory");
+        check_equal(s_b_sel,            '1', "SW uses immediate");
+        check_equal(s_imm_sel, std_logic_vector'("010"), "LOAD imm_sel must be 010");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "SW addr via ADD");
+        check_equal(s_mem_size_o, std_logic_vector'("10"), "SW mem_size word");
+        check_equal(s_mem_unsigned_o,   '0',  "SW unsigned flag unused -> default 0");
+
       elsif run("test_invalid_encodings") then
         ---------------------------------------------------------------------------
         -- 1) Completely invalid opcode
