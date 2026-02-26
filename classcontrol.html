@@ -124,6 +124,10 @@ Ports</h2></td></tr>
 <tr class="memdesc:aeb4575df23ac8d6f59bf1fa5145b7057"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">ALU operation select.  <a href="#aeb4575df23ac8d6f59bf1fa5145b7057"></a><br /></td></tr>
 <tr class="memitem:a0269bee8105dddb6f8974333d0876b58"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a0269bee8105dddb6f8974333d0876b58">mem_rw_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a0269bee8105dddb6f8974333d0876b58"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Data memory control.  <a href="#a0269bee8105dddb6f8974333d0876b58"></a><br /></td></tr>
+<tr class="memitem:a916b80cc60b06041126d45360a670d8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a916b80cc60b06041126d45360a670d8e">mem_size_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">1</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a916b80cc60b06041126d45360a670d8e"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">00=Byte, 01=Half, 10=Word  <a href="#a916b80cc60b06041126d45360a670d8e"></a><br /></td></tr>
+<tr class="memitem:a74b7f554ef2c472d3b9756cffa32b990"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#a74b7f554ef2c472d3b9756cffa32b990">mem_unsigned_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a74b7f554ef2c472d3b9756cffa32b990"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">1=Unsigned (LBU/LHU), 0=Signed  <a href="#a74b7f554ef2c472d3b9756cffa32b990"></a><br /></td></tr>
 <tr class="memitem:aa6b14173bc56533a5239c2e5ee1c3fce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcontrol.html#aa6b14173bc56533a5239c2e5ee1c3fce">wb_select_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:aa6b14173bc56533a5239c2e5ee1c3fce"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Write-back multiplexer select.  <a href="#aa6b14173bc56533a5239c2e5ee1c3fce"></a><br /></td></tr>
 </table>
@@ -339,6 +343,54 @@ Ports</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Data memory control. </p>
+
+</div>
+</div>
+<a id="a916b80cc60b06041126d45360a670d8e" name="a916b80cc60b06041126d45360a670d8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a916b80cc60b06041126d45360a670d8e">&#9670;&#160;</a></span>mem_size_o</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcontrol.html#a916b80cc60b06041126d45360a670d8e">mem_size_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">1</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>00=Byte, 01=Half, 10=Word </p>
+
+</div>
+</div>
+<a id="a74b7f554ef2c472d3b9756cffa32b990" name="a74b7f554ef2c472d3b9756cffa32b990"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74b7f554ef2c472d3b9756cffa32b990">&#9670;&#160;</a></span>mem_unsigned_o</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcontrol.html#a74b7f554ef2c472d3b9756cffa32b990">mem_unsigned_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>1=Unsigned (LBU/LHU), 0=Signed </p>
 
 </div>
 </div>
