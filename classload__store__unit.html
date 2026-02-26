@@ -111,6 +111,10 @@ Ports</h2></td></tr>
 <tr class="memdesc:ae8d3e5458b0e3cd523d6461463e36fe8"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Global clock signal.  <a href="#ae8d3e5458b0e3cd523d6461463e36fe8"></a><br /></td></tr>
 <tr class="memitem:ab86c7a8eec3a8327e506892977f85708"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#ab86c7a8eec3a8327e506892977f85708">rst_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:ab86c7a8eec3a8327e506892977f85708"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Asynchronous reset, active high.  <a href="#ab86c7a8eec3a8327e506892977f85708"></a><br /></td></tr>
+<tr class="memitem:aa69c0014783e759c7e1316923565c0f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#aa69c0014783e759c7e1316923565c0f9">sign_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:aa69c0014783e759c7e1316923565c0f9"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Bit telling the sign of the data to be read (1 = unsigned, 0 = signed)  <a href="#aa69c0014783e759c7e1316923565c0f9"></a><br /></td></tr>
+<tr class="memitem:a3b7c3ebf55e91939ebd79c0bb691599b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#a3b7c3ebf55e91939ebd79c0bb691599b">width_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">1</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a3b7c3ebf55e91939ebd79c0bb691599b"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the data to be read (byte=00, halfword=01, word=10)  <a href="#a3b7c3ebf55e91939ebd79c0bb691599b"></a><br /></td></tr>
 <tr class="memitem:a177799bc66804e26db320db1fed80dfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#a177799bc66804e26db320db1fed80dfe">addr_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a177799bc66804e26db320db1fed80dfe"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory address for access.  <a href="#a177799bc66804e26db320db1fed80dfe"></a><br /></td></tr>
 <tr class="memitem:ab3aeae00a6a62bbd6e23d91bc37746d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#ab3aeae00a6a62bbd6e23d91bc37746d1">mem_RW_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
@@ -334,6 +338,30 @@ Ports</h2></td></tr>
 
 </div>
 </div>
+<a id="aa69c0014783e759c7e1316923565c0f9" name="aa69c0014783e759c7e1316923565c0f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa69c0014783e759c7e1316923565c0f9">&#9670;&#160;</a></span>sign_i</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classload__store__unit.html#aa69c0014783e759c7e1316923565c0f9">sign_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bit telling the sign of the data to be read (1 = unsigned, 0 = signed) </p>
+
+</div>
+</div>
 <a id="acd03516902501cd1c7296a98e22c6fcb" name="acd03516902501cd1c7296a98e22c6fcb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acd03516902501cd1c7296a98e22c6fcb">&#9670;&#160;</a></span>std_logic_1164</h2>
 
@@ -353,6 +381,30 @@ Ports</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3b7c3ebf55e91939ebd79c0bb691599b" name="a3b7c3ebf55e91939ebd79c0bb691599b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b7c3ebf55e91939ebd79c0bb691599b">&#9670;&#160;</a></span>width_i</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classload__store__unit.html#a3b7c3ebf55e91939ebd79c0bb691599b">width_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">1</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Type of the data to be read (byte=00, halfword=01, word=10) </p>
 
 </div>
 </div>
