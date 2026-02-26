@@ -56,7 +56,9 @@ architecture arch of load_store_unit_tb is
   signal mem_RW_s     : std_logic := '0';
   signal data_write_s : std_logic_vector(31 downto 0) := (others => '0');
   signal data_read_s  : std_logic_vector(31 downto 0) := (others => '0');
-  signal sim_stop_s : std_logic := '0';
+  signal sim_stop_s   : std_logic := '0';
+  signal sign_s       : std_logic;
+  signal width_s      : std_logic_vector(1 downto 0);
 
   signal word_to_write : std_logic_vector(31 downto 0) := (others => '0');
   constant c_CLK_PERIOD : time := 10 ns;
@@ -70,7 +72,9 @@ begin
       addr_i       => addr_s,
       mem_RW_i     => mem_RW_s,
       data_write_i => data_write_s,
-      data_read_o  => data_read_s
+      data_read_o  => data_read_s,
+      sign_i       => sign_s,
+      width_i      => width_s
     );
 
   clk_process : process
@@ -99,8 +103,8 @@ begin
           error("Reset not functioning on load store unit");
         end if;
 
-      elsif run("test_load") then
-        info("Testing load function of load_store unit");
+      elsif run("test_load_word") then
+        info("Testing load word (lw) function of load_store unit");
 
         -- Test reading first word from DMEM
         expected := "00110011110011000000000011111111";
@@ -144,10 +148,170 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
-        info("Load test passed");
+        info("Load word test passed");
 
-      elsif run("test_store") then
-        info("Testing store function of load_store unit");
+      elsif run("test_load_half") then
+        info("Testing load half word (lh) function of load_store_unit");
+
+        -- Read first 2 bytes of memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        width_s <= "01";
+        sign_s <= '1';
+        expected := "00000000000000000000000011111111";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read second 2 bytes of memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(2, 32));
+        width_s <= "01";
+        sign_s <= '1';
+        expected := "00000000000000000011001111001100";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read 2 bytes of unreachable memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(257, 32));
+        width_s <= "01";
+        sign_s <= '1';
+        expected := (others => '0');
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read 2 bytes from address 4 memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        width_s <= "01";
+        sign_s <= '1';
+        expected := "00000000000000001010101010101010";
+
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read 2 bytes of unreachable memory unsigned
+        addr_s <= std_logic_vector(to_signed(-4, 32));
+        width_s <= "01";
+        sign_s <= '1';
+        expected := (others => '0');
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read first 2 bytes of memory signed
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        width_s <= "01";
+        sign_s <= '0';
+        expected := "00000000000000000000000011111111";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read 2 bytes from address 4 signed
+        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        width_s <= "01";
+        sign_s <= '0';
+        expected := "11111111111111111010101010101010";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+      elsif run("test_load_byte") then
+        info("Testing load byte(lb) function of load_store_unit");
+
+        -- Read first byte of memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        width_s <= "00";
+        sign_s <= '1';
+        expected := "00000000000000000000000011111111";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read byte 2 of memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(2, 32));
+        width_s <= "00";
+        sign_s <= '1';
+        expected := "00000000000000000000000011001100";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read byte of unreachable memory unsigned
+        addr_s <= std_logic_vector(to_unsigned(257, 32));
+        width_s <= "00";
+        sign_s <= '1';
+        expected := (others => '0');
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read byte of unreachable memory unsigned
+        addr_s <= std_logic_vector(to_signed(-4, 32));
+        width_s <= "00";
+        sign_s <= '1';
+        expected := (others => '0');
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read byte of memory signed
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        width_s <= "00";
+        sign_s <= '0';
+        expected := "11111111111111111111111111111111";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read bytes from address 4 signed
+        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        width_s <= "00";
+        sign_s <= '0';
+        expected := "11111111111111111111111110101010";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+        -- Read byte from address 7 signed
+        addr_s <= std_logic_vector(to_unsigned(7, 32));
+        width_s <= "00";
+        sign_s <= '0';
+        expected := "00000000000000000000000000001111";
+        
+        wait for c_CLK_PERIOD;
+        if data_read_s /= expected then
+          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
+        end if;
+
+      elsif run("test_store_word") then
+        info("Testing store word (sw) function of load_store unit");
 
         -- Test storing word on byte 8
         addr_s <= std_logic_vector(to_unsigned(8, 32));
@@ -191,8 +355,7 @@ begin
         data_write_s <= std_logic_vector(to_unsigned(63, 32));
         mem_RW_s <= '1';
 
-        info("Store test passed");
-        
+        info("Store word test passed");
       end if;
     end loop;
 
