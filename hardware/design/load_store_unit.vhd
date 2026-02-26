@@ -48,7 +48,7 @@ entity load_store_unit is
     clk_i        : in  std_logic;                     --! Global clock signal
     rst_i        : in  std_logic;                     --! Asynchronous reset, active high
     sign_i       : in  std_logic;                     --! Bit telling the sign of the data to be read (1 = unsigned, 0 = signed)
-    width_i      : in  std_logic_vector(1 downto 0);  --! Port telling the type of the data to be read (byte=00, halfword=01, word=10)
+    width_i      : in  std_logic_vector(1 downto 0);  --! Type of the data to be read (byte=00, halfword=01, word=10)
     addr_i       : in  std_logic_vector(31 downto 0); --! Memory address for access
     mem_RW_i     : in  std_logic;                     --! Read/Write control: '1' for Write, '0' for Read
     data_write_i : in  std_logic_vector(31 downto 0); --! Data to be stored in memory
@@ -67,7 +67,7 @@ begin
   address <= to_integer(signed(addr_i));
 
   --! @brief Data Read and Sign Extension Logic.
-  --! @details Performs an asynchronous read from the byte-addressable DMEM. 
+  --! @details Performs an asynchronous read from the byte-addressable DMEM.
   --! The process formats the output based on the requested data width and sign:
   --! - **Byte (00)**: Loads 8 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.
   --! - **Halfword (01)**: Loads 16 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.
