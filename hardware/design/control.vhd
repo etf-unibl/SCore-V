@@ -45,18 +45,6 @@
 --! This module decodes the instruction fields provided by the instruction decoder
 --! (opcode/funct3/funct7) and generates datapath control signals.
 --!
---! Supported instructions:
---!
---! R-type:
---!   - ADD  (opcode=0110011, funct3=000, funct7=0000000)
---!
---! I-type:
---!   - ADDI (opcode=0010011, funct3=000)
---!   - LW   (opcode=0000011, funct3=010)
---!
---! S-type:
---!   - SW   (opcode=0100011, funct3=010)
---!
 --! Generated control signals:
 --!
 --! - reg_write_enable_o:
@@ -92,14 +80,17 @@ use work.alu_pkg.all;
 --! @brief Entity definition of control unit
 entity control is
   port (
-    opcode_i           : in  std_logic_vector(6 downto 0); --! Instruction opcode
-    funct3_i           : in  std_logic_vector(2 downto 0); --! Instruction funct3 field
-    funct7_i           : in  std_logic_vector(6 downto 0); --! Instruction funct7 field
+    opcode_i           : in  std_logic_vector(6 downto 0);  --! Instruction opcode
+    funct3_i           : in  std_logic_vector(2 downto 0);  --! Instruction funct3 field
+    funct7_i           : in  std_logic_vector(6 downto 0);  --! Instruction funct7 field
+    imm_i_type_i       : in  std_logic_vector(11 downto 0); --! I-type immediate (instr[31:20])
     reg_write_enable_o : out std_logic;                     --! Register write enable signal
     imm_sel_o          : out std_logic_vector(2 downto 0);  --! Immediate select/qualifier
     b_sel_o            : out std_logic;                     --! ALU operand B select (0=rs2_data, 1=immediate)
-    alu_op_o           : out t_alu_op;                      --! ALU operation select (e.g. ALU_ADD, ALU_NOP)
+    alu_op_o           : out t_alu_op;                      --! ALU operation select
     mem_rw_o           : out std_logic;                     --! Data memory control
+    mem_size_o         : out std_logic_vector(1 downto 0);  --! 00=Byte, 01=Half, 10=Word
+    mem_unsigned_o     : out std_logic;                     --! 1=Unsigned (LBU/LHU), 0=Signed
     wb_select_o        : out std_logic                      --! Write-back multiplexer select
   );
 end entity control;
@@ -111,7 +102,7 @@ end entity control;
 architecture arch of control is
 begin
 
-  comb_proc : process (opcode_i, funct3_i, funct7_i)
+  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i)
   begin
     reg_write_enable_o <= '0';
     b_sel_o            <= '0';
@@ -119,30 +110,167 @@ begin
     imm_sel_o          <= "000";
     mem_rw_o           <= '0';
     wb_select_o        <= '0';
+    mem_size_o         <= "10"; -- Default Word
+    mem_unsigned_o     <= '0';
 
-    if (opcode_i = "0110011") and (funct3_i = "000") and (funct7_i = "0000000") then
-      reg_write_enable_o <= '1';
-      alu_op_o           <= ALU_ADD;  --! R-type ADD
-      wb_select_o        <= '1';
+-- =========================================================
+--                 R-type ALU instructions
+-- =========================================================
+    if opcode_i = "0110011" then
 
-    elsif (opcode_i = "0010011") and (funct3_i = "000") then
-      imm_sel_o          <= "001";
-      reg_write_enable_o <= '1';
-      b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; --! I-type ADDI
-      wb_select_o        <= '1';
+      if funct3_i = "000" then
+        if funct7_i = "0000000" then
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_ADD;
+        elsif funct7_i = "0100000" then
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_SUB;
+        end if;
 
-    elsif (opcode_i = "0000011") and (funct3_i = "010") then
-      imm_sel_o          <= "001";
-      reg_write_enable_o <= '1';
-      b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; --! I-type LOAD WORD
+      elsif (funct3_i = "001") and (funct7_i = "0000000") then
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_SLL;
 
-    elsif (opcode_i = "0100011") and (funct3_i = "010") then
-      imm_sel_o          <= "010";
-      b_sel_o            <= '1';
-      alu_op_o           <= ALU_ADD; --! S-type STORE WORD
-      mem_rw_o           <= '1';
+      elsif (funct3_i = "010") and (funct7_i = "0000000") then
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_SLT;
+
+      elsif (funct3_i = "011") and (funct7_i = "0000000") then
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_SLTU;
+
+      elsif (funct3_i = "100") and (funct7_i = "0000000") then
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_XOR;
+
+      elsif funct3_i = "101" then
+        if funct7_i = "0000000" then
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_SRL;
+        elsif funct7_i = "0100000" then
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_SRA;
+        end if;
+
+      elsif (funct3_i = "110") and (funct7_i = "0000000") then
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_OR;
+
+      elsif (funct3_i = "111") and (funct7_i = "0000000") then
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_AND;
+      end if;
+
+-- =========================================================
+--            I-type ALU immediate instructions
+-- =========================================================
+    elsif opcode_i = "0010011" then
+      if funct3_i = "000" then
+        imm_sel_o          <= "001";
+        b_sel_o            <= '1';
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_ADD;
+
+      elsif funct3_i = "010" then
+        imm_sel_o          <= "001";
+        b_sel_o            <= '1';
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_SLT;
+
+      elsif funct3_i = "011" then
+        imm_sel_o          <= "001";
+        b_sel_o            <= '1';
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_SLTU;
+
+      elsif funct3_i = "100" then
+        imm_sel_o          <= "001";
+        b_sel_o            <= '1';
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_XOR;
+
+      elsif funct3_i = "110" then
+        imm_sel_o          <= "001";
+        b_sel_o            <= '1';
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_OR;
+
+      elsif funct3_i = "111" then
+        imm_sel_o          <= "001";
+        b_sel_o            <= '1';
+        reg_write_enable_o <= '1';
+        wb_select_o        <= '1';
+        alu_op_o           <= ALU_AND;
+
+      elsif funct3_i = "001" then
+        if imm_i_type_i(11 downto 5) = "0000000" then
+          imm_sel_o          <= "001";
+          b_sel_o            <= '1';
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_SLL;
+        end if;
+
+      elsif funct3_i = "101" then
+        if imm_i_type_i(11 downto 5) = "0000000" then
+          imm_sel_o          <= "001";
+          b_sel_o            <= '1';
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_SRL;
+        elsif imm_i_type_i(11 downto 5) = "0100000" then
+          imm_sel_o          <= "001";
+          b_sel_o            <= '1';
+          reg_write_enable_o <= '1';
+          wb_select_o        <= '1';
+          alu_op_o           <= ALU_SRA;
+        end if;
+      end if;
+
+-- =========================================================
+--               LOAD and STORE instructions
+-- =========================================================
+    elsif opcode_i = "0000011" then
+
+      if funct3_i = "000" or funct3_i = "001" or funct3_i = "010" or funct3_i = "100" or funct3_i = "101" then
+
+        imm_sel_o   <= "001";
+        b_sel_o     <= '1';
+        alu_op_o    <= ALU_ADD;
+        wb_select_o <= '0';
+
+        reg_write_enable_o <= '1';
+        mem_size_o         <= funct3_i(1 downto 0);
+        mem_unsigned_o     <= funct3_i(2);
+
+      end if;
+
+    elsif opcode_i = "0100011" then
+      if funct3_i = "000" or funct3_i = "001" or funct3_i = "010" then
+
+        imm_sel_o <= "010";
+        b_sel_o   <= '1';
+        alu_op_o  <= ALU_ADD;
+
+        mem_rw_o   <= '1';
+        mem_size_o <= funct3_i(1 downto 0);
+
+      end if;
 
     end if;
 
