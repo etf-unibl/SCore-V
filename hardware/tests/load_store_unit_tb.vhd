@@ -89,7 +89,10 @@ begin
   end process clk_process;
 
   main : process
-    variable expected : std_logic_vector(31 downto 0);
+    variable expected  : std_logic_vector(31 downto 0);
+    variable written32 : std_logic_vector(31 downto 0);
+    variable written16 : std_logic_vector(15 downto 0);
+    variable written8  : std_logic_vector(7 downto 0);
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -356,6 +359,97 @@ begin
         mem_RW_s <= '1';
 
         info("Store word test passed");
+
+      elsif run("test_store_half") then
+        info("Testing store half word (sh) function of lsu");
+
+        -- Test store half word
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        data_write_s(15 downto 0) <= "1111000011110000";
+        mem_RW_s <= '1';
+
+        wait until clk_s;
+        wait until clk_s;
+        wait until clk_s;
+        written16 :=  DMEM(to_integer(unsigned(addr_s)) + 1) &
+                    DMEM(to_integer(unsigned(addr_s)));
+
+        if written16 /= data_write_s(15 downto 0) then
+          error("Expected " & to_string(data_write_s(15 downto 0)) & ", got " & to_string(written16));
+        end if;
+
+        -- Test store half word
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_unsigned(9, 32));
+        data_write_s(15 downto 0) <= "1100110011001100";
+        mem_RW_s <= '1';
+
+        wait until clk_s;
+        wait until clk_s;
+        wait until clk_s;
+        written16 :=  DMEM(to_integer(unsigned(addr_s)) + 1) &
+                    DMEM(to_integer(unsigned(addr_s)));
+
+        if written16 /= data_write_s(15 downto 0) then
+          error("Expected " & to_string(data_write_s(15 downto 0)) & ", got " & to_string(written16));
+        end if;
+
+        -- Test store half word at invalid address
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_unsigned(258, 32));
+        data_write_s(15 downto 0) <= "1100110011001100";
+        mem_RW_s <= '1';
+
+        -- Test store half word at invalid address
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_signed(-5, 32));
+        data_write_s(15 downto 0) <= "1100110011001100";
+        mem_RW_s <= '1';
+
+      elsif run("test_store_byte") then
+        info("Testing store byte (sb) function of lsu");
+
+        -- Test store byte
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        data_write_s(7 downto 0) <= "11110000";
+        mem_RW_s <= '1';
+
+        wait until clk_s;
+        wait until clk_s;
+        written8 := DMEM(to_integer(unsigned(addr_s)));
+
+        if written8 /= data_write_s(7 downto 0) then
+          error("Expected " & to_string(data_write_s(7 downto 0)) & ", got " & to_string(written8));
+        end if;
+
+        -- Test store byte
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_unsigned(9, 32));
+        data_write_s(7 downto 0) <= "11001100";
+        mem_RW_s <= '1';
+
+        wait until clk_s;
+        wait until clk_s;
+        written8 := DMEM(to_integer(unsigned(addr_s)));
+
+        if written8 /= data_write_s(7 downto 0) then
+          error("Expected " & to_string(data_write_s(7 downto 0)) & ", got " & to_string(written8));
+        end if;
+
+        -- Test store half word at invalid address
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_unsigned(258, 32));
+        data_write_s(7 downto 0) <= "11001100";
+        mem_RW_s <= '1';
+
+        -- Test store half word at invalid address
+        width_s <= "01";
+        addr_s <= std_logic_vector(to_signed(-5, 32));
+        data_write_s(7 downto 0) <= "11001100";
+        mem_RW_s <= '1';
+
       end if;
     end loop;
 
