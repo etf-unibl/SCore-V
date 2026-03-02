@@ -59,6 +59,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use std.textio.all;
+
+use ieee.std_logic_textio.all;
+
 --! @brief Global definitions for instruction formats and memory.
 package mem_pkg is
   --! @brief Generic instruction record representing raw fetch data.
@@ -82,10 +86,16 @@ package mem_pkg is
     21     => x"00000033",
     others => (others => '0')
   );
+  --! @brief Maximums of DMEM memory and IMEM memory
+  constant c_TOTAL_BYTES : integer := 1024;
 
   --! @brief Array type representing the instruction memory storage.
   subtype t_byte  is std_logic_vector(7 downto 0);
-  type t_bytes is array (0 to 255) of t_byte;
+  type t_bytes    is array (0 to c_TOTAL_BYTES - 1) of t_byte;
+
+  impure function initialize_memory(file_name : in string) return t_bytes;
+
+  constant c_IMEM_TEST : t_bytes := initialize_memory("instruction_memory.txt");
 
   --! @brief Array representing the data memory storage.
   signal DMEM : t_bytes := (
@@ -130,6 +140,7 @@ package mem_pkg is
 
   --! @brief Constant array containing the program to be executed.
   --! @details This serves as the ROM for the instruction fetch unit.
+
   constant c_IMEM : t_bytes := (
     0      => "10110011",
     1      => "10000111",
@@ -247,3 +258,37 @@ package mem_pkg is
   );
 
 end mem_pkg;
+
+package body mem_pkg is
+
+  impure function initialize_memory(file_name : in string) return t_bytes
+  is
+    file f_ptr                : text;
+    variable l                : line;
+    variable result           : t_bytes := (others => (others => '0'));
+    variable temp             : std_logic_vector(31 downto 0);
+    variable v_max_word_index : integer := (c_TOTAL_BYTES / 4) - 1;
+  begin
+    -- 1. Open the file in the action block to satisfy strict compilers
+    file_open(f_ptr, file_name, read_mode);
+
+    -- 2. Loop through the file
+    for i in 0 to v_max_word_index loop
+      if not endfile(f_ptr) then
+        readline(f_ptr, l);
+        read(l, temp);
+
+        result(i*4)     := temp(7 downto 0);
+        result(i*4 + 1) := temp(15 downto 8);
+        result(i*4 + 2) := temp(23 downto 16);
+        result(i*4 + 3) := temp(31 downto 24);
+      else
+        exit;
+      end if;
+    end loop;
+
+    file_close(f_ptr);
+    return result;
+  end function initialize_memory;
+
+end package body mem_pkg;
