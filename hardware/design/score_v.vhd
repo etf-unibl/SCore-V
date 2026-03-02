@@ -177,6 +177,8 @@ architecture arch of score_v is
       b_sel_o            : out std_logic;
       alu_op_o           : out t_alu_op;
       mem_rw_o           : out std_logic;
+      mem_size_o         : out std_logic_vector(1 downto 0);
+      mem_unsigned_o     : out std_logic;
       wb_select_o        : out std_logic
     );
   end component;
@@ -303,6 +305,8 @@ begin
       b_sel_o            => b_sel_sig,
       alu_op_o           => alu_op_sig,
       mem_rw_o           => mem_rw_sig,
+      mem_size_o         => width_s,
+      mem_unsigned_o     => sign_s,
       wb_select_o        => wb_select_sig
     );
 
