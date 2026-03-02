@@ -194,7 +194,7 @@ Signals</h2></td></tr>
 <p >Performs an asynchronous read from the byte-addressable DMEM. The process formats the output based on the requested data width and sign:</p><ul>
 <li><b>Byte (00)</b>: Loads 8 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.</li>
 <li><b>Halfword (01)</b>: Loads 16 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.</li>
-<li><b>Word (10)</b>: Loads 32 bits directly from four consecutive memory locations. <dl class="section note"><dt>Note</dt><dd>This process is combinatorial and updates whenever address, control signals, or memory content changes. </dd></dl>
+<li><b>Word (10)</b>: Loads 32 bits directly from four consecutive memory locations. width_i = 11 is interpreted the same way as the width_i = 10. <dl class="section note"><dt>Note</dt><dd>This process is combinatorial and updates whenever address, control signals, or memory content changes. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Validates that the address is within [0, 252] to prevent out-of-bounds array access during simulation. </dd></dl>
 </li>
 </ul>
