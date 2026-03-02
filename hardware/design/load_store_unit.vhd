@@ -72,6 +72,7 @@ begin
   --! - **Byte (00)**: Loads 8 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.
   --! - **Halfword (01)**: Loads 16 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.
   --! - **Word (10)**: Loads 32 bits directly from four consecutive memory locations.
+  --! width_i = 11 is interpreted the same way as the width_i = 10.
   --! @note This process is combinatorial and updates whenever address, control signals, or memory content changes.
   --! @warning Validates that the address is within [0, 252] to prevent out-of-bounds array access during simulation.
   process(address, sign_i, width_i, mem_RW_i, DMEM) is
@@ -112,10 +113,18 @@ begin
     --! Empty
     elsif rising_edge(clk_i) then
       if mem_RW_i = '1' and address >= 0 and address <= 252 then
-        DMEM(address)     <= data_write_i(7 downto 0);
-        DMEM(address + 1) <= data_write_i(15 downto 8);
-        DMEM(address + 2) <= data_write_i(23 downto 16);
-        DMEM(address + 3) <= data_write_i(31 downto 24);
+        case width_i is
+          when "00" => --! STORE BYTE (SB)
+            DMEM(address)     <= data_write_i(7 downto 0);
+          when "01" => --! STORE HALFWORD (SH)
+            DMEM(address)     <= data_write_i(7 downto 0);
+            DMEM(address + 1) <= data_write_i(15 downto 8);
+          when others => --! STORE WORD (SW)
+            DMEM(address)     <= data_write_i(7 downto 0);
+            DMEM(address + 1) <= data_write_i(15 downto 8);
+            DMEM(address + 2) <= data_write_i(23 downto 16);
+            DMEM(address + 3) <= data_write_i(31 downto 24);
+        end case;
       end if;
     end if;
   end process;
