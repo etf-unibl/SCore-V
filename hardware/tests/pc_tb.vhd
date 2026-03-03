@@ -8,7 +8,7 @@
 --
 -- description:
 --
---   This file implements self-checking testbench for pc unit
+--   This file implements self-checking testbench for pc unit.
 --
 --
 -----------------------------------------------------------------------------
