@@ -42,17 +42,40 @@
 --
 -- instruction    |31|FUNCT7|25|    |24|RS2|20|      |19|RS1|15|   |14|FUNCT3|12|   |11|RD|7|   |6|OPCODE|0|
 -- ADD                0000000          xxxxx            yyyyy           000           zzzzz       0110011
+-- SUB                0000010          xxxxx            yyyyy           000           zzzzz       0110011
+-- XOR                0000000          xxxxx            yyyyy           100           zzzzz       0110011
+-- OR                 0000000          xxxxx            yyyyy           110           zzzzz       0110011
+-- AND                0000000          xxxxx            yyyyy           111           zzzzz       0110011
+-- SLL                0000000          xxxxx            yyyyy           001           zzzzz       0110011
+-- SRL                0000000          xxxxx            yyyyy           101           zzzzz       0110011
+-- SRA                0000010          xxxxx            yyyyy           101           zzzzz       0110011
+-- SLT                0000000          xxxxx            yyyyy           010           zzzzz       0110011
+-- SLTU               0000000          xxxxx            yyyyy           011           zzzzz       0110011
 --
 ------------------------------------------------  I - TYPE  ------------------------------------------------
 --
 -- instruction    |31|IMM[11:0]|20|       |19|RS1|15|       |14|FUNCT3|12|       |11|RD|7|      |6|OPCODE|0|
 -- ADDI             xxxxxxxxxxxx             yyyyy              000                zzzzz          0010011
--- LOAD WORD        xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
+-- XORI             xxxxxxxxxxxx             yyyyy              100                zzzzz          0010011
+-- ORI              xxxxxxxxxxxx             yyyyy              110                zzzzz          0010011
+-- ANDI             xxxxxxxxxxxx             yyyyy              111                zzzzz          0010011
+-- SLLI             xxxxxxxxxxxx             yyyyy              001                zzzzz          0010011
+-- SRLI             xxxxxxxxxxxx             yyyyy              101                zzzzz          0010011
+-- SRAI             xxxxxxxxxxxx             yyyyy              101                zzzzz          0010011
+-- SLTI             xxxxxxxxxxxx             yyyyy              010                zzzzz          0010011
+-- SLTIU            xxxxxxxxxxxx             yyyyy              011                zzzzz          0010011
+-- LB               xxxxxxxxxxxx             yyyyy              000                zzzzz          0000011
+-- LH               xxxxxxxxxxxx             yyyyy              001                zzzzz          0000011
+-- LW               xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
+-- LBU              xxxxxxxxxxxx             yyyyy              100                zzzzz          0000011
+-- LHU              xxxxxxxxxxxx             yyyyy              101                zzzzz          0000011
 --
 ------------------------------------------------  S - TYPE  ------------------------------------------------
 --
 -- instruction   |31|IMM[11:5]|25|  |24|RS2|20|  |19|RS1|15|  |14|FUNCT3|12|   |11|IMM[4:0]|7|  |6|OPCODE|0|
--- STORE WORD         xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
+-- SB                xxxxxxx          yyyyy         zzzzz         000             xxxxx          0100011
+-- SH                xxxxxxx          yyyyy         zzzzz         001             xxxxx          0100011
+-- SW                xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
 --
 ------------------------------------------------------------------------------------------------------------
 
