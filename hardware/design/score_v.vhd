@@ -90,26 +90,24 @@ architecture arch of score_v is
   signal pc_sig       : std_logic_vector(31 downto 0); --! Current PC
   signal pc_next_sig  : std_logic_vector(31 downto 0); --! Next sequential PC
 
-  --! @brief Instruction and decoding signals
-  signal instr_sig    : t_instruction_rec;             --! Fetched instruction
-
-  signal opcode_sig       : std_logic_vector(6 downto 0);  --! Decoded opcode
-  signal rd_sig           : std_logic_vector(4 downto 0);  --! Decoded destination register
-  signal rs1_sig          : std_logic_vector(4 downto 0);  --! Decoded source register 1
-  signal rs2_sig          : std_logic_vector(4 downto 0);  --! Decoded source register 2
-  signal funct3_sig       : std_logic_vector(2 downto 0);  --! Decoded funct3 field
-  signal funct7_sig       : std_logic_vector(6 downto 0);  --! Decoded funct7 field
-  signal imm_i_type_sig   : std_logic_vector(11 downto 0); --! Decoded imm_i_type field
-  signal imm_s_type_h_sig : std_logic_vector(6 downto 0);  --! instr[31:25]
-  signal imm_s_type_l_sig : std_logic_vector(4 downto 0);  --! instr[11:7]
-
-
   --! @brief Control and Branching signals
   signal br_eq_sig        : std_logic;                     --! Comparator equal flag
   signal br_lt_sig        : std_logic;                     --! Comparator less-than flag
   signal a_sel_sig        : std_logic;                     --! MUX select for ALU operand A (RS1 vs PC)
   signal pc_sel_sig       : std_logic;                     --! MUX select for next PC (PC+4 vs Target)
   signal br_un_sig        : std_logic;                     --! Control for unsigned comparison
+
+  --! @brief Instruction and decoding signals
+  signal opcode_sig     : std_logic_vector(6 downto 0);   --! Decoded opcode
+  signal rd_sig         : std_logic_vector(4 downto 0);   --! Decoded destination register
+  signal rs1_sig        : std_logic_vector(4 downto 0);   --! Decoded source register 1
+  signal rs2_sig        : std_logic_vector(4 downto 0);   --! Decoded source register 2
+  signal funct3_sig     : std_logic_vector(2 downto 0);   --! Decoded funct3 field
+  signal funct7_sig     : std_logic_vector(6 downto 0);   --! Decoded funct7 field
+  signal imm_i_type_sig : std_logic_vector(11 downto 0);  --! Decoded imm_i_type field
+  signal imm_s_type_h_sig : std_logic_vector(6 downto 0); --! instr[31:25]
+  signal imm_s_type_l_sig : std_logic_vector(4 downto 0); --! instr[11:7]
+  signal imm_b_type_sig : std_logic_vector(11 downto 0);  --! instr[11:7]
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -132,6 +130,8 @@ architecture arch of score_v is
   signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
+  signal pc_sel_s       : std_logic; --! Selector for branch logic
+
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
   --!   the next PC input and clock/reset signals.
@@ -148,8 +148,10 @@ architecture arch of score_v is
   --! @details Computes the next PC value by incrementing the current PC.
   component pc_next_instruction is
     port (
-      pc_i       : in  std_logic_vector(31 downto 0);
-      pc_next_o  : out std_logic_vector(31 downto 0)
+      pc_target_i : in  std_logic_vector(31 downto 0);
+      pc_sel_i    : in  std_logic;
+      pc_i        : in  std_logic_vector(31 downto 0);
+      pc_next_o   : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -200,11 +202,12 @@ architecture arch of score_v is
   --! @details Sign-extends immediate values from the instruction based on the format.
   component imm_gen is
     port (
-      imm_i_type_i    : in  std_logic_vector(11 downto 0); --! Od instr[31:20]
-      imm_s_type_h_i  : in  std_logic_vector(6 downto 0);  --! Od instr[31:25]
+      imm_i_type_i    : in  std_logic_vector(11 downto 0);
+      imm_s_type_h_i  : in  std_logic_vector(6 downto 0);
       imm_s_type_l_i  : in  std_logic_vector(4 downto 0);
-      imm_sel_i          : in  std_logic_vector(2 downto 0);
-      imm_o              : out std_logic_vector(31 downto 0)
+      imm_b_type_i    : in  std_logic_vector(11 downto 0);
+      imm_sel_i       : in  std_logic_vector(2 downto 0);
+      imm_o           : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -287,8 +290,10 @@ begin
   --! @brief Next PC computation
   u_pc_next : pc_next_instruction
     port map (
-      pc_i      => pc_sig,
-      pc_next_o => pc_next_sig
+      pc_target_i => alu_result_sig,
+      pc_sel_i    => pc_sel_s,
+      pc_i        => pc_sig,
+      pc_next_o   => pc_next_sig
     );
 
   --! @brief Instruction decoder
@@ -334,6 +339,7 @@ begin
       imm_i_type_i    => imm_i_type_sig,
       imm_s_type_h_i  => imm_s_type_h_sig,
       imm_s_type_l_i  => imm_s_type_l_sig,
+      imm_b_type_i    => imm_b_type_sig,
       imm_sel_i       => imm_sel_sig,
       imm_o           => imm_sig
     );
