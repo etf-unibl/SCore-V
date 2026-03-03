@@ -23,6 +23,11 @@
 --       for both register and immediate shift instructions.
 --     - SLT uses signed comparison, while SLTU uses unsigned comparison.
 --
+--   Added branch condition flag coverage:
+--     - zero_o : asserted when y_o == 0 (useful for BEQ/BNE via SUB compare)
+--     - lt_o   : asserted when signed(a_i) < signed(b_i) (BLT/BGE)
+--     - ltu_o  : asserted when unsigned(a_i) < unsigned(b_i) (BLTU/BGEU)
+--
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
 -----------------------------------------------------------------------------
@@ -69,6 +74,10 @@ architecture arch of alu_tb is
   signal b_i : std_logic_vector(31 downto 0) := (others => '0');
   signal alu_op_i : t_alu_op := ALU_NOP;
   signal y_o : std_logic_vector(31 downto 0);
+  -- ALU flag outputs
+  signal zero_o : std_logic;
+  signal lt_o   : std_logic;
+  signal ltu_o  : std_logic;
 
   -- expected = (a + b) mod 2^32
   function exp_add(a, b : std_logic_vector(31 downto 0)) return std_logic_vector is
@@ -152,6 +161,43 @@ architecture arch of alu_tb is
     return std_logic_vector(shift_right(signed(a), shamt));
   end function;
 
+  function exp_zero_from_result(r : std_logic_vector(31 downto 0)) return std_logic is
+  begin
+    if r = x"00000000" then
+      return '1';
+    else
+      return '0';
+    end if;
+  end function;
+
+  function exp_lt(a, b : std_logic_vector(31 downto 0)) return std_logic is
+  begin
+    if signed(a) < signed(b) then
+      return '1';
+    else
+      return '0';
+    end if;
+  end function;
+
+  function exp_ltu(a, b : std_logic_vector(31 downto 0)) return std_logic is
+  begin
+    if unsigned(a) < unsigned(b) then
+      return '1';
+    else
+      return '0';
+    end if;
+  end function;
+
+  procedure check_flags(
+    constant exp_res : in std_logic_vector(31 downto 0);
+    constant msg     : in string
+  ) is
+  begin
+    check_equal(zero_o, exp_zero_from_result(exp_res), msg & " (zero_o)");
+    check_equal(lt_o,   exp_lt(a_i, b_i),             msg & " (lt_o)");
+    check_equal(ltu_o,  exp_ltu(a_i, b_i),            msg & " (ltu_o)");
+  end procedure;
+
 begin
 
   uut_alu : entity design_lib.alu
@@ -159,7 +205,10 @@ begin
       a_i      => a_i,
       b_i      => b_i,
       alu_op_i => alu_op_i,
-      y_o      => y_o
+      y_o      => y_o,
+      zero_o   => zero_o,
+      lt_o     => lt_o,
+      ltu_o    => ltu_o
     );
 
   main : process
@@ -176,7 +225,10 @@ begin
         a_i <= x"FFFFFFFF";
         b_i <= x"12345678";
         wait for 10 ns;
+
+        exp := (others => '0');
         check_equal(y_o, C_ZERO32, "ALU_NOP should output zero");
+        check_flags(exp, "ALU_NOP");
 
       elsif run("test_add") then
         info("Testing ADD operation of ALU");
@@ -188,15 +240,20 @@ begin
             a_i <= std_logic_vector(to_unsigned(i, 32));
             b_i <= std_logic_vector(to_unsigned(j, 32));
             wait for 10 ns;
+
             exp := exp_add(a_i, b_i);
             check_equal(y_o, exp, "Loop ADD failed!");
+            check_flags(exp, "ADD loop i=" & integer'image(i) & " j=" & integer'image(j));
           end loop;
         end loop;
+
         a_i <= x"FFFFFFFF";
         b_i <= x"FFFFFFFF";
         wait for 10 ns;
+
         exp := exp_add(a_i, b_i);
         check_equal(y_o, exp, "ADD overflow wrap-around failed!");
+        check_flags(exp, "ADD overflow wrap-around");
 
       elsif run("test_sub") then
         info("Testing SUB operation of ALU");
@@ -209,6 +266,7 @@ begin
         wait for 10 ns;
         exp := exp_sub(a_i, b_i);
         check_equal(y_o, exp, "SUB 10-5 failed");
+        check_flags(exp, "SUB 10-5");
 
         -- Wrap-around cases
         a_i <= x"00000000";
@@ -216,18 +274,21 @@ begin
         wait for 10 ns;
         exp := exp_sub(a_i, b_i);
         check_equal(y_o, exp, "SUB 0-1 wrap-around failed");
+        check_flags(exp, "SUB 0-1");
 
         a_i <= x"FFFFFFFF";
         b_i <= x"FFFFFFFF";
         wait for 10 ns;
         exp := exp_sub(a_i, b_i);
         check_equal(y_o, exp, "SUB FFFFFFFF-FFFFFFFF failed");
+        check_flags(exp, "SUB FFFFFFFF-FFFFFFFF");
 
         a_i <= x"80000000";
         b_i <= x"00000001";
         wait for 10 ns;
         exp := exp_sub(a_i, b_i);
         check_equal(y_o, exp, "SUB 80000000-1 failed");
+        check_flags(exp, "SUB 80000000-1");
 
       elsif run("test_xor") then
         info("Testing XOR operation of ALU");
@@ -239,6 +300,7 @@ begin
         wait for 10 ns;
         exp := exp_xor(a_i, b_i);
         check_equal(y_o, exp, "XOR 0^0 failed");
+        check_flags(exp, "XOR 0^0");
 
         -- all1 xor 0 = all1
         a_i <= "11111111111111111111111111111111";
@@ -246,6 +308,7 @@ begin
         wait for 10 ns;
         exp := exp_xor(a_i, b_i);
         check_equal(y_o, exp, "XOR all1^0 failed");
+        check_flags(exp, "XOR all^0");
 
         -- all1 xor all1 = 0
         a_i <= "11111111111111111111111111111111";
@@ -253,6 +316,7 @@ begin
         wait for 10 ns;
         exp := exp_xor(a_i, b_i);
         check_equal(y_o, exp, "XOR all1^all1 failed");
+        check_flags(exp, "XOR all1^all1");
 
         -- mixed pattern
         a_i <= "00010010001101000101011001111000"; -- 0x12345678
@@ -260,6 +324,7 @@ begin
         wait for 10 ns;
         exp := exp_xor(a_i, b_i);
         check_equal(y_o, exp, "XOR mixed pattern failed");
+        check_flags(exp, "XOR 0x12345678^0x87654321");
 
         -- 0xAAAAAAAA xor 0x55555555 = 0xFFFFFFFF
         a_i <= "10101010101010101010101010101010";
@@ -267,6 +332,7 @@ begin
         wait for 10 ns;
         exp := exp_xor(a_i, b_i);
         check_equal(y_o, exp, "XOR alternating bits failed");
+        check_flags(exp, "XOR 0xAAAAAAAA^0x55555555");
 
       elsif run("test_or") then
         info("Testing OR operation of ALU");
@@ -278,6 +344,7 @@ begin
         wait for 10 ns;
         exp := exp_or(a_i, b_i);
         check_equal(y_o, exp, "OR 0|0 failed");
+        check_flags(exp, "OR 0|0");
 
         -- all1 | 0 = all1
         a_i <= "11111111111111111111111111111111";
@@ -285,6 +352,7 @@ begin
         wait for 10 ns;
         exp := exp_or(a_i, b_i);
         check_equal(y_o, exp, "OR all1|0 failed");
+        check_flags(exp, "OR all1|0");
 
         -- mixed pattern(0x12345678 | 0x87654321)
         a_i <= "00010010001101000101011001111000";
@@ -292,6 +360,7 @@ begin
         wait for 10 ns;
         exp := exp_or(a_i, b_i);
         check_equal(y_o, exp, "OR mixed pattern 1 failed");
+        check_flags(exp, "OR 0x12345678|0x87654321");
 
         -- ORI-like case (immediate style on b_i)
         a_i <= "00000000000000001111111100000000"; -- 0x0000FF00
@@ -299,6 +368,7 @@ begin
         wait for 10 ns;
         exp := exp_or(a_i, b_i);
         check_equal(y_o, exp, "OR/ORI immediate-style case failed");
+        check_flags(exp, "OR 0x0000FF00|0x0000000F");
 
         -- mixed pattern(0x00FF00FF | 0x0F0F0F0F)
         a_i <= "00000000111111110000000011111111";
@@ -306,6 +376,7 @@ begin
         wait for 10 ns;
         exp := exp_or(a_i, b_i);
         check_equal(y_o, exp, "OR mixed pattern 2 failed");
+        check_flags(exp, "OR 0x00FF00FF|0x0F0F0F0F");
 
       elsif run("test_and") then
         info("Testing AND operation of ALU");
@@ -316,24 +387,28 @@ begin
         wait for 10 ns;
         exp := exp_and(a_i, b_i);
         check_equal(y_o, exp, "AND fail");
+        check_flags(exp, "AND 0xAAAAAAAA&0x55555555");
 
         a_i <= "11111111111111111111111111111111";
         b_i <= "11111111111111111111111111111111";
         wait for 10 ns;
         exp := exp_and(a_i, b_i);
         check_equal(y_o, exp, "AND fail");
+        check_flags(exp, "AND all1&all1");
 
         a_i <= "00000000000000000000000000000000";
         b_i <= "11111111101111111110111111111111";
         wait for 10 ns;
         exp := exp_and(a_i, b_i);
         check_equal(y_o, exp, "AND fail");
+        check_flags(exp, "AND 0&0xFFBFEFFF");
 
         a_i <= "00000000000000000000000000000000";
         b_i <= "00000000000000000000000000000000";
         wait for 10 ns;
         exp := exp_and(a_i, b_i);
         check_equal(y_o, exp, "AND fail");
+        check_flags(exp, "AND 0&0");
 
       elsif run("test_sll") then
         info("Testing SLL operation of ALU");
@@ -345,6 +420,7 @@ begin
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 0 << 0 failed");
+        check_flags(exp, "SLL 0<<0");
 
         -- 1 << 1 = 2
         a_i <= "00000000000000000000000000000001";
@@ -352,6 +428,7 @@ begin
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 1 << 1 failed");
+        check_flags(exp, "SLL 1<<1");
 
         -- LSB set shifted left by 31 -> MSB set
         a_i <= "00000000000000000000000000000001";
@@ -359,6 +436,7 @@ begin
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 1 << 31 failed");
+        check_flags(exp, "SLL 1<<31");
 
         -- shift left by 4
         a_i <= "00001111000000000000000000000000"; -- 0x0F000000
@@ -366,6 +444,7 @@ begin
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL 0x0F000000 << 4 failed");
+        check_flags(exp, "SLL 0x0F000000<<4");
 
         -- only b(4:0) matters
         a_i <= "00000000000000000000000000000001";
@@ -373,6 +452,7 @@ begin
         wait for 10 ns;
         exp := exp_sll(a_i, b_i);
         check_equal(y_o, exp, "SLL shamt from b(4:0) failed");
+        check_flags(exp, "SLL shamt b(4:0)");
 
       elsif run("test_srl") then
         info("Testing SRL operation of ALU");
@@ -384,6 +464,7 @@ begin
         wait for 10 ns;
         exp := exp_srl(a_i, b_i);
         check_equal(y_o, exp, "SRL 0 >> 0 failed");
+        check_flags(exp, "SRL 0>>0");
 
        -- 1 >> 1 = 0
        a_i <= "00000000000000000000000000000001";
@@ -391,6 +472,7 @@ begin
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL 1 >> 1 failed");
+       check_flags(exp, "SRL 1>>1");
 
        -- Logical shift right: fills with zeros on the left
        -- 0x80000000 >> 1 = 0x40000000
@@ -399,6 +481,7 @@ begin
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL 1000..0 >> 1 failed");
+       check_flags(exp, "SRL 0x80000000>>1");
 
        -- 0xF0000000 >> 4 = 0x0F000000
        a_i <= "11110000000000000000000000000000";
@@ -406,6 +489,7 @@ begin
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL 1111.... >> 4 failed");
+       check_flags(exp, "SRL 0xF0000000>>4");
 
        -- SRLI-like: only b_i(4 downto 0) is used as the shift amount
        a_i <= "10000000000000000000000000000000";
@@ -413,6 +497,7 @@ begin
        wait for 10 ns;
        exp := exp_srl(a_i, b_i);
        check_equal(y_o, exp, "SRL sh from b(4:0) failed");
+       check_flags(exp, "SRL shamt b(4:0)");
 
       elsif run("test_sra") then
         info("Testing SRA operation of ALU");
@@ -425,6 +510,7 @@ begin
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA positive failed");
+        check_flags(exp, "SRA 0x10>>>2");
 
         -- Arithmetic shift right replicates the sign bit (MSB) on the left
         -- 0x80000000 >>> 1 = 0xC0000000
@@ -433,6 +519,7 @@ begin
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA sign extension failed (MSB should stay 1)");
+        check_flags(exp, "SRA 0x80000000>>>1");
 
         -- Negative value example: sign-extension fills with ones
         -- 0xF0000000 >>> 4 = 0xFF000000
@@ -441,6 +528,7 @@ begin
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA shift 4 places failed");
+        check_flags(exp, "SRA 0xF0000000>>>4");
 
         -- Shift by 31 keeps only the sign after extension:
         -- 0x80000000 >>> 31 = 0xFFFFFFFF (i.e. -1)
@@ -449,6 +537,7 @@ begin
         wait for 10 ns;
         exp := exp_sra(a_i, to_integer(unsigned(b_i(4 downto 0))));
         check_equal(y_o, exp, "SRA shift by 31 failed (sign extension)");
+        check_flags(exp, "SRA 0x80000000>>>31");
 
       elsif run("test_slt") then
         info("Testing SLT operation of ALU");
@@ -460,6 +549,7 @@ begin
         wait for 10 ns;
         exp := exp_slt(a_i, b_i);
         check_equal(y_o, exp, "SLT 3<5 failed");
+        check_flags(exp, "SLT 3<5");
 
         -- 5 < 3 => 0
         a_i <= x"00000005";
@@ -467,6 +557,7 @@ begin
         wait for 10 ns;
         exp := exp_slt(a_i, b_i);
         check_equal(y_o, exp, "SLT 5<3 failed");
+        check_flags(exp, "SLT 5<3");
 
         -- -1 < 1 => 1
         a_i <= x"FFFFFFFF"; -- -1
@@ -474,6 +565,7 @@ begin
         wait for 10 ns;
         exp := exp_slt(a_i, b_i);
         check_equal(y_o, exp, "SLT -1<1 failed");
+        check_flags(exp, "SLT -1<1");
 
         -- 1 < -1 => 0
         a_i <= x"00000001"; -- 1
@@ -481,6 +573,7 @@ begin
         wait for 10 ns;
         exp := exp_slt(a_i, b_i);
         check_equal(y_o, exp, "SLT 1<-1 failed");
+        check_flags(exp, "SLT 1<-1");
 
         -- -10 < -5 => 1  (0xFFFFFFF6 < 0xFFFFFFFB signed)
         a_i <= x"FFFFFFF6"; -- -10
@@ -488,6 +581,7 @@ begin
         wait for 10 ns;
         exp := exp_slt(a_i, b_i);
         check_equal(y_o, exp, "SLT -10<-5 failed");
+        check_flags(exp, "SLT -10<-5");
 
         -- most negative < 0 => 1
         a_i <= x"80000000"; -- -2147483648
@@ -495,6 +589,7 @@ begin
         wait for 10 ns;
         exp := exp_slt(a_i, b_i);
         check_equal(y_o, exp, "SLT 0x80000000<0 failed");
+        check_flags(exp, "SLT min<0");
 
       elsif run("test_sltu") then
         info("Testing SLTU operation of ALU");
@@ -506,6 +601,7 @@ begin
         wait for 10 ns;
         exp := exp_sltu(a_i, b_i);
         check_equal(y_o, exp, "SLTU 3<5 failed");
+        check_flags(exp, "SLTU 3<5");
 
         -- 5 < 3 => 0
         a_i <= x"00000005";
@@ -513,6 +609,7 @@ begin
         wait for 10 ns;
         exp := exp_sltu(a_i, b_i);
         check_equal(y_o, exp, "SLTU 5<3 failed");
+        check_flags(exp, "SLTU 5<3");
 
         -- 0xFFFFFFFF < 1 => 0
         a_i <= x"FFFFFFFF";
@@ -520,6 +617,7 @@ begin
         wait for 10 ns;
         exp := exp_sltu(a_i, b_i);
         check_equal(y_o, exp, "SLTU 0xFFFFFFFF<1 failed");
+        check_flags(exp, "SLTU 0xFFFFFFFF<1");
 
         -- 1 < 0xFFFFFFFF => 1
         a_i <= x"00000001";
@@ -527,6 +625,7 @@ begin
         wait for 10 ns;
         exp := exp_sltu(a_i, b_i);
         check_equal(y_o, exp, "SLTU 1<0xFFFFFFFF failed");
+        check_flags(exp, "SLTU 1<0xFFFFFFFF");
 
         -- 0 < 0xFFFFFFFF => 1
         a_i <= x"00000000";
@@ -534,6 +633,58 @@ begin
         wait for 10 ns;
         exp := exp_sltu(a_i, b_i);
         check_equal(y_o, exp, "SLTU 0x00000000<0xFFFFFFFF failed");
+        check_flags(exp, "SLTU 0<0xFFFFFFFF");
+
+      elsif run("test_branch_flags") then
+        info("Testing branch flags: zero/lt/ltu basic cases");
+
+        alu_op_i <= ALU_SUB;
+        a_i <= x"12345678";
+        b_i <= x"12345678";
+        wait for 10 ns;
+
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB equal (y_o)");
+        check_flags(exp, "SUB equal (flags)");
+
+        alu_op_i <= ALU_SUB;
+        a_i <= x"FFFFFFFF";
+        b_i <= x"00000001";
+        wait for 10 ns;
+
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB -1-1 (y_o)");
+        check_flags(exp, "SUB -1 vs 1 (flags)");
+
+        alu_op_i <= ALU_SUB;
+        a_i <= x"00000001";
+        b_i <= x"FFFFFFFF";
+        wait for 10 ns;
+
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB 1-(-1) (y_o)");
+        check_flags(exp, "SUB 1 vs -1 (flags)");
+
+      elsif run("test_branch_flags_boundaries") then
+        info("Testing branch flags: boundary/edge cases");
+
+        alu_op_i <= ALU_SUB;
+        a_i <= x"80000000";
+        b_i <= x"00000000";
+        wait for 10 ns;
+
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB minint-0 (y_o)");
+        check_flags(exp, "SUB minint vs 0 (flags)");
+
+        alu_op_i <= ALU_SUB;
+        a_i <= x"00000000";
+        b_i <= x"80000000";
+        wait for 10 ns;
+
+        exp := exp_sub(a_i, b_i);
+        check_equal(y_o, exp, "SUB 0-minint (y_o)");
+        check_flags(exp, "SUB 0 vs minint (flags)");
 
       end if;
     end loop;

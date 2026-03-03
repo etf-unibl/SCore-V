@@ -14,6 +14,11 @@
 --   operations required by the RV32I base integer instruction set.
 --   For shift operations, the shift amount is taken from b_i(4 downto 0).
 --
+--   In addition to the 32-bit result (y_o), the ALU provides branch-related flags:
+--     * zero_o = '1' when the ALU result equals 0 (y_o/res_s == 0)
+--     * lt_o   = '1' when signed(a_i) < signed(b_i)
+--     * ltu_o  = '1' when unsigned(a_i) < unsigned(b_i)
+--
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
 -----------------------------------------------------------------------------
@@ -47,6 +52,10 @@
 --! Operands are provided as 32-bit vectors (a_i, b_i) and the result is y_o.
 --! For shift operations, only b_i(4 downto 0) is used as the shift amount.
 --! SLT performs signed comparison, while SLTU performs unsigned comparison.
+--! Branch-related flags:
+--!  - zero_o = '1' when the ALU result (y_o / internal res_s) equals 0
+--!  - lt_o   = '1' when signed(a_i) < signed(b_i)
+--!  - ltu_o  = '1' when unsigned(a_i) < unsigned(b_i)
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -60,13 +69,17 @@ entity alu is
     a_i      : in  std_logic_vector(31 downto 0); --! First operand
     b_i      : in  std_logic_vector(31 downto 0); --! Second operand
     alu_op_i : in  t_alu_op;                      --! Operation select
-    y_o      : out std_logic_vector(31 downto 0)  --! Result
+    y_o      : out std_logic_vector(31 downto 0);  --! Result
+    --! @brief Branch-related flags
+    zero_o   : out std_logic;  --! '1' when y_o == 0
+    lt_o     : out std_logic;  --! signed(a_i) < signed(b_i)
+    ltu_o    : out std_logic   --! unsigned(a_i) < unsigned(b_i)
   );
 end entity alu;
 
 --! @brief Architecture implementation of the ALU
 --! @details
---! Pure combinational logic. The internal signal res_s holds the computed result.
+--! Pure combinational logic. The internal signal res_s holds the computed result for y_o and zero_o.
 architecture arch of alu is
   signal res_s : std_logic_vector(31 downto 0);
 begin
@@ -131,6 +144,9 @@ begin
 
   --! @brief Result output
   --! @details Drives the ALU result to the output port.
-  y_o <= res_s;
+  y_o    <= res_s;
+  zero_o <= '1' when res_s = x"00000000" else '0';
+  lt_o   <= '1' when signed(a_i) < signed(b_i) else '0';
+  ltu_o  <= '1' when unsigned(a_i) < unsigned(b_i) else '0';
 
 end architecture arch;
