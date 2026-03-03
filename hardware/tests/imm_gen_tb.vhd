@@ -8,7 +8,7 @@
 --
 -- description:
 --
---   This file implements self-checking testbench for immediate generator unit
+--  This file implements self-checking testbench for immediate generator unit
 --
 --
 -----------------------------------------------------------------------------
@@ -54,11 +54,13 @@ architecture arch of imm_gen_tb is
   signal imm_i_type_i    : std_logic_vector(11 downto 0) := (others => '0');
   signal imm_s_type_h_i  : std_logic_vector(6 downto 0)  := (others => '0');
   signal imm_s_type_l_i  : std_logic_vector(4 downto 0)  := (others => '0');
+  signal imm_b_type_i    : std_logic_vector(11 downto 0) := (others => '0');
   signal imm_sel_i       : std_logic_vector(2 downto 0)  := (others => '0');
   signal imm_o           : std_logic_vector(31 downto 0);
-  
+
   constant c_SEL_I_TYPE : std_logic_vector(2 downto 0) := "001";
   constant c_SEL_S_TYPE : std_logic_vector(2 downto 0) := "010";
+  constant c_SEL_B_TYPE : std_logic_vector(2 downto 0) := "011";
 
 begin
 
@@ -67,46 +69,87 @@ begin
       imm_i_type_i   => imm_i_type_i,
       imm_s_type_h_i => imm_s_type_h_i,
       imm_s_type_l_i => imm_s_type_l_i,
+      imm_b_type_i   => imm_b_type_i,
       imm_sel_i      => imm_sel_i,
       imm_o          => imm_o
     );
 
+  -- Test process for Immediate Generator
+  -- This test verifies:
+  -- I-type immediates (positive and negative sign extension)
+  -- S-type immediates (correct concatenation and sign extension)
+  -- B-type immediates (left shift by 1, sign extension, edge values)
+  -- Default case behavior (output should be zero)
   main : process
   begin
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
-      if run("test_imm_gen") then 
-        
+      if run("test_imm_gen") then
+
+        -- I-Type tests
         imm_i_type_i <= std_logic_vector(to_signed(100, 12));
         imm_sel_i    <= c_SEL_I_TYPE;
         wait for 10 ns;
-        check_equal(to_integer(signed(imm_o)), 100, "I-Type Positive failed");
-        
+        check_equal(to_integer(signed(imm_o)), 100,
+                    "I-Type Positive failed");
+
         imm_i_type_i <= std_logic_vector(to_signed(-5, 12));
         imm_sel_i    <= c_SEL_I_TYPE;
         wait for 10 ns;
-        check_equal(to_integer(signed(imm_o)), -5, "I-Type Negative failed");
-        
-        imm_s_type_h_i <= "0111111"; 
-        imm_s_type_l_i <= "11111";  
+        check_equal(to_integer(signed(imm_o)), -5,
+                    "I-Type Negative failed");
+
+        -- S-Type tests
+        imm_s_type_h_i <= "0111111";
+        imm_s_type_l_i <= "11111";
         imm_sel_i      <= c_SEL_S_TYPE;
         wait for 10 ns;
-        check_equal(to_integer(signed(imm_o)), 2047, "S-positive failed");
+        check_equal(to_integer(signed(imm_o)), 2047,
+                    "S-Type Positive failed");
 
         imm_s_type_h_i <= "1111111";
         imm_s_type_l_i <= "11111";
         imm_sel_i      <= c_SEL_S_TYPE;
         wait for 10 ns;
-        check_equal(to_integer(signed(imm_o)), -1, "S-Negative failed");
-        
-        imm_sel_i <= "000"; 
+        check_equal(to_integer(signed(imm_o)), -1,
+                    "S-Type Negative failed");
+
+        imm_sel_i <= "000";
         wait for 10 ns;
-        check_equal(to_integer(signed(imm_o)), 0, "Default case should output zero");
-        
+        check_equal(to_integer(signed(imm_o)), 0,
+                    "Default case should output zero");
+
+        -- B-Type tests
+        -- Includes left shift by 1 and sign extension checks
+        imm_b_type_i <= std_logic_vector(to_signed(2, 12));
+        imm_sel_i    <= c_SEL_B_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), 4,
+                    "B-Type Positive (4 bytes) failed");
+
+        imm_b_type_i <= "011111111111";
+        imm_sel_i    <= c_SEL_B_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), 4094,
+                    "B-Type Max Positive failed");
+
+        imm_b_type_i <= (others => '1');
+        imm_sel_i    <= c_SEL_B_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), -2,
+                    "B-Type Small Negative (-2) failed");
+
+        imm_b_type_i <= "100000000000";
+        imm_sel_i    <= c_SEL_B_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), -4096,
+                    "B-Type Max Negative (-4096) failed");
+
       end if;
     end loop;
-    
+
     test_runner_cleanup(runner);
   end process main;
+
 end arch;
