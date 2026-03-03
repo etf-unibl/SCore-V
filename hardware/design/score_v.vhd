@@ -130,8 +130,6 @@ architecture arch of score_v is
   signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
-  signal pc_sel_s       : std_logic; --! Selector for branch logic
-
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
   --!   the next PC input and clock/reset signals.
@@ -291,7 +289,7 @@ begin
   u_pc_next : pc_next_instruction
     port map (
       pc_target_i => alu_result_sig,
-      pc_sel_i    => pc_sel_s,
+      pc_sel_i    => pc_sel_sig,
       pc_i        => pc_sig,
       pc_next_o   => pc_next_sig
     );
