@@ -118,7 +118,7 @@ begin
         funct3_o <= instr32_v(14 downto 12);
         rd_o     <= instr32_v(11 downto 7);
 
-      when "0010011" | "0000011" => --! I-type examples (OP-IMM or LOAD): 0010011 or 0000011
+      when "0010011" | "0000011" | "1100111" => --! I-type examples (OP-IMM or LOAD or JALR)
         imm_i_type_o <= instr32_v(31 downto 20);
         rs1_o        <= instr32_v(19 downto 15);
         funct3_o     <= instr32_v(14 downto 12);
@@ -140,7 +140,7 @@ begin
         imm_b_type_o(9 downto 4) <= instr32_v(30 downto 25); -- imm[10:5]
         imm_b_type_o(3 downto 0) <= instr32_v(11 downto 8);  -- imm[4:1]
 
-      when "1101111" | "1100111" => --! J-type (JUMP) : 1101111, 1100111
+      when "1101111" => --! J-type (JAL) : 1101111
         rd_o                         <= instr32_v(11 downto 7);
         imm_j_u_type_o(19)           <= instr32_v(31);
         imm_j_u_type_o(18 downto 11) <= instr32_v(19 downto 12);
