@@ -112,6 +112,8 @@ Ports</h2></td></tr>
 <tr class="memdesc:ad3df004775d0f3abd6fc1f326404feed"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">From instr[31:25].  <a href="#ad3df004775d0f3abd6fc1f326404feed"></a><br /></td></tr>
 <tr class="memitem:a33c1cdaa823c5a317d5b7239e4890379"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classimm__gen.html#a33c1cdaa823c5a317d5b7239e4890379">imm_s_type_l_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a33c1cdaa823c5a317d5b7239e4890379"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">From instr[11:7].  <a href="#a33c1cdaa823c5a317d5b7239e4890379"></a><br /></td></tr>
+<tr class="memitem:a7aac96599ee5a4bafe3e67b51b9e4f57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classimm__gen.html#a7aac96599ee5a4bafe3e67b51b9e4f57">imm_b_type_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">11</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a7aac96599ee5a4bafe3e67b51b9e4f57"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">B type immediate.  <a href="#a7aac96599ee5a4bafe3e67b51b9e4f57"></a><br /></td></tr>
 <tr class="memitem:aaabbcebe08646acba4dde21ba73480a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classimm__gen.html#aaabbcebe08646acba4dde21ba73480a3">imm_sel_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">2</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:aaabbcebe08646acba4dde21ba73480a3"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediate select.  <a href="#aaabbcebe08646acba4dde21ba73480a3"></a><br /></td></tr>
 <tr class="memitem:a70e7d5509fe3527a7e2845b5c87ae6e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classimm__gen.html#a70e7d5509fe3527a7e2845b5c87ae6e0">imm_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
@@ -119,7 +121,7 @@ Ports</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Immediate Generation Unit. </p>
-<p >Generates a 32-bit sign-extended immediate value. Currently supports only I-type and S-type instructions (e.g., ADDI). Other types will be added in future extensions. </p>
+<p >Generates a 32-bit sign-extended immediate value. Currently supports only I/S/B-type instructions. Other types will be added in future extensions. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a0a6af6eef40212dbaf130d57ce711256" name="a0a6af6eef40212dbaf130d57ce711256"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a6af6eef40212dbaf130d57ce711256">&#9670;&#160;</a></span>ieee</h2>
@@ -140,6 +142,30 @@ Ports</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7aac96599ee5a4bafe3e67b51b9e4f57" name="a7aac96599ee5a4bafe3e67b51b9e4f57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7aac96599ee5a4bafe3e67b51b9e4f57">&#9670;&#160;</a></span>imm_b_type_i</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classimm__gen.html#a7aac96599ee5a4bafe3e67b51b9e4f57">imm_b_type_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">11</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>B type immediate. </p>
 
 </div>
 </div>
