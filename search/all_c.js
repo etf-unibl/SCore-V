@@ -8,13 +8,16 @@ var searchData=
   ['pc_5fnext_5finstruction_2evhd_5',['pc_next_instruction.vhd',['../pc__next__instruction_8vhd.html',1,'']]],
   ['pc_5fnext_5fo_6',['pc_next_o',['../classpc__next__instruction.html#a47c1c29745d97b2d7ff3958d3af1f856',1,'pc_next_instruction']]],
   ['pc_5fnext_5fsig_7',['pc_next_sig',['../classscore__v_1_1arch.html#a8cad814ff0e9a3c737ef1ad317d71094',1,'score_v::arch']]],
-  ['pc_5fo_8',['pc_o',['../classpc.html#a3b1dd06064836b982a39318569cd4bad',1,'pc.pc_o()'],['../classscore__v.html#a3b1dd06064836b982a39318569cd4bad',1,'score_v.pc_o()']]],
+  ['pc_5fo_8',['pc_o',['../classscore__v.html#a3b1dd06064836b982a39318569cd4bad',1,'score_v.pc_o()'],['../classpc.html#a3b1dd06064836b982a39318569cd4bad',1,'pc.pc_o()']]],
   ['pc_5freg_9',['pc_reg',['../classpc_1_1arch.html#ab1848495c0d58b151137f7d3fc1bdc30',1,'pc::arch']]],
   ['pc_5freg_5fp_10',['pc_reg_p',['../classpc_1_1arch.html#a383ecc1ddd95809bb6059177dfedc424',1,'pc::arch']]],
-  ['pc_5fsig_11',['pc_sig',['../classscore__v_1_1arch.html#a328284cd6754d7c3b42f0f3cfbb5d9a9',1,'score_v::arch']]],
-  ['process_5f0_12',['PROCESS_0',['../classalu_1_1arch.html#a63497421ea207460135e0358829155d1',1,'alu::arch']]],
-  ['process_5f1_13',['PROCESS_1',['../classinstruction__decoder_1_1arch.html#a91ee9f06f77c4c7e84d9e0d48a8f2b27',1,'instruction_decoder::arch']]],
-  ['process_5f2_14',['PROCESS_2',['../classload__store__unit_1_1arch.html#a2e7550a0c8818d7bdb6a8b537c323ecf',1,'load_store_unit::arch']]],
-  ['process_5f3_15',['PROCESS_3',['../classload__store__unit_1_1arch.html#a7ee7794fecc26322b72c359b74b5feb6',1,'load_store_unit::arch']]],
-  ['process_5f4_16',['PROCESS_4',['../classreg__file_1_1arch.html#ad1ce6d4fc60a6c6256af04e491ae69ca',1,'reg_file::arch']]]
+  ['pc_5fsel_5fi_11',['pc_sel_i',['../classpc__next__instruction.html#aa19344a11453bf7faf8cd80d8ca90561',1,'pc_next_instruction']]],
+  ['pc_5fsel_5fs_12',['pc_sel_s',['../classscore__v_1_1arch.html#a9f7dd35eeeda85a2cf5da8df8f46373e',1,'score_v::arch']]],
+  ['pc_5fsig_13',['pc_sig',['../classscore__v_1_1arch.html#a328284cd6754d7c3b42f0f3cfbb5d9a9',1,'score_v::arch']]],
+  ['pc_5ftarget_5fi_14',['pc_target_i',['../classpc__next__instruction.html#ad35cf69c0f58274c16c41be9f6ca0e9f',1,'pc_next_instruction']]],
+  ['process_5f0_15',['PROCESS_0',['../classalu_1_1arch.html#a63497421ea207460135e0358829155d1',1,'alu::arch']]],
+  ['process_5f1_16',['PROCESS_1',['../classinstruction__decoder_1_1arch.html#a91ee9f06f77c4c7e84d9e0d48a8f2b27',1,'instruction_decoder::arch']]],
+  ['process_5f2_17',['PROCESS_2',['../classload__store__unit_1_1arch.html#a2e7550a0c8818d7bdb6a8b537c323ecf',1,'load_store_unit::arch']]],
+  ['process_5f3_18',['PROCESS_3',['../classload__store__unit_1_1arch.html#a7ee7794fecc26322b72c359b74b5feb6',1,'load_store_unit::arch']]],
+  ['process_5f4_19',['PROCESS_4',['../classreg__file_1_1arch.html#ad1ce6d4fc60a6c6256af04e491ae69ca',1,'reg_file::arch']]]
 ];
