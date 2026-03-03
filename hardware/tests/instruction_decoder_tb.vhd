@@ -66,6 +66,7 @@ is
   signal imm_s_type_h_s : std_logic_vector(6 downto 0);
   signal imm_s_type_l_s : std_logic_vector(4 downto 0);
   signal imm_b_type_s   : std_logic_vector(11 downto 0);
+  signal imm_j_u_type_s : std_logic_vector(19 downto 0);
 
   constant c_CLK_PERIOD : time := 20 ns;
 
@@ -81,6 +82,7 @@ is
     exp_imm_s_h : std_logic_vector(6 downto 0);
     exp_imm_s_l : std_logic_vector(4 downto 0);
     exp_imm_b   : std_logic_vector(11 downto 0);
+    exp_imm_j_u : std_logic_vector(19 downto 0);
   end record t_test_vector;
 
   type t_test_vector_array is array(natural range <>) of t_test_vector;
@@ -88,19 +90,27 @@ is
   constant c_TEST_VECTORS : t_test_vector_array := (
     -- R-type: add x3, x1, x2
     (x"002081B3", "0110011", "00001", "00010", "00011", "000", "0000000",
-     x"000",      "0000000", "00000", x"000"),
+     x"000",      "0000000", "00000", x"000", x"00000"),
 
     -- I-type: addi x5, x1, 10
     (x"00A08293", "0010011", "00001", "00000", "00101", "000", "0000000",
-     x"00A",      "0000000", "00000", x"000"),
+     x"00A",      "0000000", "00000", x"000", x"00000"),
 
     -- S-type: sw x2, 4(x1)
     (x"0020A223", "0100011", "00001", "00010", "00000", "010", "0000000",
-     x"000",      "0000000", "00100", x"000"),
+     x"000",      "0000000", "00100", x"000", x"00000"),
 
     -- B-type: beq x1, x2, +16  (if REG[x1]==REG[x2] jump 4 instructions)
     (x"00208863", "1100011", "00001", "00010", "00000", "000", "0000000",
-     x"000",      "0000000", "00000", x"008")
+     x"000",      "0000000", "00000", x"008", x"00000"),
+
+    -- U-type: lui x5, 0xABCDE
+    (x"ABCDE2B7", "0110111", "00000", "00000", "00101", "000", "0000000",
+     x"000",      "0000000", "00000", x"000", x"ABCDE"),
+
+    -- J-type: jal x1, +4
+    (x"004000EF", "1101111", "00000", "00000", "00001", "000", "0000000",
+     x"000",      "0000000", "00000", x"000", x"00002")
   );
 
 begin
@@ -117,7 +127,8 @@ begin
       imm_i_type_o   => imm_i_type_s,
       imm_s_type_h_o => imm_s_type_h_s,
       imm_s_type_l_o => imm_s_type_l_s,
-      imm_b_type_o   => imm_b_type_s
+      imm_b_type_o   => imm_b_type_s,
+      imm_j_u_type_o => imm_j_u_type_s
     );
 
   stimulus_check : process
@@ -172,6 +183,10 @@ begin
 
           if imm_b_type_s /= c_TEST_VECTORS(i).exp_imm_b then
             failure("Imm_B mismatch at index " & integer'image(i));
+          end if;
+
+          if imm_j_u_type_s /= c_TEST_VECTORS(i).exp_imm_j_u then
+            failure("Imm_J_U mismatch at index " & integer'image(i));
           end if;
 
         end loop;
