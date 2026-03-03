@@ -124,6 +124,8 @@ architecture arch of score_v is
   signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
+  signal pc_sel_s       : std_logic; --! Selector for branch logic
+
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
   --!   the next PC input and clock/reset signals.
@@ -140,8 +142,10 @@ architecture arch of score_v is
   --! @details Computes the next PC value by incrementing the current PC.
   component pc_next_instruction is
     port (
-      pc_i       : in  std_logic_vector(31 downto 0);
-      pc_next_o  : out std_logic_vector(31 downto 0)
+      pc_target_i : in  std_logic_vector(31 downto 0);
+      pc_sel_i    : in  std_logic;
+      pc_i        : in  std_logic_vector(31 downto 0);
+      pc_next_o   : out std_logic_vector(31 downto 0)
     );
   end component;
 
@@ -274,8 +278,10 @@ begin
   --! @brief Next PC computation
   u_pc_next : pc_next_instruction
     port map (
-      pc_i      => pc_sig,
-      pc_next_o => pc_next_sig
+      pc_target_i => alu_result_sig,
+      pc_sel_i    => pc_sel_s,
+      pc_i        => pc_sig,
+      pc_next_o   => pc_next_sig
     );
 
   --! @brief Instruction decoder
