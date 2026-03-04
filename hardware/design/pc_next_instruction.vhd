@@ -8,7 +8,7 @@
 --
 -- description:
 --
---   This file implements a simple next Program Counter (PC) calculation
+--   This file implements next Program Counter (PC) calculation
 --   logic.
 --
 -----------------------------------------------------------------------------
@@ -47,8 +47,10 @@ use ieee.numeric_std.all;
 
 entity pc_next_instruction is
   port (
-    pc_i       : in  std_logic_vector(31 downto 0); --! Current Program Counter value
-    pc_next_o  : out std_logic_vector(31 downto 0)  --! Next sequential PC value
+    pc_target_i     : in  std_logic_vector(31 downto 0); --! Target PC value
+    pc_sel_i        : in  std_logic;                     --! Selector for branch logic
+    pc_i            : in  std_logic_vector(31 downto 0); --! Current Program Counter value
+    pc_next_o       : out std_logic_vector(31 downto 0)  --! Next sequential PC value
   );
 end pc_next_instruction;
 
@@ -57,5 +59,5 @@ end pc_next_instruction;
 architecture arch of pc_next_instruction is
 begin
   --! @brief Output assignment
-  pc_next_o <= std_logic_vector(unsigned(pc_i) + 4);
+  pc_next_o <= pc_target_i when pc_sel_i = '1' else std_logic_vector(unsigned(pc_i) + 4);
 end arch;
