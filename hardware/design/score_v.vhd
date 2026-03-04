@@ -117,6 +117,7 @@ architecture arch of score_v is
 
   --! @brief Datapath integration and control signals
   signal imm_sig       : std_logic_vector(31 downto 0); --! Immediate value output from the Immediate Generator
+  signal alu_a_sig     : std_logic_vector(31 downto 0); --! ALU operand A input, selected betwwen rs1_data and pc_sig
   signal alu_b_sig     : std_logic_vector(31 downto 0); --! ALU operand B input, selected between rs2_data and imm_sig
   signal imm_sel_sig   : std_logic_vector(2 downto 0);  --! Selection signal for Immediate Generator to define instruction format
   signal b_sel_sig     : std_logic;                     --! Control signal for ALU operand B source selection
@@ -209,15 +210,17 @@ architecture arch of score_v is
     );
   end component;
 
-  --! @brief ALU Operand B Multiplexer
-  --! @details Selects between register data and immediate value for ALU input.
-  component alu_operand_b_mux is
+  --! @brief Multiplexer
+  --! @details
+  --! Selects between register data and immediate value for ALU input
+  --! and selects between register data and pc
+  component mux2_1 is
     port (
-      in0_i : in  std_logic_vector(31 downto 0);
-      in1_i : in  std_logic_vector(31 downto 0);
-      sel_i : in  std_logic;
-      out_o : out std_logic_vector(31 downto 0)
-    );
+    in0_i : in  std_logic_vector(31 downto 0);
+    in1_i : in  std_logic_vector(31 downto 0);
+    sel_i : in  std_logic;
+    out_o : out std_logic_vector(31 downto 0)
+  );
   end component;
 
   --! @brief Load Store Unit
@@ -355,8 +358,17 @@ begin
       rs2_data_o  => rs2_data_sig
     );
 
+  --! @brief ALU Operand A Multiplexer
+  u_alu_a_mux : mux2_1
+    port map (
+      in0_i => rs1_data_sig,
+      in1_i => pc_sig,
+      sel_i => a_sel_sig,
+      out_o => alu_a_sig
+    );
+
   --! @brief ALU Operand B Multiplexer
-  u_alu_mux : alu_operand_b_mux
+  u_alu_b_mux : mux2_1
     port map (
       in0_i => rs2_data_sig,
       in1_i => imm_sig,
@@ -367,11 +379,12 @@ begin
   --! @brief ALU
   u_alu : alu
     port map (
-      a_i      => rs1_data_sig,
+      a_i      => alu_a_sig,
       b_i      => alu_b_sig,
       alu_op_i => alu_op_sig,
       y_o      => alu_result_sig
     );
+
   --! @brief Load Store Unit
   u_lsu : load_store_unit
     port map (
