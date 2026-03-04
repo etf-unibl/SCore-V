@@ -57,11 +57,15 @@ architecture arch of imm_gen_tb is
   signal imm_b_type_i    : std_logic_vector(11 downto 0) := (others => '0');
   signal imm_sel_i       : std_logic_vector(2 downto 0)  := (others => '0');
   signal imm_o           : std_logic_vector(31 downto 0);
+  signal imm_j_u_type_i  : std_logic_vector(19 downto 0) := (others => '0');
 
   constant c_SEL_I_TYPE : std_logic_vector(2 downto 0) := "001";
   constant c_SEL_S_TYPE : std_logic_vector(2 downto 0) := "010";
   constant c_SEL_B_TYPE : std_logic_vector(2 downto 0) := "011";
+  constant c_SEL_U_TYPE : std_logic_vector(2 downto 0) := "100";
+  constant c_SEL_J_TYPE : std_logic_vector(2 downto 0) := "101";
 
+  constant c_EXPECTED_U : std_logic_vector(31 downto 0) := x"12345000";
 begin
 
   uut_imm_gen : entity design_lib.imm_gen
@@ -70,6 +74,7 @@ begin
       imm_s_type_h_i => imm_s_type_h_i,
       imm_s_type_l_i => imm_s_type_l_i,
       imm_b_type_i   => imm_b_type_i,
+      imm_j_u_type_i => imm_j_u_type_i,
       imm_sel_i      => imm_sel_i,
       imm_o          => imm_o
     );
@@ -145,6 +150,24 @@ begin
         wait for 10 ns;
         check_equal(to_integer(signed(imm_o)), -4096,
                     "B-Type Max Negative (-4096) failed");
+        -- J and U types
+        imm_j_u_type_i <= x"12345";
+        imm_sel_i      <= c_SEL_U_TYPE;
+        wait for 10 ns;
+        check_equal(imm_o, c_EXPECTED_U, 
+                   "U-Type LUI failed");
+
+        imm_j_u_type_i <= "0" & "0000000010" & "0" & "00000000"; 
+        imm_sel_i      <= c_SEL_J_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), 4, 
+                    "J-Type Positive offset failed");
+
+        imm_j_u_type_i <= (others => '1');
+        imm_sel_i      <= c_SEL_J_TYPE;
+        wait for 10 ns;
+        check_equal(to_integer(signed(imm_o)), -2, 
+                    "J-Type Negative offset failed");
 
       end if;
     end loop;
