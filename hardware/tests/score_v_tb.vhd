@@ -133,10 +133,25 @@ architecture sim of score_v_tb is
     27 => (108, "0010011", "011", "0000000", 23, 20,0, 0,        0,        '1'),
     28 => (112, "0000011", "000", "0000010", 24, 0,0, 36,       -16,        '1'),
     29 => (116, "0100011", "000", "0000101",  0, 4,24, 36,        0,        '0'),
-	  30 => (120, "0000011", "001", "0000010", 24, 0, 0, 36,       240,        '1'),
-    31 => (124, "0000011", "101", "0000000", 24, 0, 0, 36, 240, '1'),
-    32 => (128, "0100011", "001", "0000000",  0, 0, 24, 36, 0, '0'),
-    33 => (132, "0000011", "100", "0000000", 24, 0, 0, 36, 240, '1')
+    30 => (120, "0000011", "001", "0000010", 24, 0, 0, 36,       240,        '1'),
+    31 => (124, "0000011", "101", "0000000", 24, 0, 0, 36,       240,        '1'),
+    32 => (128, "0100011", "001", "0000000",  0, 0, 24, 36,       0,        '0'),
+    33 => (132, "0000011", "100", "0000000", 24, 0, 0, 36,       240,        '1'),
+    34 => (136, "1100011", "000", "0000000", 0, 27, 26, 140,      0,        '0'),
+    35 => (140, "1100011", "000", "0000000", 0, 27, 25, 148,      0,        '0'),
+    36 => (144, "1100011", "001", "0000000", 0, 25, 26, 152,      0,        '0'),
+    37 => (152, "1100011", "100", "0000000", 0, 25, 26, 160,      0,        '0'),
+    38 => (160, "1100011", "101", "0000000", 0, 27, 25, 168,      0,        '0'), -- branch taken
+    39 => (168, "1100011", "101", "0000000", 0, 25, 25, 176,      0,        '0'), -- branch taken
+    40 => (176, "1100011", "101", "0000000", 0, 25, 26, 184,      0,        '0'), -- branch not taken
+    41 => (180, "1100011", "101", "0000000", 0, 28, 29, 188,      0,        '0'),
+    42 => (188, "1100011", "101", "0000000", 0, 29, 29, 196,      0,        '0'), -- branch taken
+    43 => (196, "1100011", "101", "0000000", 0, 28, 29, 204,      0,        '0'), -- branch taken
+    44 => (204, "1100011", "110", "0000000", 0, 25, 26, 212,      0,        '0'), -- BLTU taken
+    45 => (212, "1100011", "110", "0000000", 0, 27, 25, 220,      0,        '0'), -- BLTU not taken
+    46 => (216, "1100011", "111", "0000000", 0, 27, 25, 224,      0,        '0'), -- BGEU taken
+    47 => (224, "1100011", "111", "0000000", 0, 25, 25, 232,      0,        '0'), -- BGEU taken
+    48 => (232, "1100011", "111", "0000000", 0, 25, 26, 240,      0,        '0')  -- BGEU not taken
   );
 
 begin
@@ -179,7 +194,6 @@ begin
     wait;
   end process;
 
-
   monitor_proc : process
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
@@ -188,7 +202,6 @@ begin
 
     while test_suite loop
       if run("test_reset") then
-        info("Testing reset function of score_v");
         rst_s <= '1';
         wait until rising_edge(clk_s);
 
@@ -197,15 +210,14 @@ begin
         wait until rising_edge(clk_s);
         rst_s <= '0';
 
-        for i in 0 to 33 loop
+        for i in 0 to 48 loop
           wait until rising_edge(clk_s);
+
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
           if step <= res'high then
             check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
-
             check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
-
             check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
 
             if opcode_s = "0110011" then
@@ -213,22 +225,19 @@ begin
             end if;
 
             check_equal(to_integer(unsigned(rd_addr_s)), res(step).rd, "RD Error at step " & integer'image(step));
-
             check_equal(to_integer(unsigned(rs1_addr_s)), res(step).rs1, "RS1 Error at step " & integer'image(step));
-
-            check_equal(to_integer(unsigned(rs2_addr_s)),res(step).rs2,
+            check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2,
               "RS2 Error at step " & integer'image(step) &
               " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
               " | expected = " & integer'image(res(step).rs2));
-
             check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
-			if reg_we_s = '1' then
-			  check_equal(to_integer(signed(wb_data_s)),
-						  res(step).wb_out,
-						  "WB Error at step " & integer'image(step));
-			end if;
+
+            if reg_we_s = '1' then
+              check_equal(to_integer(signed(wb_data_s)), res(step).wb_out, "WB Error at step " & integer'image(step));
+            end if;
+
             check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
- 
+
             step := step + 1;
           else
             test_runner_cleanup(runner);

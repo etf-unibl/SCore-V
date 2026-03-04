@@ -278,6 +278,19 @@ architecture arch of score_v is
     );
   end component;
 
+  --! @brief Branch Comparator
+  --! @details Performs arithmetic and logic operations on input operands
+  --!          and provides the result as output.
+  component branch_comparator is
+    port (
+      a_i     : in  std_logic_vector(31 downto 0);
+      b_i     : in  std_logic_vector(31 downto 0);
+      br_un_i : in  std_logic;
+      br_eq_o : out std_logic;
+      br_lt_o : out std_logic
+    );
+  end component;
+
 begin
 
   --! @brief Program Counter instance
@@ -386,6 +399,15 @@ begin
       alu_op_i => alu_op_sig,
       y_o      => alu_result_sig
     );
+  --! @brief Branch Comparator
+  u_branch_cmp : branch_comparator
+    port map (
+      a_i     => rs1_data_sig,
+      b_i     => rs2_data_sig,
+      br_un_i => br_un_sig,
+      br_eq_o => br_eq_sig,
+      br_lt_o => br_lt_sig
+  );
 
   --! @brief Load Store Unit
   u_lsu : load_store_unit
