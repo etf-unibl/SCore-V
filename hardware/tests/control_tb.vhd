@@ -65,27 +65,37 @@ architecture arch of control_tb is
   signal s_wb_select_o      : std_logic;
   signal s_mem_size_o       : std_logic_vector(1 downto 0);
   signal s_mem_unsigned_o   : std_logic;
+  signal s_br_eq            : std_logic := '0';
+  signal s_br_lt            : std_logic := '0';
+  signal s_a_sel            : std_logic;
+  signal s_pc_sel           : std_logic;
+  signal s_br_un            : std_logic;
 
 begin
   -- Instantiate the Unit Under Test (UUT)
-  uut: entity design_lib.control
+  uut : entity design_lib.control
     port map (
       opcode_i           => s_opcode,
       funct3_i           => s_funct3,
       funct7_i           => s_funct7,
       imm_i_type_i       => s_imm_i_type,
+      br_eq_i            => s_br_eq,
+      br_lt_i            => s_br_lt,
       reg_write_enable_o => s_reg_write_enable,
       imm_sel_o          => s_imm_sel,
-      b_sel_o            => s_b_sel,         
+      b_sel_o            => s_b_sel,
+      a_sel_o            => s_a_sel,
       alu_op_o           => s_alu_op,
       mem_rw_o           => s_mem_rw_o,
       mem_size_o         => s_mem_size_o,
       mem_unsigned_o     => s_mem_unsigned_o,
-      wb_select_o        => s_wb_select_o
+      wb_select_o        => s_wb_select_o,
+      pc_sel_o           => s_pc_sel,
+      br_un_o            => s_br_un
     );
 
   -- Stimulus process
-  stim_proc: process
+  stim_proc : process
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -276,7 +286,7 @@ begin
         check_equal(s_wb_select_o,      '1', "SLTIU writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLTIU imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLTU), "SLTIU -> ALU_SLTU");
-        
+
         -- I-type SLLI: funct3=001, imm[11:5]=0000000
         s_opcode     <= "0010011";
         s_funct3     <= "001";
@@ -390,7 +400,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LHU addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("01"), "LHU mem_size half");
         check_equal(s_mem_unsigned_o,   '1',  "LHU unsigned");
-        
+
         -----------------------------------------------------------------------
         -- STORES: SB, SH, SW (opcode = 0100011)
         -- Expected:
@@ -550,6 +560,60 @@ begin
         check_equal(s_b_sel,            '0', "STORE with unsupported funct3: b_sel default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "STORE with unsupported funct3: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "STORE with unsupported funct3: ALU_NOP");
+
+      elsif run("test_branch_instr") then
+
+        ---------------------------------------------------------------------------
+        -- BRANCH Instructions: BEQ, BNE, BLT, BGE, BLTU, BGEU (opcode = 1100011)
+        -- Expected default B-type signals:
+        -- imm_sel = 011, b_sel = 1, a_sel = 1, alu_op = ADD, reg_write_enable = 0
+        ---------------------------------------------------------------------------
+
+        s_opcode <= "1100011";
+        s_imm_i_type <= (others => '0');
+
+        -- BEQ (funct3 = 000): Branch if rs1 == rs2
+        s_funct3 <= "000";
+        s_br_eq  <= '1'; -- Simulate rs1 == rs2
+        wait for 5 ns;
+        check_equal(s_pc_sel, '1', "BEQ: pc_sel should be 1 when br_eq is 1");
+        check_equal(s_a_sel, '1', "B-type: a_sel must be 1 (PC)");
+        check_equal(s_b_sel, '1', "B-type: b_sel must be 1 (Imm)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "B-type: ALU_ADD for target calculation");
+        check_equal(s_reg_write_enable, '0', "B-type: reg_write must be 0");
+        check_equal(to_integer(unsigned(s_imm_sel)), 3, "B-type: imm_sel must be 011");
+
+        -- BNE (funct3 = 001): Branch if rs1 != rs2
+        s_funct3 <= "001";
+        s_br_eq  <= '1'; -- Inputs are equal, condition is false
+        wait for 5 ns;
+        check_equal(s_pc_sel, '0', "BNE: pc_sel should be 0 when br_eq is 1");
+
+        s_br_eq  <= '0'; -- Inputs are not equal, condition is true
+        wait for 5 ns;
+        check_equal(s_pc_sel, '1', "BNE: pc_sel should be 1 when br_eq is 0");
+
+        -- BLT (funct3 = 100): Branch if rs1 < rs2 (signed)
+        s_funct3 <= "100";
+        s_br_lt  <= '1'; -- Simulate rs1 < rs2
+        wait for 5 ns;
+        check_equal(s_pc_sel, '1', "BLT: pc_sel should be 1 when br_lt is 1");
+        check_equal(s_br_un, '0', "BLT: br_un signal must be 0 (signed)");
+
+        -- BLTU (funct3 = 110): Branch if rs1 < rs2 (unsigned)
+        s_funct3 <= "110";
+        s_br_lt  <= '1';
+        wait for 5 ns;
+        check_equal(s_br_un, '1', "BLTU: br_un signal must be 1 (unsigned)");
+        check_equal(s_pc_sel, '1', "BLTU: pc_sel should be 1 when br_lt is 1");
+
+        -- BGEU (funct3 = 111): Branch if rs1 >= rs2 (unsigned)
+        s_funct3 <= "111";
+        s_br_lt  <= '1'; -- rs1 < rs2, so rs1 >= rs2 is false
+        wait for 5 ns;
+        check_equal(s_br_un, '1', "BGEU: br_un signal must be 1");
+        check_equal(s_pc_sel, '0', "BGEU: pc_sel should be 0 when br_lt is 1");
+
       end if;
     end loop;
 
