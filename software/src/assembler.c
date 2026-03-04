@@ -179,7 +179,7 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm,
 	output_expected(instr, regd, reg1, 0, imm, expected_out);
 }
 
-void handle_s_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out) {
+void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	printf("\nregd 0x%X\n", regd & 0x1F);

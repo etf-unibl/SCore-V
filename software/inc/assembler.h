@@ -130,7 +130,7 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm,
 /** Handles S_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_s_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out);
+void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1, FILE* output, FILE* expected_out);
 
 /** Prints expected output
  */
