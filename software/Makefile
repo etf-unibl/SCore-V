@@ -1,4 +1,4 @@
 make:
 
 assembler:
-	gcc ./src/assembler.c ./inc/assembler.h -o ./obj/assembler
+	gcc -Wall ./src/assembler.c ./inc/assembler.h -o ./obj/assembler
