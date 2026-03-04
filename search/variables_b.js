@@ -5,5 +5,5 @@ var searchData=
   ['opcode_5fsig_2',['opcode_sig',['../classscore__v_1_1arch.html#aeb6454c269613639c7bb21b51e7cc0b4',1,'score_v::arch']]],
   ['opcode_7e0_3',['opcode~0',['../classmem__pkg.html#a7332976f975cf87bc30a666091905726',1,'mem_pkg']]],
   ['other_5finstruction_5fbits_7e1_4',['other_instruction_bits~1',['../classmem__pkg.html#a185ebe26758bb8c6995d6c5a95983950',1,'mem_pkg']]],
-  ['out_5fo_5',['out_o',['../classalu__operand__b__mux.html#a13040791fea65831b53b9530f79fe48c',1,'alu_operand_b_mux']]]
+  ['out_5fo_5',['out_o',['../classmux2__1.html#a13040791fea65831b53b9530f79fe48c',1,'mux2_1']]]
 ];

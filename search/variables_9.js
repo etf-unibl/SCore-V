@@ -8,5 +8,6 @@ var searchData=
   ['mem_5frw_5fo_5',['mem_rw_o',['../classcontrol.html#a0269bee8105dddb6f8974333d0876b58',1,'control']]],
   ['mem_5frw_5fsig_6',['mem_rw_sig',['../classscore__v_1_1arch.html#a4b68c77982008e7f4267cef4dbcc4cfe',1,'score_v::arch']]],
   ['mem_5fsize_5fo_7',['mem_size_o',['../classcontrol.html#a916b80cc60b06041126d45360a670d8e',1,'control']]],
-  ['mem_5funsigned_5fo_8',['mem_unsigned_o',['../classcontrol.html#a74b7f554ef2c472d3b9756cffa32b990',1,'control']]]
+  ['mem_5funsigned_5fo_8',['mem_unsigned_o',['../classcontrol.html#a74b7f554ef2c472d3b9756cffa32b990',1,'control']]],
+  ['mux2_5f1_9',['mux2_1',['../classscore__v_1_1arch.html#ae724850bfeb02110bdb0bdf432f47b6a',1,'score_v::arch']]]
 ];

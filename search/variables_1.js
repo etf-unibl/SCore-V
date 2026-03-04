@@ -11,5 +11,6 @@ var searchData=
   ['br_5flt_5fsig_8',['br_lt_sig',['../classscore__v_1_1arch.html#a8422f14744fe21b0c459f8b3cf68a300',1,'score_v::arch']]],
   ['br_5fun_5fi_9',['br_un_i',['../classbranch__comparator.html#a566269cce88fd25660472bb12dee90f5',1,'branch_comparator']]],
   ['br_5fun_5fo_10',['br_un_o',['../classcontrol.html#abc8624e63d33ef75b9ad234c9ab63500',1,'control']]],
-  ['br_5fun_5fsig_11',['br_un_sig',['../classscore__v_1_1arch.html#ad0d911719773f4dc55a6cba703a07172',1,'score_v::arch']]]
+  ['br_5fun_5fsig_11',['br_un_sig',['../classscore__v_1_1arch.html#ad0d911719773f4dc55a6cba703a07172',1,'score_v::arch']]],
+  ['branch_5fcomparator_12',['branch_comparator',['../classscore__v_1_1arch.html#a64ba2f799301eed7e88080d00c038176',1,'score_v::arch']]]
 ];
