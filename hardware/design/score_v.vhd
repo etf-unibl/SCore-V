@@ -168,7 +168,8 @@ architecture arch of score_v is
       funct7_o        : out std_logic_vector(6 downto 0);
       imm_i_type_o    : out std_logic_vector(11 downto 0);
       imm_s_type_h_o  : out std_logic_vector(6 downto 0);
-      imm_s_type_l_o  : out std_logic_vector(4 downto 0)
+      imm_s_type_l_o  : out std_logic_vector(4 downto 0);
+      imm_b_type_o   : out std_logic_vector(11 downto 0)
     );
   end component;
 
@@ -309,7 +310,8 @@ begin
       funct7_o        => funct7_sig,
       imm_i_type_o    => imm_i_type_sig,
       imm_s_type_h_o  => imm_s_type_h_sig,
-      imm_s_type_l_o  => imm_s_type_l_sig
+      imm_s_type_l_o  => imm_s_type_l_sig,
+      imm_b_type_o    => imm_b_type_o_sig
     );
 
   --! @brief Control unit instance
