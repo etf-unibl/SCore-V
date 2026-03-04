@@ -2,13 +2,19 @@
 
 int main(int argc, char* argv[]) {
 	FILE *fptr;
-	fptr = fopen("test.txt", "r");
+	if(argc != 2) {
+		printf("Missing input file location argument");
+		return 0;
+	}
+	fptr = fopen(argv[1], "r");
 	if(fptr == NULL) {
 		printf("Unable to open file");
 		return 0;
 	}
 
 	process_file(fptr);
+	for(int i=0;i<12;i++)
+		printf("%08b\n", dmem[i]);
 
 	fclose(fptr);
 }
@@ -143,10 +149,6 @@ uint8_t get_reg_ls(char word[40]) {
 void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
-	printf("\nreg2 0x%X\n", reg2 & 0x1F);
-	printf("reg1 0x%X\n", reg1 & 0x1F);
-	printf("regd 0x%X\n", regd & 0x1F);
-
 	result = ((instr->funct7 & 0x7F) << 25) |
              ((reg2          & 0x1F) << 20) |
              ((reg1          & 0x1F) << 15) |
@@ -163,10 +165,6 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
 void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
-	printf("\nregd 0x%X\n", regd & 0x1F);
-	printf("reg1 0x%X\n", reg1 & 0x1F);
-	printf("imm 0x%X\n", imm & 0x7FF);
-
 	result = ((imm           & 0x7FF) << 20) |
              ((reg1          & 0x1F)  << 15) |
              ((instr->funct3 & 0x07)  << 12) |
@@ -181,10 +179,6 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm,
 
 void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1, FILE* output, FILE* expected_out) {
 	uint32_t result;
-
-	printf("\nregd 0x%X\n", regd & 0x1F);
-	printf("reg1 0x%X\n", reg1 & 0x1F);
-	printf("imm 0x%X\n", imm & 0x7FF);
 
 	result = ((imm           & 0xFE0) << 25) |
              ((regd          & 0x1F)  << 20) |
@@ -221,9 +215,86 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	if(instr->format == R_TYPE) {
 		if(instr->signess == 0) {
 			alu_out = instr->signed_operation(registers[reg1], registers[reg2]);
+			registers[regd] = alu_out;
 		}
 		else {
 			alu_out = instr->unsigned_operation(registers[reg1], registers[reg2]);
+			registers[regd] = alu_out;
+		}
+		wb_out = alu_out;
+	}
+	else if(instr->format == I_TYPE && strstr(instr->name, "l") == NULL) {
+		if(instr->signess == 0) {
+			alu_out = instr->signed_operation(registers[reg1], imm);
+			registers[regd] = alu_out;
+		}
+		else {
+			alu_out = instr->unsigned_operation(registers[reg1], imm);
+			registers[regd] = alu_out;
+		}
+		wb_out = alu_out;
+	}
+	else if(strstr(instr->name, "l") != NULL || instr->format == S_TYPE) {
+		alu_out = imm + registers[reg1];
+		if(instr->format == S_TYPE) {
+			if(strcmp(instr->name, "sw") == 0) {
+				dmem[alu_out + 3] = ((registers[regd] & 0xFF000000) >> 24);
+				dmem[alu_out + 2] = ((registers[regd] & 0xFF0000) >> 16);
+				dmem[alu_out + 1] = ((registers[regd] & 0xFF00) >> 8);
+				dmem[alu_out] = registers[regd] & 0xFF;
+				wb_out = dmem[alu_out+3] | dmem[alu_out+2] | dmem[alu_out+1] | dmem[alu_out];
+			}
+			else if(strcmp(instr->name, "sh") == 0) {
+				dmem[alu_out + 1] = ((registers[regd] & 0xFF00) >> 8);
+				dmem[alu_out] = registers[regd] & 0xFF;
+				wb_out = ((0x00001111 & (dmem[alu_out+1] | dmem[alu_out])));
+			}
+			else if(strcmp(instr->name, "sb") == 0) {
+				dmem[alu_out] = registers[regd] & 0xFF;
+				wb_out = (0x00000011 & dmem[alu_out]);
+			}
+		}
+		else {
+			int sign_pom;
+			if(strcmp(instr->name, "lw") == 0) {
+				registers[regd] = (dmem[alu_out + 3] << 24) |
+								  (dmem[alu_out + 2] << 16) |
+								  (dmem[alu_out + 1] << 8)  |
+								  (dmem[alu_out]);
+				wb_out = registers[regd];
+			}
+			else if(strcmp(instr->name, "lh") == 0) {
+				if((dmem[alu_out + 1] & 0x80) != 0)
+					sign_pom = 0xFFFFFFFF;
+				else
+					sign_pom = 0x0000FFFF;
+
+				registers[regd] = sign_pom & 
+					              	((dmem[alu_out + 1] << 8)  |
+								  	(dmem[alu_out]));
+				wb_out = registers[regd];
+			}
+			else if(strcmp(instr->name, "lb") == 0) {
+				if((dmem[alu_out] & 0x80) != 0)
+					sign_pom = 0xFFFFFFFF;
+				else
+					sign_pom = 0x000000FF;
+
+				registers[regd] = 0x000000FF & (dmem[alu_out]);
+				wb_out = registers[regd];
+			}
+			else if(strcmp(instr->name, "lhu") == 0) {
+				registers[regd] = (0x0000FFFF) & 
+									((dmem[alu_out + 1] << 8)  |
+								  	(dmem[alu_out]));
+				wb_out = registers[regd];
+			}
+			else if(strcmp(instr->name, "lbu") == 0) {
+				registers[regd] = 0x000000FF & (dmem[alu_out]);
+				wb_out = registers[regd];
+			}
+			registers[regd] = dmem[alu_out];
+			wb_out = registers[regd];
 		}
 	}
 

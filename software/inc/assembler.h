@@ -10,7 +10,7 @@ typedef enum {
 } InstrFormat;
 
 int32_t registers[32];
-uint32_t dmem[64];
+uint8_t dmem[256];
 
 int add(int a, int b) { return a+b; }
 int sub(int a, int b) { return a-b; }
@@ -23,16 +23,8 @@ int sra(int a, int b) { return a>>b; }
 int slt(int a, int b) { return (a < b)?1:0; }
 unsigned int sltu(unsigned int a, unsigned int b) { return (a < b)?1:0; }
 
-// L and S functions below need fixing
-int lb(int a, int b) { return a+b; }
-int lh(int a, int b) { return a+b; }
-int lw(int a, int b) { return a+b; }
-int lbu(int a, int b) { return a+b; }
-int lhu(int a, int b) { return a+b; }
-
-int sb(int a, int b) { return a+b; }
-int sh(int a, int b) { return a+b; }
-int sw(int a, int b) { return a+b; }
+// For load and store functions:
+unsigned addiu(unsigned int a, unsigned int b) { return a + b; }
 
 typedef struct {
     const char *name;
@@ -67,15 +59,15 @@ Instruction instr_table[] = {
 	{"slti",  I_TYPE, 0x13, 0x2, 0x00, 0, slt, NULL},
 	{"sltiu", I_TYPE, 0x13, 0x2, 0x00, 0, NULL, sltu},
 
-	{"lb",    I_TYPE, 0x03, 0x0, 0x00},
-	{"lh",    I_TYPE, 0x03, 0x1, 0x00},
-	{"lw",    I_TYPE, 0x03, 0x2, 0x00},
-	{"lbu",   I_TYPE, 0x03, 0x4, 0x00},
-	{"lbu",   I_TYPE, 0x03, 0x5, 0x00},
+	{"lb",    I_TYPE, 0x03, 0x0, 0x00, 1, NULL, addiu},
+	{"lh",    I_TYPE, 0x03, 0x1, 0x00, 1, NULL, addiu},
+	{"lw",    I_TYPE, 0x03, 0x2, 0x00, 1, NULL, addiu},
+	{"lbu",   I_TYPE, 0x03, 0x4, 0x00, 1, NULL, addiu},
+	{"lbu",   I_TYPE, 0x03, 0x5, 0x00, 1, NULL, addiu},
 
-	{"sb",    S_TYPE, 0x23, 0x0, 0x00},
-	{"sh",   S_TYPE, 0x23, 0x1, 0x00},
-	{"sw",   S_TYPE, 0x23, 0x2, 0x00}
+	{"sb",    S_TYPE, 0x23, 0x0, 0x00, 1, NULL, addiu},
+	{"sh",    S_TYPE, 0x23, 0x1, 0x00, 1, NULL, addiu},
+	{"sw",    S_TYPE, 0x23, 0x2, 0x00, 1, NULL, addiu}
 };
 
 unsigned int pc = 0;
