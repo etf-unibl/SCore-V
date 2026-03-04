@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
 
 	fptr = fopen(argv[1], "r");
 	if(fptr == NULL) {
-		printf("Unable to open file");
+		printf("Unable to open source file\n");
 		return 0;
 	}
 
@@ -20,15 +20,16 @@ int main(int argc, char* argv[]) {
 void process_file(FILE* fptr) {
 	char line[256];
 	FILE* fout;
-	fout = fopen("output.txt", "w");
+	fout = fopen("../hardware/tests/program.txt", "w");
 	if(fout == NULL) {
-		printf("Unable to open file\n");
+		printf("Unable to open program output file\n");
+		return;
 	}
 
 	FILE *expected_out;
-	expected_out = fopen("expected.txt", "w");
+	expected_out = fopen("../hardware/tests/expected.txt", "w");
 	if(fptr == NULL) {
-		printf("Unable to open file");
+		printf("Unable to open expected output file");
 		return;
 	}
 
@@ -356,8 +357,10 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	}
 
 	// Combine all arguments to a single string
-	sprintf(exp_line, "%u, \"%07b\", \"%03b\", \"%07b\", %u, %u, %u, %d, %d, '%c'",
+	sprintf(exp_line, "%u, \"%07b\", \"%03b\", \"%07b\", %u, %u, %u, %d, %d, '%c'\n",
 			pc, instr->opcode, instr->funct3, instr->funct7, regd, reg1, reg2, alu_out, wb_out, wb);
+
+	fputs(exp_line, expected_out);
 
 	// increment program counter
 	pc += 4;
