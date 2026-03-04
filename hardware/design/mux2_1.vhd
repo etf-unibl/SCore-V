@@ -56,14 +56,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity mux2_1 is
-  generic (
-    g_WIDTH : positive := 32 --! Width of the input and output vectors
-  );
   port (
-    in0_i : in  std_logic_vector(g_WIDTH-1 downto 0); --! First input
-    in1_i : in  std_logic_vector(g_WIDTH-1 downto 0); --! Second input
+    in0_i : in  std_logic_vector(31 downto 0); --! First input
+    in1_i : in  std_logic_vector(31 downto 0); --! Second input
     sel_i : in  std_logic;                            --! Select signal
-    out_o : out std_logic_vector(g_WIDTH-1 downto 0)  --! Selected output
+    out_o : out std_logic_vector(31 downto 0)  --! Selected output
   );
 end entity mux2_1;
 
