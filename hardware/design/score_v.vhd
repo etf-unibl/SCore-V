@@ -311,7 +311,7 @@ begin
       imm_i_type_o    => imm_i_type_sig,
       imm_s_type_h_o  => imm_s_type_h_sig,
       imm_s_type_l_o  => imm_s_type_l_sig,
-      imm_b_type_o    => imm_b_type_o_sig
+      imm_b_type_o    => imm_b_type_sig
     );
 
   --! @brief Control unit instance
