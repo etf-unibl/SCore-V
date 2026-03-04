@@ -98,16 +98,17 @@ architecture arch of score_v is
   signal br_un_sig        : std_logic;                     --! Control for unsigned comparison
 
   --! @brief Instruction and decoding signals
-  signal opcode_sig     : std_logic_vector(6 downto 0);   --! Decoded opcode
-  signal rd_sig         : std_logic_vector(4 downto 0);   --! Decoded destination register
-  signal rs1_sig        : std_logic_vector(4 downto 0);   --! Decoded source register 1
-  signal rs2_sig        : std_logic_vector(4 downto 0);   --! Decoded source register 2
-  signal funct3_sig     : std_logic_vector(2 downto 0);   --! Decoded funct3 field
-  signal funct7_sig     : std_logic_vector(6 downto 0);   --! Decoded funct7 field
-  signal imm_i_type_sig : std_logic_vector(11 downto 0);  --! Decoded imm_i_type field
-  signal imm_s_type_h_sig : std_logic_vector(6 downto 0); --! instr[31:25]
-  signal imm_s_type_l_sig : std_logic_vector(4 downto 0); --! instr[11:7]
-  signal imm_b_type_sig : std_logic_vector(11 downto 0);  --! instr[11:7]
+  signal opcode_sig         : std_logic_vector(6 downto 0);   --! Decoded opcode
+  signal rd_sig             : std_logic_vector(4 downto 0);   --! Decoded destination register
+  signal rs1_sig            : std_logic_vector(4 downto 0);   --! Decoded source register 1
+  signal rs2_sig            : std_logic_vector(4 downto 0);   --! Decoded source register 2
+  signal funct3_sig         : std_logic_vector(2 downto 0);   --! Decoded funct3 field
+  signal funct7_sig         : std_logic_vector(6 downto 0);   --! Decoded funct7 field
+  signal imm_i_type_sig     : std_logic_vector(11 downto 0);  --! Decoded imm_i_type field
+  signal imm_s_type_h_sig   : std_logic_vector(6 downto 0); --! instr[31:25]
+  signal imm_s_type_l_sig   : std_logic_vector(4 downto 0); --! instr[11:7]
+  signal imm_b_type_sig     : std_logic_vector(11 downto 0);  --! instr[11:7]
+  signal imm_j_u_type_o_sig : std_logic_vector(19 downto 0);  --! J-type and U-type immediate (instr[31:12])
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -127,7 +128,7 @@ architecture arch of score_v is
   signal mem_data_sig   : std_logic_vector(31 downto 0); --! Data read from LSU
   signal final_wb_sig   : std_logic_vector(31 downto 0); --! Data to be written back to RegFile
   signal mem_rw_sig     : std_logic;                     --! Control signal for memory R/W
-  signal wb_select_sig  : std_logic;                     --! Control signal for WB Mux
+  signal wb_select_sig  : std_logic_vector(1 downto 0);  --! Control signal for WB Mux
   signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
@@ -169,7 +170,8 @@ architecture arch of score_v is
       imm_i_type_o    : out std_logic_vector(11 downto 0);
       imm_s_type_h_o  : out std_logic_vector(6 downto 0);
       imm_s_type_l_o  : out std_logic_vector(4 downto 0);
-      imm_b_type_o   : out std_logic_vector(11 downto 0)
+      imm_b_type_o    : out std_logic_vector(11 downto 0);
+      imm_j_u_type_o  : out std_logic_vector(19 downto 0)
     );
   end component;
 
@@ -192,7 +194,7 @@ architecture arch of score_v is
       mem_rw_o           : out std_logic;
       mem_size_o         : out std_logic_vector(1 downto 0);
       mem_unsigned_o     : out std_logic;
-      wb_select_o        : out std_logic;
+      wb_select_o        : out std_logic_vector(1 downto 0);
       pc_sel_o           : out std_logic;
       br_un_o            : out std_logic
     );
@@ -245,7 +247,8 @@ architecture arch of score_v is
     port (
       alu_result_i : in  std_logic_vector(31 downto 0);
       mem_data_i   : in  std_logic_vector(31 downto 0);
-      wb_select_i  : in  std_logic;
+      pc4_i        : in  std_logic_vector(31 downto 0);
+      wb_select_i  : in  std_logic_vector(1 downto 0);
       wb_data_o    : out std_logic_vector(31 downto 0)
     );
   end component;
@@ -324,7 +327,8 @@ begin
       imm_i_type_o    => imm_i_type_sig,
       imm_s_type_h_o  => imm_s_type_h_sig,
       imm_s_type_l_o  => imm_s_type_l_sig,
-      imm_b_type_o    => imm_b_type_sig
+      imm_b_type_o    => imm_b_type_sig,
+      imm_j_u_type_o  => imm_j_u_type_o_sig
     );
 
   --! @brief Control unit instance
@@ -428,6 +432,7 @@ begin
       alu_result_i => alu_result_sig,
       mem_data_i   => mem_data_sig,
       wb_select_i  => wb_select_sig,
+      pc4_i        => pc_next_sig,
       wb_data_o    => final_wb_sig
     );
 

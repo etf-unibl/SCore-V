@@ -87,8 +87,9 @@
 --!
 --! - wb_select_o:
 --!     Write-back multiplexer select.
---!     '0' = Data memory output (DataR)
---!     '1' = ALU result
+--!     "00" = Data memory output (DataR)
+--!     "01" = ALU result
+--!     "10" = PC+4
 --!
 --! - pc_sel_o:
 --!     Next PC value selector.
@@ -121,7 +122,7 @@ entity control is
     mem_rw_o           : out std_logic;                     --! Data memory control
     mem_size_o         : out std_logic_vector(1 downto 0);  --! 00=Byte, 01=Half, 10=Word
     mem_unsigned_o     : out std_logic;                     --! 1=Unsigned (LBU/LHU), 0=Signed
-    wb_select_o        : out std_logic;                     --! Write-back multiplexer select
+    wb_select_o        : out std_logic_vector(1 downto 0);                     --! Write-back multiplexer select
     pc_sel_o           : out std_logic;                     --! Next PC select (0=PC+4, 1=Branch target)
     br_un_o            : out std_logic                      --! Unsigned branch comparison enable
   );
@@ -142,7 +143,7 @@ begin
     alu_op_o           <= ALU_NOP;
     imm_sel_o          <= "000";
     mem_rw_o           <= '0';
-    wb_select_o        <= '0';
+    wb_select_o        <= "00";
     mem_size_o         <= "10"; -- Default Word
     mem_unsigned_o     <= '0';
     pc_sel_o           <= '0';
@@ -156,53 +157,53 @@ begin
       if funct3_i = "000" then
         if funct7_i = "0000000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_ADD;
         elsif funct7_i = "0100000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SUB;
         end if;
 
       elsif (funct3_i = "001") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLL;
 
       elsif (funct3_i = "010") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLT;
 
       elsif (funct3_i = "011") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLTU;
 
       elsif (funct3_i = "100") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_XOR;
 
       elsif funct3_i = "101" then
         if funct7_i = "0000000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRL;
         elsif funct7_i = "0100000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRA;
         end if;
 
       elsif (funct3_i = "110") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_OR;
 
       elsif (funct3_i = "111") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_AND;
       end if;
 
@@ -214,42 +215,42 @@ begin
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_ADD;
 
       elsif funct3_i = "010" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLT;
 
       elsif funct3_i = "011" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLTU;
 
       elsif funct3_i = "100" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_XOR;
 
       elsif funct3_i = "110" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_OR;
 
       elsif funct3_i = "111" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_AND;
 
       elsif funct3_i = "001" then
@@ -257,7 +258,7 @@ begin
           imm_sel_o          <= "001";
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SLL;
         end if;
 
@@ -266,13 +267,13 @@ begin
           imm_sel_o          <= "001";
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRL;
         elsif imm_i_type_i(11 downto 5) = "0100000" then
           imm_sel_o          <= "001";
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRA;
         end if;
       end if;
@@ -287,7 +288,7 @@ begin
         imm_sel_o   <= "001";
         b_sel_o     <= '1';
         alu_op_o    <= ALU_ADD;
-        wb_select_o <= '0';
+        wb_select_o <= "00";
 
         reg_write_enable_o <= '1';
         mem_size_o         <= funct3_i(1 downto 0);
