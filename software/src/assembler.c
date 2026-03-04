@@ -119,7 +119,7 @@ Instruction* find_instruction(const char *name) {
 
 uint8_t get_reg(char reg_word[40]) {
 	char* token = strtok(reg_word, ",");
-	if (token[0] != 'r') return -1;
+	if (token[0] != 'x') return -1;
     return atoi(token + 1);
 }
 
@@ -136,7 +136,7 @@ uint16_t get_imm_ls(char word[40]) {
 uint8_t get_reg_ls(char word[40]) {
 	char* token = strtok(word, "(),");
 	token = strtok(NULL, "(),");
-	if (token[0] != 'r') return -1;
+	if (token[0] != 'x') return -1;
     return atoi(token + 1);
 }
 
@@ -212,9 +212,20 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	reg2 &= 0x1F;
 	regd &= 0x1F;
 
-	wb = 'c';
-	alu_out = 12;
+	if(instr->format == S_TYPE)
+		wb = '0';
+	else
+		wb = '1';
 	wb_out = 14;
+
+	if(instr->format == R_TYPE) {
+		if(instr->signess == 0) {
+			alu_out = instr->signed_operation(registers[reg1], registers[reg2]);
+		}
+		else {
+			alu_out = instr->unsigned_operation(registers[reg1], registers[reg2]);
+		}
+	}
 
 	sprintf(exp_line, "%u, \"%07b\", \"%03b\", \"%07b\", %u, %u, %u, %d, %d, '%c'",
 			pc, instr->opcode, instr->funct3, instr->funct7, regd, reg1, reg2, alu_out, wb_out, wb);
@@ -224,17 +235,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 }
 
 void output_result(uint32_t result, FILE* output) {
-	int i=0;
-	while (result) {
-    	if (result & 1)
-        	fputc('1', output);
-    	else
-        	fputc('0', output);
-    	result >>= 1;
-		i++;
-	}
-	for(;i<32;i++) {
-        fputc('0', output);
-	}
-	fputc('\n', output);
+	char instruction[35];
+	sprintf(instruction, "%032b\n", result);
+	fputs(instruction, output);
 }

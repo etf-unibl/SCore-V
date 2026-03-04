@@ -9,6 +9,9 @@ typedef enum {
     S_TYPE
 } InstrFormat;
 
+int32_t registers[32];
+uint32_t dmem[64];
+
 int add(int a, int b) { return a+b; }
 int sub(int a, int b) { return a-b; }
 int xor_op(int a, int b) { return a^b; }
