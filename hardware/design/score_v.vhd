@@ -108,6 +108,7 @@ architecture arch of score_v is
   signal imm_s_type_h_sig : std_logic_vector(6 downto 0); --! instr[31:25]
   signal imm_s_type_l_sig : std_logic_vector(4 downto 0); --! instr[11:7]
   signal imm_b_type_sig : std_logic_vector(11 downto 0);  --! instr[11:7]
+  signal imm_j_u_type_sig : std_logic_vector(19 downto 0);  --! instr[11:7]
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -206,6 +207,7 @@ architecture arch of score_v is
       imm_s_type_h_i  : in  std_logic_vector(6 downto 0);
       imm_s_type_l_i  : in  std_logic_vector(4 downto 0);
       imm_b_type_i    : in  std_logic_vector(11 downto 0);
+      imm_j_u_type_i  : in  std_logic_vector(19 downto 0);
       imm_sel_i       : in  std_logic_vector(2 downto 0);
       imm_o           : out std_logic_vector(31 downto 0)
     );
@@ -356,6 +358,7 @@ begin
       imm_s_type_h_i  => imm_s_type_h_sig,
       imm_s_type_l_i  => imm_s_type_l_sig,
       imm_b_type_i    => imm_b_type_sig,
+      imm_j_u_type_i  => imm_j_u_type_sig,
       imm_sel_i       => imm_sel_sig,
       imm_o           => imm_sig
     );

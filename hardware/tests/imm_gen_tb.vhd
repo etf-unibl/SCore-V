@@ -84,6 +84,8 @@ begin
   -- I-type immediates (positive and negative sign extension)
   -- S-type immediates (correct concatenation and sign extension)
   -- B-type immediates (left shift by 1, sign extension, edge values)
+  -- U-type immediates (Loading into upper 20 bits, lower 12 bits zero-filled)
+  -- J-type immediates (Complex bit reordering, sign extension, and implicit 1-bit left shift for jump offsets)
   -- Default case behavior (output should be zero)
   main : process
   begin
