@@ -1,17 +1,29 @@
+/**
+ * @file assembler.h
+ */
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * Enum for currently supported types of instructions.
+ * Used in Instruction struct.
+ */
 typedef enum {
     R_TYPE,
     I_TYPE,
     S_TYPE
 } InstrFormat;
 
+/// Array of registers used in expected result generator
 int32_t registers[32];
+
+/// Data memory used in expected result generator
 uint8_t dmem[256];
 
+// Below functions are used in calculating expected output
 int add(int a, int b) { return a+b; }
 int sub(int a, int b) { return a-b; }
 int xor_op(int a, int b) { return a^b; }
@@ -22,10 +34,16 @@ unsigned int srl(unsigned int a, unsigned int b) { return a>>b; }
 int sra(int a, int b) { return a>>b; }
 int slt(int a, int b) { return (a < b)?1:0; }
 unsigned int sltu(unsigned int a, unsigned int b) { return (a < b)?1:0; }
+unsigned addiu(unsigned int a, unsigned int b) { return a + b; } // For load and store functions:
 
-// For load and store functions:
-unsigned addiu(unsigned int a, unsigned int b) { return a + b; }
+/**
+ * Program Counter, used for expected result generator
+ */
+unsigned int pc = 0;
 
+/**
+ * Struct used for defining different types of instructions.
+ */
 typedef struct {
     const char *name;
     InstrFormat format;
@@ -37,6 +55,9 @@ typedef struct {
     unsigned int (*unsigned_operation)(unsigned int, unsigned int);
 } Instruction;
 
+/**
+ * Table of currently supported functions
+ */
 Instruction instr_table[] = {
 	{"add",   R_TYPE, 0x33, 0x0, 0x00, 0, add, NULL},
 	{"sub",   R_TYPE, 0x33, 0x0, 0x02, 0, sub, NULL},
@@ -69,8 +90,6 @@ Instruction instr_table[] = {
 	{"sh",    S_TYPE, 0x23, 0x1, 0x00, 1, NULL, addiu},
 	{"sw",    S_TYPE, 0x23, 0x2, 0x00, 1, NULL, addiu}
 };
-
-unsigned int pc = 0;
 
 /** Function that call process_line function on each line
  * of input .txt.
