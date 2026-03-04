@@ -25,8 +25,7 @@ var searchData=
   ['instr_5faddr_5fo_22',['instr_addr_o',['../classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63',1,'score_v']]],
   ['instr_5fdata_5fi_23',['instr_data_i',['../classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9',1,'score_v']]],
   ['instr_5fi_24',['instr_i',['../classinstruction__decoder.html#a73c0454814fcb76c7cb649b537ef249f',1,'instruction_decoder']]],
-  ['instr_5fsig_25',['instr_sig',['../classscore__v_1_1arch.html#ac8b2b6e26ca6ab2685888526237d1dc6',1,'score_v::arch']]],
-  ['instruction_5fbits_5fo_26',['instruction_bits_o',['../classfetch__instruction.html#abdce7358176852bf67f503fc459762e0',1,'fetch_instruction']]],
-  ['instruction_5fcount_5fi_27',['instruction_count_i',['../classfetch__instruction.html#a902662b755e48cb5eba9eaa9d241c378',1,'fetch_instruction']]],
-  ['instruction_5fdecoder_28',['instruction_decoder',['../classscore__v_1_1arch.html#ad66c4a131e4d6b27190696c497f40f16',1,'score_v::arch']]]
+  ['instruction_5fbits_5fo_25',['instruction_bits_o',['../classfetch__instruction.html#abdce7358176852bf67f503fc459762e0',1,'fetch_instruction']]],
+  ['instruction_5fcount_5fi_26',['instruction_count_i',['../classfetch__instruction.html#a902662b755e48cb5eba9eaa9d241c378',1,'fetch_instruction']]],
+  ['instruction_5fdecoder_27',['instruction_decoder',['../classscore__v_1_1arch.html#ad66c4a131e4d6b27190696c497f40f16',1,'score_v::arch']]]
 ];

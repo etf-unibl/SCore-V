@@ -93,11 +93,16 @@ Entities</h2></td></tr>
 <p >Generated control signals:</p>
 <ul>
 <li>reg_write_enable_o: Enables writeback into register file (rd).</li>
-<li>imm_sel_o: Immediate format selector for ImmGen. "001" = I-type immediate "010" = S-type immediate</li>
+<li>imm_sel_o: Immediate format selector for ImmGen. "001" = I-type immediate "010" = S-type immediate "011" = B-type immediate</li>
 <li>b_sel_o: Selects ALU operand B source. '0' = rs2_data '1' = imm32</li>
+<li>a_sel_o: Selects ALU operand A source. '0' = rs1_data '1' = PC (Program Counter)</li>
 <li>alu_op_o: Selects ALU operation (e.g. ALU_ADD, ALU_NOP).</li>
+<li>mem_size_o: Specifies the data access width for memory load and store operations. "00" = Byte "01" = Halfword "10" = Word</li>
+<li>mem_unsigned_o: Determines if the data from memory should be sign-extended or zero-extended. '0' = Signed (sign-extended, e.g., LB, LH) '1' = Unsigned (zero-extended, e.g., LBU, LHU)</li>
 <li>mem_rw_o: Data memory control. '0' = Read '1' = Write</li>
-<li>wb_select_o: Write-back multiplexer select. '0' = Data memory output (DataR) '1' = ALU result </li>
+<li>wb_select_o: Write-back multiplexer select. '0' = Data memory output (DataR) '1' = ALU result</li>
+<li>pc_sel_o: Next PC value selector. '0' = PC + 4 '1' = ALU result (Target branch address)</li>
+<li>br_un_o: Selects branch comparison signedness. '0' = Signed comparison '1' = Unsigned comparison </li>
 </ul>
 </div></div><!-- contents -->
 <!-- start footer part -->

@@ -114,10 +114,18 @@ Signals</h2></td></tr>
 <tr class="memdesc:a328284cd6754d7c3b42f0f3cfbb5d9a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal PC signals Current PC.  <a href="#a328284cd6754d7c3b42f0f3cfbb5d9a9"></a><br /></td></tr>
 <tr class="memitem:a8cad814ff0e9a3c737ef1ad317d71094"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#a8cad814ff0e9a3c737ef1ad317d71094">pc_next_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a8cad814ff0e9a3c737ef1ad317d71094"><td class="mdescLeft">&#160;</td><td class="mdescRight">Next sequential PC.  <a href="#a8cad814ff0e9a3c737ef1ad317d71094"></a><br /></td></tr>
-<tr class="memitem:ac8b2b6e26ca6ab2685888526237d1dc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#ac8b2b6e26ca6ab2685888526237d1dc6">instr_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="vhdlchar">t_instruction_rec</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:ac8b2b6e26ca6ab2685888526237d1dc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction and decoding signals Fetched instruction.  <a href="#ac8b2b6e26ca6ab2685888526237d1dc6"></a><br /></td></tr>
+<tr class="memitem:adf8156433cc9a661b79ec6db5be2a385"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#adf8156433cc9a661b79ec6db5be2a385">br_eq_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:adf8156433cc9a661b79ec6db5be2a385"><td class="mdescLeft">&#160;</td><td class="mdescRight">Control and Branching signals Comparator equal flag.  <a href="#adf8156433cc9a661b79ec6db5be2a385"></a><br /></td></tr>
+<tr class="memitem:a8422f14744fe21b0c459f8b3cf68a300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#a8422f14744fe21b0c459f8b3cf68a300">br_lt_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a8422f14744fe21b0c459f8b3cf68a300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Comparator less-than flag.  <a href="#a8422f14744fe21b0c459f8b3cf68a300"></a><br /></td></tr>
+<tr class="memitem:add27306a730d6113b68ca937d682ac77"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#add27306a730d6113b68ca937d682ac77">a_sel_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:add27306a730d6113b68ca937d682ac77"><td class="mdescLeft">&#160;</td><td class="mdescRight">MUX select for ALU operand A (RS1 vs PC)  <a href="#add27306a730d6113b68ca937d682ac77"></a><br /></td></tr>
+<tr class="memitem:ad31e9fbef45c1df6b49d859b4d6f50a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#ad31e9fbef45c1df6b49d859b4d6f50a0">pc_sel_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:ad31e9fbef45c1df6b49d859b4d6f50a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">MUX select for next PC (PC+4 vs Target)  <a href="#ad31e9fbef45c1df6b49d859b4d6f50a0"></a><br /></td></tr>
+<tr class="memitem:ad0d911719773f4dc55a6cba703a07172"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#ad0d911719773f4dc55a6cba703a07172">br_un_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:ad0d911719773f4dc55a6cba703a07172"><td class="mdescLeft">&#160;</td><td class="mdescRight">Control for unsigned comparison.  <a href="#ad0d911719773f4dc55a6cba703a07172"></a><br /></td></tr>
 <tr class="memitem:aeb6454c269613639c7bb21b51e7cc0b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#aeb6454c269613639c7bb21b51e7cc0b4">opcode_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">6</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:aeb6454c269613639c7bb21b51e7cc0b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decoded opcode.  <a href="#aeb6454c269613639c7bb21b51e7cc0b4"></a><br /></td></tr>
+<tr class="memdesc:aeb6454c269613639c7bb21b51e7cc0b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction and decoding signals Decoded opcode.  <a href="#aeb6454c269613639c7bb21b51e7cc0b4"></a><br /></td></tr>
 <tr class="memitem:a6cc8f0f12a4fe59fd990014602bd2e37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#a6cc8f0f12a4fe59fd990014602bd2e37">rd_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a6cc8f0f12a4fe59fd990014602bd2e37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decoded destination register.  <a href="#a6cc8f0f12a4fe59fd990014602bd2e37"></a><br /></td></tr>
 <tr class="memitem:a735b435e88a2a703106fbfe1edfa0606"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#a735b435e88a2a703106fbfe1edfa0606">rs1_sig</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
@@ -166,8 +174,6 @@ Signals</h2></td></tr>
 <tr class="memdesc:adbf61be69614bceca1240832f328c34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign of data to be loaded or stored.  <a href="#adbf61be69614bceca1240832f328c34c"></a><br /></td></tr>
 <tr class="memitem:a4a562d4446e9d332363fd47a9172904c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#a4a562d4446e9d332363fd47a9172904c">width_s</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">1</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a4a562d4446e9d332363fd47a9172904c"><td class="mdescLeft">&#160;</td><td class="mdescRight">load/store byte(00), half(01), word(11)  <a href="#a4a562d4446e9d332363fd47a9172904c"></a><br /></td></tr>
-<tr class="memitem:a9f7dd35eeeda85a2cf5da8df8f46373e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v_1_1arch.html#a9f7dd35eeeda85a2cf5da8df8f46373e">pc_sel_s</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a9f7dd35eeeda85a2cf5da8df8f46373e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selector for branch logic.  <a href="#a9f7dd35eeeda85a2cf5da8df8f46373e"></a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Instantiations" name="Instantiations"></a>
 Instantiations</h2></td></tr>
@@ -196,6 +202,30 @@ Instantiations</h2></td></tr>
 <div class="textblock"><p >Architecture arch for top-level SCore-V CPU. </p>
 <p >Instantiates and connects all CPU submodules: PC, PC next, instruction fetch, instruction decoder, control unit, register file, and ALU. Handles the ADD datapath for now. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="add27306a730d6113b68ca937d682ac77" name="add27306a730d6113b68ca937d682ac77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add27306a730d6113b68ca937d682ac77">&#9670;&#160;</a></span>a_sel_sig</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#add27306a730d6113b68ca937d682ac77">a_sel_sig</a> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>MUX select for ALU operand A (RS1 vs PC) </p>
+
+</div>
+</div>
 <a id="a205ce47b385f0dede25ae06417988605" name="a205ce47b385f0dede25ae06417988605"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a205ce47b385f0dede25ae06417988605">&#9670;&#160;</a></span>alu</h2>
 
@@ -339,6 +369,78 @@ Instantiations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Control signal for ALU operand B source selection. </p>
+
+</div>
+</div>
+<a id="adf8156433cc9a661b79ec6db5be2a385" name="adf8156433cc9a661b79ec6db5be2a385"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf8156433cc9a661b79ec6db5be2a385">&#9670;&#160;</a></span>br_eq_sig</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#adf8156433cc9a661b79ec6db5be2a385">br_eq_sig</a> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Control and Branching signals Comparator equal flag. </p>
+
+</div>
+</div>
+<a id="a8422f14744fe21b0c459f8b3cf68a300" name="a8422f14744fe21b0c459f8b3cf68a300"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8422f14744fe21b0c459f8b3cf68a300">&#9670;&#160;</a></span>br_lt_sig</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#a8422f14744fe21b0c459f8b3cf68a300">br_lt_sig</a> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Comparator less-than flag. </p>
+
+</div>
+</div>
+<a id="ad0d911719773f4dc55a6cba703a07172" name="ad0d911719773f4dc55a6cba703a07172"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0d911719773f4dc55a6cba703a07172">&#9670;&#160;</a></span>br_un_sig</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#ad0d911719773f4dc55a6cba703a07172">br_un_sig</a> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Control for unsigned comparison. </p>
 
 </div>
 </div>
@@ -608,30 +710,6 @@ Instantiations</h2></td></tr>
 
 </div>
 </div>
-<a id="ac8b2b6e26ca6ab2685888526237d1dc6" name="ac8b2b6e26ca6ab2685888526237d1dc6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac8b2b6e26ca6ab2685888526237d1dc6">&#9670;&#160;</a></span>instr_sig</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#ac8b2b6e26ca6ab2685888526237d1dc6">instr_sig</a> <b><span class="vhdlchar">t_instruction_rec</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Instruction and decoding signals Fetched instruction. </p>
-
-</div>
-</div>
 <a id="ad66c4a131e4d6b27190696c497f40f16" name="ad66c4a131e4d6b27190696c497f40f16"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad66c4a131e4d6b27190696c497f40f16">&#9670;&#160;</a></span>instruction_decoder</h2>
 
@@ -750,7 +828,7 @@ Instantiations</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decoded opcode. </p>
+<p>Instruction and decoding signals Decoded opcode. </p>
 
 </div>
 </div>
@@ -828,8 +906,8 @@ Instantiations</h2></td></tr>
 
 </div>
 </div>
-<a id="a9f7dd35eeeda85a2cf5da8df8f46373e" name="a9f7dd35eeeda85a2cf5da8df8f46373e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f7dd35eeeda85a2cf5da8df8f46373e">&#9670;&#160;</a></span>pc_sel_s</h2>
+<a id="ad31e9fbef45c1df6b49d859b4d6f50a0" name="ad31e9fbef45c1df6b49d859b4d6f50a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad31e9fbef45c1df6b49d859b4d6f50a0">&#9670;&#160;</a></span>pc_sel_sig</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -838,7 +916,7 @@ Instantiations</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#a9f7dd35eeeda85a2cf5da8df8f46373e">pc_sel_s</a> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
+          <td class="memname"><a class="el" href="classscore__v_1_1arch.html#ad31e9fbef45c1df6b49d859b4d6f50a0">pc_sel_sig</a> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
         </tr>
       </table>
   </td>
@@ -848,7 +926,7 @@ Instantiations</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Selector for branch logic. </p>
+<p>MUX select for next PC (PC+4 vs Target) </p>
 
 </div>
 </div>

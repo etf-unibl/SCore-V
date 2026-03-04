@@ -9,7 +9,8 @@ var searchData=
   ['pc_5fo_6',['pc_o',['../classpc.html#a3b1dd06064836b982a39318569cd4bad',1,'pc.pc_o()'],['../classscore__v.html#a3b1dd06064836b982a39318569cd4bad',1,'score_v.pc_o()']]],
   ['pc_5freg_7',['pc_reg',['../classpc_1_1arch.html#ab1848495c0d58b151137f7d3fc1bdc30',1,'pc::arch']]],
   ['pc_5fsel_5fi_8',['pc_sel_i',['../classpc__next__instruction.html#aa19344a11453bf7faf8cd80d8ca90561',1,'pc_next_instruction']]],
-  ['pc_5fsel_5fs_9',['pc_sel_s',['../classscore__v_1_1arch.html#a9f7dd35eeeda85a2cf5da8df8f46373e',1,'score_v::arch']]],
-  ['pc_5fsig_10',['pc_sig',['../classscore__v_1_1arch.html#a328284cd6754d7c3b42f0f3cfbb5d9a9',1,'score_v::arch']]],
-  ['pc_5ftarget_5fi_11',['pc_target_i',['../classpc__next__instruction.html#ad35cf69c0f58274c16c41be9f6ca0e9f',1,'pc_next_instruction']]]
+  ['pc_5fsel_5fo_9',['pc_sel_o',['../classcontrol.html#a468809803a3c89055cc157e8f9a12136',1,'control']]],
+  ['pc_5fsel_5fsig_10',['pc_sel_sig',['../classscore__v_1_1arch.html#ad31e9fbef45c1df6b49d859b4d6f50a0',1,'score_v::arch']]],
+  ['pc_5fsig_11',['pc_sig',['../classscore__v_1_1arch.html#a328284cd6754d7c3b42f0f3cfbb5d9a9',1,'score_v::arch']]],
+  ['pc_5ftarget_5fi_12',['pc_target_i',['../classpc__next__instruction.html#ad35cf69c0f58274c16c41be9f6ca0e9f',1,'pc_next_instruction']]]
 ];
