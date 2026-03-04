@@ -47,19 +47,13 @@
 --! The multiplexer has two inputs:
 --!   - alu_result_i : Result produced by the ALU
 --!   - mem_data_i   : Data read from data memory (DMEM)
+--!   - pc4_i        : PC + 4 (JAL/JALR link address)
 --!
---! Selection is controlled by:
---!   - wb_select_i
---!
---! Signal semantics:
---!   wb_select_i = '0'  -> mem_data_i is selected (used for LOAD instructions)
---!   wb_select_i = '1'  -> alu_result_i is selected (used for arithmetic instructions)
---!
---! Typical usage:
---!   - R-type ADD     -> wb_select_i = '1'
---!   - I-type ADDI    -> wb_select_i = '1'
---!   - I-type LW      -> wb_select_i = '0'
---!   - S-type SW      -> Don't care (register write disabled)
+--! Selection is controlled by a 2-bit select input:
+--!   wb_select_i = "00" -> mem_data_i (used for LOAD instructions)
+--!   wb_select_i = "01" -> alu_result_i (used for arithmetic instructions)
+--!   wb_select_i = "10" -> pc4_i
+--!   wb_select_i = "11" -> unused (drives zeros)
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -68,15 +62,17 @@ entity wb_mux is
   port (
     alu_result_i  : in  std_logic_vector(31 downto 0); --! Result produced by the ALU
     mem_data_i    : in  std_logic_vector(31 downto 0); --! Data read from data memory (DMEM)
-    wb_select_i   : in  std_logic;                     --! Selection input
+    pc4_i         : in  std_logic_vector(31 downto 0); --! PC + 4 (JAL/JALR)
+    wb_select_i   : in  std_logic_vector(1 downto 0);  --! Selection input
     wb_data_o     : out std_logic_vector(31 downto 0)  --! Final write-back data to be written into destination register (rd)
   );
 end entity wb_mux;
 
 architecture arch of wb_mux is
 begin
-
-  wb_data_o <= mem_data_i when wb_select_i = '0'
-               else alu_result_i;
-
+  with wb_select_i select
+    wb_data_o <= mem_data_i when "00",
+                 alu_result_i  when "01",
+                 pc4_i when "10",
+                 (others => '0') when others; -- "11" unused
 end arch;
