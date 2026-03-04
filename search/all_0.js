@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['a_5fi_0',['a_i',['../classalu.html#a392051ce70fdb6bdf162d8d49ff942d3',1,'alu']]],
+  ['a_5fi_0',['a_i',['../classbranch__comparator.html#a392051ce70fdb6bdf162d8d49ff942d3',1,'branch_comparator.a_i()'],['../classalu.html#a392051ce70fdb6bdf162d8d49ff942d3',1,'alu.a_i()']]],
   ['a_5fsel_5fo_1',['a_sel_o',['../classcontrol.html#a289db01baa5309214f6259c7fcc0e5bd',1,'control']]],
   ['a_5fsel_5fsig_2',['a_sel_sig',['../classscore__v_1_1arch.html#add27306a730d6113b68ca937d682ac77',1,'score_v::arch']]],
   ['addr_5fi_3',['addr_i',['../classload__store__unit.html#a177799bc66804e26db320db1fed80dfe',1,'load_store_unit']]],
@@ -18,5 +18,5 @@ var searchData=
   ['alu_5fresult_5fi_15',['alu_result_i',['../classwb__mux.html#a20c4096ebcde223fa59040dca8e98e23',1,'wb_mux']]],
   ['alu_5fresult_5fo_16',['alu_result_o',['../classscore__v.html#a006be26d73d93e955b7bcba2d6bf8c78',1,'score_v']]],
   ['alu_5fresult_5fsig_17',['alu_result_sig',['../classscore__v_1_1arch.html#a8011ff90ba4fa7d3cab62e6915c576fa',1,'score_v::arch']]],
-  ['arch_18',['arch',['../classalu_1_1arch.html',1,'arch'],['../classalu__operand__b__mux_1_1arch.html',1,'arch'],['../classcontrol_1_1arch.html',1,'arch'],['../classcounter__vunit__example_1_1arch.html',1,'arch'],['../classfetch__instruction_1_1arch.html',1,'arch'],['../classimm__gen_1_1arch.html',1,'arch'],['../classinstruction__decoder_1_1arch.html',1,'arch'],['../classload__store__unit_1_1arch.html',1,'arch'],['../classpc_1_1arch.html',1,'arch'],['../classpc__next__instruction_1_1arch.html',1,'arch'],['../classreg__file_1_1arch.html',1,'arch'],['../classscore__v_1_1arch.html',1,'arch'],['../classwb__mux_1_1arch.html',1,'arch']]]
+  ['arch_18',['arch',['../classalu_1_1arch.html',1,'arch'],['../classalu__operand__b__mux_1_1arch.html',1,'arch'],['../classbranch__comparator_1_1arch.html',1,'arch'],['../classcontrol_1_1arch.html',1,'arch'],['../classcounter__vunit__example_1_1arch.html',1,'arch'],['../classfetch__instruction_1_1arch.html',1,'arch'],['../classimm__gen_1_1arch.html',1,'arch'],['../classinstruction__decoder_1_1arch.html',1,'arch'],['../classload__store__unit_1_1arch.html',1,'arch'],['../classpc_1_1arch.html',1,'arch'],['../classpc__next__instruction_1_1arch.html',1,'arch'],['../classreg__file_1_1arch.html',1,'arch'],['../classscore__v_1_1arch.html',1,'arch'],['../classwb__mux_1_1arch.html',1,'arch']]]
 ];

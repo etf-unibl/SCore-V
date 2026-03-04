@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['a_5fi_0',['a_i',['../classalu.html#a392051ce70fdb6bdf162d8d49ff942d3',1,'alu']]],
+  ['a_5fi_0',['a_i',['../classbranch__comparator.html#a392051ce70fdb6bdf162d8d49ff942d3',1,'branch_comparator.a_i()'],['../classalu.html#a392051ce70fdb6bdf162d8d49ff942d3',1,'alu.a_i()']]],
   ['a_5fsel_5fo_1',['a_sel_o',['../classcontrol.html#a289db01baa5309214f6259c7fcc0e5bd',1,'control']]],
   ['a_5fsel_5fsig_2',['a_sel_sig',['../classscore__v_1_1arch.html#add27306a730d6113b68ca937d682ac77',1,'score_v::arch']]],
   ['addr_5fi_3',['addr_i',['../classload__store__unit.html#a177799bc66804e26db320db1fed80dfe',1,'load_store_unit']]],
