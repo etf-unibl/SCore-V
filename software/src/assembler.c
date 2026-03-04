@@ -21,14 +21,23 @@ void process_file(FILE* fptr) {
 		printf("Unable to open file\n");
 	}
 
+	FILE *expected_out;
+	expected_out = fopen("expected.txt", "w");
+	if(fptr == NULL) {
+		printf("Unable to open file");
+		return;
+	}
+
+
 	while(fgets(line, sizeof(line), fptr)) {
-		process_line(line, fout);
+		process_line(line, fout, expected_out);
 	}
 
 	fclose(fout);
+	fclose(expected_out);
 }
 
-void process_line(char line[256], FILE* fout) {
+void process_line(char line[256], FILE* fout, FILE* expected_out) {
 	printf("%s", line);	
 	char line_copy[256];
 	strcpy(line_copy, line);
@@ -49,11 +58,11 @@ void process_line(char line[256], FILE* fout) {
 			regd = get_reg(words[1]);
 			reg1 = get_reg(words[2]);
 			reg2 = get_reg(words[3]);
-			if(reg1 == 255 | reg2 == 255 | regd == 255) {
+			if((reg1 == 255) || (reg2 == 255) || (regd == 255)) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_r_type(instr, regd, reg1, reg2, fout);
+			handle_r_type(instr, regd, reg1, reg2, fout, expected_out);
 			break;
 		case I_TYPE :
 			if(strcmp(instr->name, "lw")  == 0 || strcmp(instr->name, "lb") == 0 ||
@@ -68,7 +77,7 @@ void process_line(char line[256], FILE* fout) {
 					printf("Error passing args at [%s]\n", line);
 					return;
 				}
-				handle_i_type(instr, regd, reg1, imm, fout);
+				handle_i_type(instr, regd, reg1, imm, fout, expected_out);
 				break;
 			}
 
@@ -79,7 +88,7 @@ void process_line(char line[256], FILE* fout) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_i_type(instr, regd, reg1, imm, fout);
+			handle_i_type(instr, regd, reg1, imm, fout, expected_out);
 			break;
 		case S_TYPE :
 			char pom_word[40];
@@ -91,7 +100,7 @@ void process_line(char line[256], FILE* fout) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_s_type(instr, regd, imm, reg1, fout);
+			handle_s_type(instr, regd, imm, reg1, fout, expected_out);
 			break;
 		default :
 			break;
@@ -131,7 +140,7 @@ uint8_t get_reg_ls(char word[40]) {
     return atoi(token + 1);
 }
 
-void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output) {
+void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	printf("\nreg2 0x%X\n", reg2 & 0x1F);
@@ -148,9 +157,10 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
 	printf("0x%X\n\n", result);
 
 	output_result(result, output);
+	output_expected(instr, regd, reg1, reg2, 0, expected_out);
 }
 
-void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output) {
+void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	printf("\nregd 0x%X\n", regd & 0x1F);
@@ -166,9 +176,10 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm,
 	printf("0x%X\n\n", result);
 
 	output_result(result, output);
+	output_expected(instr, regd, reg1, 0, imm, expected_out);
 }
 
-void handle_s_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output) {
+void handle_s_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	printf("\nregd 0x%X\n", regd & 0x1F);
@@ -185,6 +196,31 @@ void handle_s_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm,
 	printf("0x%X\n\n", result);
 
 	output_result(result, output);
+	output_expected(instr, regd, reg1, 0, imm, expected_out);
+}
+
+/* Format of the array:
+ * pc, opcode, f3, f7, rd, rs1, rs2, alu_out, wb_out, wb
+ */
+void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, uint16_t imm, FILE* expected_out) {
+	char exp_line[400];
+	char wb;
+	int wb_out;
+	int alu_out;
+
+	reg1 &= 0x1F;
+	reg2 &= 0x1F;
+	regd &= 0x1F;
+
+	wb = 'c';
+	alu_out = 12;
+	wb_out = 14;
+
+	sprintf(exp_line, "%u, \"%07b\", \"%03b\", \"%07b\", %u, %u, %u, %d, %d, '%c'",
+			pc, instr->opcode, instr->funct3, instr->funct7, regd, reg1, reg2, alu_out, wb_out, wb);
+	pc += 4;
+
+	printf("EXPECTED: %s\n", exp_line);
 }
 
 void output_result(uint32_t result, FILE* output) {
