@@ -159,16 +159,16 @@ begin
         check_equal(imm_o, c_EXPECTED_U, 
                    "U-Type LUI failed");
 
-        imm_j_u_type_i <= "0" & "0000000010" & "0" & "00000000"; 
+        imm_j_u_type_i <= std_logic_vector(to_signed(2, 20)); 
         imm_sel_i      <= c_SEL_J_TYPE;
         wait for 10 ns;
         check_equal(to_integer(signed(imm_o)), 4, 
                     "J-Type Positive offset failed");
 
-        imm_j_u_type_i <= (others => '1');
+        imm_j_u_type_i <= std_logic_vector(to_signed(-2, 20));
         imm_sel_i      <= c_SEL_J_TYPE;
         wait for 10 ns;
-        check_equal(to_integer(signed(imm_o)), -2, 
+        check_equal(to_integer(signed(imm_o)), -4, 
                     "J-Type Negative offset failed");
 
       end if;

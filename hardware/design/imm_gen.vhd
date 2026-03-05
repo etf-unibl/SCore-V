@@ -80,10 +80,7 @@ begin
 
       when "101" =>
         imm_o(0)            <= '0';
-        imm_o(10 downto 1)  <= imm_j_u_type_i(18 downto 9);
-        imm_o(11)           <= imm_j_u_type_i(8);
-        imm_o(19 downto 12) <= imm_j_u_type_i(7 downto 0);
-        imm_o(20)           <= imm_j_u_type_i(19);
+        imm_o(20 downto 1)  <= imm_j_u_type_i;
         imm_o(31 downto 21) <= (others => imm_j_u_type_i(19));
 
       when others =>
