@@ -308,6 +308,11 @@ begin
 
       end if;
 
+
+-- =========================================================
+--               BRANCH TYPE INSTRUCTIONS
+-- =========================================================
+
     elsif opcode_i = "1100011" then
       if funct3_i = "000" or funct3_i = "001" or funct3_i = "100" or funct3_i = "101" or funct3_i = "110" or funct3_i = "111" then
 
@@ -337,6 +342,49 @@ begin
         end case;
 
       end if;
+
+-- =========================================================
+--               U-type (LUI, AUIPC)
+-- =========================================================
+
+    elsif opcode_i = "0110111" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "100";
+      b_sel_o            <= '1';
+      a_sel_o            <= '0';
+      alu_op_o           <= ALU_ADD;
+      wb_select_o        <= "01";
+
+    elsif opcode_i = "0010111" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "100";
+      b_sel_o            <= '1';
+      a_sel_o            <= '1';
+      alu_op_o           <= ALU_ADD;
+      wb_select_o        <= "01";
+
+-- =========================================================
+--               JAL and JALR
+-- =========================================================
+
+    elsif opcode_i = "1101111" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "101";
+      a_sel_o            <= '1';
+      b_sel_o            <= '1';
+      alu_op_o           <= ALU_ADD;
+      pc_sel_o           <= '1';
+      wb_select_o        <= "10";
+
+    elsif opcode_i = "1100111" and funct3_i = "000" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "001";
+      a_sel_o            <= '0';
+      b_sel_o            <= '1';
+      alu_op_o           <= ALU_ADD;
+      pc_sel_o           <= '1';
+      wb_select_o        <= "10";
+
     end if;
 
   end process comb_proc;
