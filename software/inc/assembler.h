@@ -84,7 +84,7 @@ Instruction instr_table[] = {
 	{"lh",    I_TYPE, 0x03, 0x1, 0x00, 1, NULL, addiu},
 	{"lw",    I_TYPE, 0x03, 0x2, 0x00, 1, NULL, addiu},
 	{"lbu",   I_TYPE, 0x03, 0x4, 0x00, 1, NULL, addiu},
-	{"lbu",   I_TYPE, 0x03, 0x5, 0x00, 1, NULL, addiu},
+	{"lhu",   I_TYPE, 0x03, 0x5, 0x00, 1, NULL, addiu},
 
 	{"sb",    S_TYPE, 0x23, 0x0, 0x00, 1, NULL, addiu},
 	{"sh",    S_TYPE, 0x23, 0x1, 0x00, 1, NULL, addiu},
