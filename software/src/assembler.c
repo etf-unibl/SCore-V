@@ -69,7 +69,8 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 	}
 
 	Instruction *instr = find_instruction(words[0]);
-	uint8_t reg1, reg2, regd, imm;
+	uint8_t reg1, reg2, regd;
+	int16_t imm;
 
 	switch(instr->format) {
 		case R_TYPE :
@@ -148,7 +149,7 @@ uint8_t get_reg(char reg_word[40]) {
 /**
  * Returns only imm number, excluding ','
  */
-uint16_t get_imm(char word[40]) {
+int16_t get_imm(char word[40]) {
 	char* token = strtok(word, ",");
     return atoi(token);
 }
@@ -157,7 +158,7 @@ uint16_t get_imm(char word[40]) {
  * With load sotre functions, syntax is different
  * because of brackets around second register.
  */
-uint16_t get_imm_ls(char word[40]) {
+int16_t get_imm_ls(char word[40]) {
 	char* token = strtok(word, "(");
     return atoi(token);
 }
@@ -203,7 +204,7 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
  * Then writes expected result to other output file using
  * function output_expected.
  */
-void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out) {
+void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int16_t imm, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	result = ((imm           & 0x7FF) << 20) |
@@ -225,7 +226,7 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm,
  * Then writes expected result to other output file using
  * function output_expected.
  */
-void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1, FILE* output, FILE* expected_out) {
+void handle_s_type(Instruction* instr, uint8_t regd, int16_t imm, uint8_t reg1, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	result = ((imm           & 0xFE0) << 25) |
@@ -244,7 +245,7 @@ void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1,
 /* Format of the expected result:
  * pc, opcode, f3, f7, rd, rs1, rs2, alu_out, wb_out, wb
  */
-void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, uint16_t imm, FILE* expected_out) {
+void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int16_t imm, FILE* expected_out) {
 	char exp_line[400];
 	char wb;
 	int wb_out;
@@ -273,7 +274,11 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		wb_out = alu_out;
 	}
 	// If the instruction is of I_TYPE, but NOT a LOAD instruction, do the same as for R_TYPE, except imm instead of reg2
-	else if(instr->format == I_TYPE && strstr(instr->name, "l") == NULL) {
+	else if(instr->format == I_TYPE && strstr(instr->name, "lb") == NULL
+									&& strstr(instr->name, "lh") == NULL
+									&& strstr(instr->name, "lw") == NULL
+									&& strstr(instr->name, "lbu") == NULL
+									&& strstr(instr->name, "lhu") == NULL) {
 		if(instr->signess == 0) {
 			alu_out = instr->signed_operation(registers[reg1], imm);
 			registers[regd] = alu_out;
