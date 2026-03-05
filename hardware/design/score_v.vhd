@@ -59,6 +59,10 @@ use work.alu_pkg.all;
 --!         purposes, allowing detailed monitoring of their states.
 
 entity score_v is
+  generic (
+    --! @brief Absolute path to data_memory.txt, forwarded to load_store_unit.
+    g_DMEM_INIT_FILE : string := "data_memory.txt"
+  );
   port (
     clk_i        : in  std_logic;                     --! Clock input
     rst_i        : in  std_logic;                     --! Reset input
@@ -230,6 +234,9 @@ architecture arch of score_v is
   --! @brief Load Store Unit
   --! @details Interface for memory access, managing address and R/W signals.
   component load_store_unit is
+    generic (
+      g_INIT_FILE : string := "data_memory.txt"
+    );
     port (
       clk_i        : in  std_logic;
       rst_i        : in  std_logic;
@@ -417,6 +424,9 @@ begin
 
   --! @brief Load Store Unit
   u_lsu : load_store_unit
+    generic map (
+      g_init_file => g_DMEM_INIT_FILE
+    )
     port map (
       clk_i        => clk_i,
       rst_i        => rst_i,

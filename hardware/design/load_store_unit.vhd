@@ -40,10 +40,20 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.mem_pkg.all;
 
+use std.textio.all;
+
+use ieee.std_logic_textio.all;
+
 --! @brief Entity for the Load Store Unit (LSU).
 --! @details This unit interfaces with the Data Memory (DMEM) defined in mem_pkg.
 --! It supports 32-bit (word) synchronous writes and asynchronous reads.
 entity load_store_unit is
+  generic (
+    --! @brief Absolute path to data_memory.txt, set by run.py.
+    --! @details Each line must contain one byte as a 2-digit hex value.
+    --!          Used in simulation only - Quartus ignores this.
+    g_INIT_FILE : string := "data_memory.txt"
+  );
   port (
     clk_i        : in  std_logic;                     --! Global clock signal
     rst_i        : in  std_logic;                     --! Asynchronous reset, active high
@@ -61,8 +71,35 @@ architecture arch of load_store_unit is
   --! Internal signal to hold the 32-bit word assembled from byte-addressable DMEM.
   signal word_to_read : std_logic_vector(31 downto 0);
   signal address      : integer;
-begin
+  --! @brief Loads DMEM from a hex byte file at elaboration time.
+  --! @param file_name Absolute path to data_memory.txt.
+  --! @return Populated t_bytes array.
+  --! @brief Loads DMEM from a hex byte file at elaboration time.
+  --! @details Each line must contain one byte as a 2-digit hex value (e.g. FF).
+  --!          SIMULATION ONLY - Quartus ignores this function.
+  --! @param file_name Absolute path to data_memory.txt.
+  --! @return Populated t_bytes array.
+  impure function initialize_dmem(file_name : in string) return t_bytes
+  is
+    file     f_ptr  : text;
+    variable l      : line;
+    variable result : t_bytes := (others => (others => '0'));
+    variable temp   : std_logic_vector(7 downto 0);
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    for i in 0 to c_TOTAL_BYTES - 1 loop
+      exit when endfile(f_ptr);
+      readline(f_ptr, l);
+      hread(l, temp);
+      result(i) := temp;
+    end loop;
+    file_close(f_ptr);
+    return result;
+  end function initialize_dmem;
 
+  --! @brief Data memory array initialised from file at elaboration time.
+  signal DMEM : t_bytes := initialize_dmem(g_INIT_FILE);
+begin
   --! @brief Concurrent address conversion.
   address <= to_integer(signed(addr_i));
 
