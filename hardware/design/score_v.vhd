@@ -98,16 +98,17 @@ architecture arch of score_v is
   signal br_un_sig        : std_logic;                     --! Control for unsigned comparison
 
   --! @brief Instruction and decoding signals
-  signal opcode_sig     : std_logic_vector(6 downto 0);   --! Decoded opcode
-  signal rd_sig         : std_logic_vector(4 downto 0);   --! Decoded destination register
-  signal rs1_sig        : std_logic_vector(4 downto 0);   --! Decoded source register 1
-  signal rs2_sig        : std_logic_vector(4 downto 0);   --! Decoded source register 2
-  signal funct3_sig     : std_logic_vector(2 downto 0);   --! Decoded funct3 field
-  signal funct7_sig     : std_logic_vector(6 downto 0);   --! Decoded funct7 field
-  signal imm_i_type_sig : std_logic_vector(11 downto 0);  --! Decoded imm_i_type field
-  signal imm_s_type_h_sig : std_logic_vector(6 downto 0); --! instr[31:25]
-  signal imm_s_type_l_sig : std_logic_vector(4 downto 0); --! instr[11:7]
-  signal imm_b_type_sig : std_logic_vector(11 downto 0);  --! instr[11:7]
+  signal opcode_sig         : std_logic_vector(6 downto 0);   --! Decoded opcode
+  signal rd_sig             : std_logic_vector(4 downto 0);   --! Decoded destination register
+  signal rs1_sig            : std_logic_vector(4 downto 0);   --! Decoded source register 1
+  signal rs2_sig            : std_logic_vector(4 downto 0);   --! Decoded source register 2
+  signal funct3_sig         : std_logic_vector(2 downto 0);   --! Decoded funct3 field
+  signal funct7_sig         : std_logic_vector(6 downto 0);   --! Decoded funct7 field
+  signal imm_i_type_sig     : std_logic_vector(11 downto 0);  --! Decoded imm_i_type field
+  signal imm_s_type_h_sig   : std_logic_vector(6 downto 0); --! instr[31:25]
+  signal imm_s_type_l_sig   : std_logic_vector(4 downto 0); --! instr[11:7]
+  signal imm_b_type_sig     : std_logic_vector(11 downto 0);  --! instr[11:7]
+  signal imm_j_u_type_sig : std_logic_vector(19 downto 0);  --! J-type and U-type immediate (instr[31:12])
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -117,6 +118,7 @@ architecture arch of score_v is
 
   --! @brief Datapath integration and control signals
   signal imm_sig       : std_logic_vector(31 downto 0); --! Immediate value output from the Immediate Generator
+  signal alu_a_sig     : std_logic_vector(31 downto 0); --! ALU operand A input, selected betwwen rs1_data and pc_sig
   signal alu_b_sig     : std_logic_vector(31 downto 0); --! ALU operand B input, selected between rs2_data and imm_sig
   signal imm_sel_sig   : std_logic_vector(2 downto 0);  --! Selection signal for Immediate Generator to define instruction format
   signal b_sel_sig     : std_logic;                     --! Control signal for ALU operand B source selection
@@ -126,7 +128,7 @@ architecture arch of score_v is
   signal mem_data_sig   : std_logic_vector(31 downto 0); --! Data read from LSU
   signal final_wb_sig   : std_logic_vector(31 downto 0); --! Data to be written back to RegFile
   signal mem_rw_sig     : std_logic;                     --! Control signal for memory R/W
-  signal wb_select_sig  : std_logic;                     --! Control signal for WB Mux
+  signal wb_select_sig  : std_logic_vector(1 downto 0);  --! Control signal for WB Mux
   signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
@@ -167,7 +169,9 @@ architecture arch of score_v is
       funct7_o        : out std_logic_vector(6 downto 0);
       imm_i_type_o    : out std_logic_vector(11 downto 0);
       imm_s_type_h_o  : out std_logic_vector(6 downto 0);
-      imm_s_type_l_o  : out std_logic_vector(4 downto 0)
+      imm_s_type_l_o  : out std_logic_vector(4 downto 0);
+      imm_b_type_o    : out std_logic_vector(11 downto 0);
+      imm_j_u_type_o  : out std_logic_vector(19 downto 0)
     );
   end component;
 
@@ -190,7 +194,7 @@ architecture arch of score_v is
       mem_rw_o           : out std_logic;
       mem_size_o         : out std_logic_vector(1 downto 0);
       mem_unsigned_o     : out std_logic;
-      wb_select_o        : out std_logic;
+      wb_select_o        : out std_logic_vector(1 downto 0);
       pc_sel_o           : out std_logic;
       br_un_o            : out std_logic
     );
@@ -204,20 +208,23 @@ architecture arch of score_v is
       imm_s_type_h_i  : in  std_logic_vector(6 downto 0);
       imm_s_type_l_i  : in  std_logic_vector(4 downto 0);
       imm_b_type_i    : in  std_logic_vector(11 downto 0);
+      imm_j_u_type_i  : in  std_logic_vector(19 downto 0);
       imm_sel_i       : in  std_logic_vector(2 downto 0);
       imm_o           : out std_logic_vector(31 downto 0)
     );
   end component;
 
-  --! @brief ALU Operand B Multiplexer
-  --! @details Selects between register data and immediate value for ALU input.
-  component alu_operand_b_mux is
+  --! @brief Multiplexer
+  --! @details
+  --! Selects between register data and immediate value for ALU input
+  --! and selects between register data and pc
+  component mux2_1 is
     port (
-      in0_i : in  std_logic_vector(31 downto 0);
-      in1_i : in  std_logic_vector(31 downto 0);
-      sel_i : in  std_logic;
-      out_o : out std_logic_vector(31 downto 0)
-    );
+    in0_i : in  std_logic_vector(31 downto 0);
+    in1_i : in  std_logic_vector(31 downto 0);
+    sel_i : in  std_logic;
+    out_o : out std_logic_vector(31 downto 0)
+  );
   end component;
 
   --! @brief Load Store Unit
@@ -241,7 +248,8 @@ architecture arch of score_v is
     port (
       alu_result_i : in  std_logic_vector(31 downto 0);
       mem_data_i   : in  std_logic_vector(31 downto 0);
-      wb_select_i  : in  std_logic;
+      pc4_i        : in  std_logic_vector(31 downto 0);
+      wb_select_i  : in  std_logic_vector(1 downto 0);
       wb_data_o    : out std_logic_vector(31 downto 0)
     );
   end component;
@@ -271,6 +279,19 @@ architecture arch of score_v is
       b_i      : in  std_logic_vector(31 downto 0);
       alu_op_i : in  t_alu_op;
       y_o      : out std_logic_vector(31 downto 0)
+    );
+  end component;
+
+  --! @brief Branch Comparator
+  --! @details Performs arithmetic and logic operations on input operands
+  --!          and provides the result as output.
+  component branch_comparator is
+    port (
+      a_i     : in  std_logic_vector(31 downto 0);
+      b_i     : in  std_logic_vector(31 downto 0);
+      br_un_i : in  std_logic;
+      br_eq_o : out std_logic;
+      br_lt_o : out std_logic
     );
   end component;
 
@@ -306,7 +327,9 @@ begin
       funct7_o        => funct7_sig,
       imm_i_type_o    => imm_i_type_sig,
       imm_s_type_h_o  => imm_s_type_h_sig,
-      imm_s_type_l_o  => imm_s_type_l_sig
+      imm_s_type_l_o  => imm_s_type_l_sig,
+      imm_b_type_o    => imm_b_type_sig,
+      imm_j_u_type_o  => imm_j_u_type_sig
     );
 
   --! @brief Control unit instance
@@ -338,6 +361,7 @@ begin
       imm_s_type_h_i  => imm_s_type_h_sig,
       imm_s_type_l_i  => imm_s_type_l_sig,
       imm_b_type_i    => imm_b_type_sig,
+      imm_j_u_type_i  => imm_j_u_type_sig,
       imm_sel_i       => imm_sel_sig,
       imm_o           => imm_sig
     );
@@ -355,8 +379,17 @@ begin
       rs2_data_o  => rs2_data_sig
     );
 
+  --! @brief ALU Operand A Multiplexer
+  u_alu_a_mux : mux2_1
+    port map (
+      in0_i => rs1_data_sig,
+      in1_i => pc_sig,
+      sel_i => a_sel_sig,
+      out_o => alu_a_sig
+    );
+
   --! @brief ALU Operand B Multiplexer
-  u_alu_mux : alu_operand_b_mux
+  u_alu_b_mux : mux2_1
     port map (
       in0_i => rs2_data_sig,
       in1_i => imm_sig,
@@ -367,11 +400,21 @@ begin
   --! @brief ALU
   u_alu : alu
     port map (
-      a_i      => rs1_data_sig,
+      a_i      => alu_a_sig,
       b_i      => alu_b_sig,
       alu_op_i => alu_op_sig,
       y_o      => alu_result_sig
     );
+  --! @brief Branch Comparator
+  u_branch_cmp : branch_comparator
+    port map (
+      a_i     => rs1_data_sig,
+      b_i     => rs2_data_sig,
+      br_un_i => br_un_sig,
+      br_eq_o => br_eq_sig,
+      br_lt_o => br_lt_sig
+  );
+
   --! @brief Load Store Unit
   u_lsu : load_store_unit
     port map (
@@ -391,6 +434,7 @@ begin
       alu_result_i => alu_result_sig,
       mem_data_i   => mem_data_sig,
       wb_select_i  => wb_select_sig,
+      pc4_i        => pc_next_sig,
       wb_data_o    => final_wb_sig
     );
 

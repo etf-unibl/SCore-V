@@ -4,13 +4,13 @@
 -- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
--- unit name:     wb_mux
+-- unit name:     mux2_1
 --
 -- description:
 --
---   This file implements the write-back multiplexer for the RISC-V core.
---   The multiplexer selects the data source that will be written into
---   the destination register (rd) of the register file.
+--   This file implements a generic 2-to-1 multiplexer.
+--   The multiplexer selects one of two input vectors and forwards
+--   the selected value to the output.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -38,41 +38,33 @@
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
 
---! @file wb_mux.vhd
---! @brief Write-back multiplexer for the RISC-V core datapath
+--! @file mux2_1.vhd
+--! @brief Generic 2-to-1 multiplexer
 --! @details
---! This module selects the data source that will be written back
---! into the register file (rd).
+--! This module implements a parameterizable-width 2:1 multiplexer.
+--! The data width is defined by the generic parameter g_WIDTH.
 --!
---! The multiplexer has two inputs:
---!   - alu_result_i : Result produced by the ALU
---!   - mem_data_i   : Data read from data memory (DMEM)
---!   - pc4_i        : PC + 4 (JAL/JALR link address)
+--! Inputs:
+--!   - in0_i : First input vector
+--!   - in1_i : Second input vector
 --!
---! Selection is controlled by a 2-bit select input:
---!   wb_select_i = "00" -> mem_data_i (used for LOAD instructions)
---!   wb_select_i = "01" -> alu_result_i (used for arithmetic instructions)
---!   wb_select_i = "10" -> pc4_i
---!   wb_select_i = "11" -> unused (drives zeros)
+--! Selection:
+--!   - sel_i = '0' -> out_o = in0_i
+--!   - sel_i = '1' -> out_o = in1_i
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity wb_mux is
+entity mux2_1 is
   port (
-    alu_result_i  : in  std_logic_vector(31 downto 0); --! Result produced by the ALU
-    mem_data_i    : in  std_logic_vector(31 downto 0); --! Data read from data memory (DMEM)
-    pc4_i         : in  std_logic_vector(31 downto 0); --! PC + 4 (JAL/JALR)
-    wb_select_i   : in  std_logic_vector(1 downto 0);  --! Selection input
-    wb_data_o     : out std_logic_vector(31 downto 0)  --! Final write-back data to be written into destination register (rd)
+    in0_i : in  std_logic_vector(31 downto 0); --! First input
+    in1_i : in  std_logic_vector(31 downto 0); --! Second input
+    sel_i : in  std_logic;                            --! Select signal
+    out_o : out std_logic_vector(31 downto 0)  --! Selected output
   );
-end entity wb_mux;
+end entity mux2_1;
 
-architecture arch of wb_mux is
+architecture arch of mux2_1 is
 begin
-  with wb_select_i select
-    wb_data_o <= mem_data_i when "00",
-                 alu_result_i  when "01",
-                 pc4_i when "10",
-                 (others => '0') when others; -- "11" unused
-end arch;
+  out_o <= in0_i when sel_i = '0' else in1_i;
+end architecture arch;
