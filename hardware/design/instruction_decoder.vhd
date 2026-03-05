@@ -55,6 +55,8 @@
 --! - Common fields: rs1, rs2, rd, funct3, funct7
 --! - I-type immediate: imm_i_type_o = instr[31:20]
 --! - S-type immediate split: imm_s_type_h_o = instr[31:25], imm_s_type_l_o = instr[11:7]
+--! - B-type immediate: imm_b_type_o
+--! - J-type and U-type: imm_j_u_type_o
 --!
 --! Unused outputs for a given opcode are driven to all zeros.
 
@@ -67,15 +69,17 @@ use work.mem_pkg.all;
 entity instruction_decoder is
   port (
     instr_i        : in  t_instruction_rec;  --! Record-based instruction input (opcode + upper bits)
-    opcode_o       : out std_logic_vector(6 downto 0); --! Opcode field (instr[6:0])
-    rs1_o          : out std_logic_vector(4 downto 0); --! Register source 1 (instr[19:15])
-    rs2_o          : out std_logic_vector(4 downto 0); --! Register source 2 (instr[24:20])
-    rd_o           : out std_logic_vector(4 downto 0); --! Register destination (instr[11:7])
-    funct3_o       : out std_logic_vector(2 downto 0); --! funct3 field (instr[14:12])
-    funct7_o       : out std_logic_vector(6 downto 0); --! funct7 field (instr[31:25])
+    opcode_o       : out std_logic_vector(6 downto 0);  --! Opcode field (instr[6:0])
+    rs1_o          : out std_logic_vector(4 downto 0);  --! Register source 1 (instr[19:15])
+    rs2_o          : out std_logic_vector(4 downto 0);  --! Register source 2 (instr[24:20])
+    rd_o           : out std_logic_vector(4 downto 0);  --! Register destination (instr[11:7])
+    funct3_o       : out std_logic_vector(2 downto 0);  --! funct3 field (instr[14:12])
+    funct7_o       : out std_logic_vector(6 downto 0);  --! funct7 field (instr[31:25])
     imm_i_type_o   : out std_logic_vector(11 downto 0); --! I-type immediate (instr[31:20])
-    imm_s_type_h_o : out std_logic_vector(6 downto 0); --! S-type immediate high part (instr[31:25])
-    imm_s_type_l_o : out std_logic_vector(4 downto 0) --! S-type immediate low part (instr[11:7])
+    imm_s_type_h_o : out std_logic_vector(6 downto 0);  --! S-type immediate high part (instr[31:25])
+    imm_s_type_l_o : out std_logic_vector(4 downto 0);  --! S-type immediate low part (instr[11:7])
+    imm_b_type_o   : out std_logic_vector(11 downto 0); --! B-type immediate
+    imm_j_u_type_o : out std_logic_vector(19 downto 0)  --! J-type and U-type immediate (instr[31:12])
 );
 end instruction_decoder;
 
@@ -101,6 +105,8 @@ begin
     imm_i_type_o   <= (others => '0');
     imm_s_type_h_o <= (others => '0');
     imm_s_type_l_o <= (others => '0');
+    imm_b_type_o   <= (others => '0');
+    imm_j_u_type_o <= (others => '0');
 
     opcode_o <= instr_i.opcode;
 
@@ -112,7 +118,7 @@ begin
         funct3_o <= instr32_v(14 downto 12);
         rd_o     <= instr32_v(11 downto 7);
 
-      when "0010011" | "0000011" => --! I-type examples (OP-IMM or LOAD): 0010011 or 0000011
+      when "0010011" | "0000011" | "1100111" => --! I-type examples (OP-IMM or LOAD or JALR)
         imm_i_type_o <= instr32_v(31 downto 20);
         rs1_o        <= instr32_v(19 downto 15);
         funct3_o     <= instr32_v(14 downto 12);
@@ -124,6 +130,26 @@ begin
         rs1_o          <= instr32_v(19 downto 15);
         funct3_o       <= instr32_v(14 downto 12);
         imm_s_type_l_o <= instr32_v(11 downto 7);
+
+      when "1100011" => --! B-type (BRANCH): 1100011
+        rs2_o                    <= instr32_v(24 downto 20);
+        rs1_o                    <= instr32_v(19 downto 15);
+        funct3_o                 <= instr32_v(14 downto 12);
+        imm_b_type_o(11)         <= instr32_v(31);           -- imm[12]
+        imm_b_type_o(10)         <= instr32_v(7);            -- imm[11]
+        imm_b_type_o(9 downto 4) <= instr32_v(30 downto 25); -- imm[10:5]
+        imm_b_type_o(3 downto 0) <= instr32_v(11 downto 8);  -- imm[4:1]
+
+      when "1101111" => --! J-type (JAL) : 1101111
+        rd_o                         <= instr32_v(11 downto 7);
+        imm_j_u_type_o(19)           <= instr32_v(31);
+        imm_j_u_type_o(18 downto 11) <= instr32_v(19 downto 12);
+        imm_j_u_type_o(10)           <= instr32_v(20);
+        imm_j_u_type_o(9 downto 0)   <= instr32_v(30 downto 21);
+
+      when "0110111" | "0010111" => --! U-type (Upper immediate) : 0110111, 0010111
+        rd_o                         <= instr32_v(11 downto 7);
+        imm_j_u_type_o(19 downto 0) <= instr32_v(31 downto 12);
 
       when others =>
         null;
