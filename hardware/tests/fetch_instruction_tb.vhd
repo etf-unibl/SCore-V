@@ -59,6 +59,30 @@ architecture arch of fetch_instruction_tb is
 
   signal test_in  : std_logic_vector(31 downto 0);
   signal test_out : t_instruction_rec;
+  impure function initialize_memory(file_name : in string) return t_bytes
+  is
+    file     f_ptr            : text;
+    variable l                : line;
+    variable result           : t_bytes := (others => (others => '0'));
+    variable temp             : std_logic_vector(31 downto 0);
+    variable v_max_word_index : integer := (c_TOTAL_BYTES / 4) - 1;
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    for i in 0 to v_max_word_index loop
+      if not endfile(f_ptr) then
+        readline(f_ptr, l);
+        read(l, temp);
+        result(i*4)     := temp(7  downto 0);
+        result(i*4 + 1) := temp(15 downto 8);
+        result(i*4 + 2) := temp(23 downto 16);
+        result(i*4 + 3) := temp(31 downto 24);
+      else
+        exit;
+      end if;
+    end loop;
+    file_close(f_ptr);
+    return result;
+  end function initialize_memory;
   signal c_IMEM   : t_bytes := initialize_memory("instruction_memory.txt");
 
 begin
