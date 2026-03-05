@@ -56,6 +56,7 @@ void process_file(FILE* fptr) {
 void process_line(char line[256], FILE* fout, FILE* expected_out) {
 	printf("%s", line);	
 
+	char pom_word[40];
 	char line_copy[256];
 	strcpy(line_copy, line);
 	char* token = strtok(line_copy, " ");
@@ -82,11 +83,11 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 			handle_r_type(instr, regd, reg1, reg2, fout, expected_out);
 			break;
 		case I_TYPE :
+			memset(pom_word, 0, sizeof(pom_word));
 			// Different handling of load functions because of their assembly format
 			if(strcmp(instr->name, "lw")  == 0 || strcmp(instr->name, "lb") == 0 ||
 			   strcmp(instr->name, "lbu") == 0 || strcmp(instr->name, "lh") == 0 ||
 			   strcmp(instr->name, "lhu") == 0) {
-				char pom_word[40];
 				strcpy(pom_word, words[2]);
 				regd = get_reg(words[1]);
 				imm = get_imm_ls(words[2]);
@@ -109,7 +110,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 			handle_i_type(instr, regd, reg1, imm, fout, expected_out);
 			break;
 		case S_TYPE :
-			char pom_word[40];
+			memset(pom_word, 0, sizeof(pom_word));
 			strcpy(pom_word, words[2]);
 			regd = get_reg(words[1]);
 			imm = get_imm_ls(words[2]);
@@ -356,9 +357,17 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		}
 	}
 
+	char funct3[4] = "";
+	char funct7[8] = "";
+	char opcode[8] = "";
+
+	bits_to_str(instr->opcode, 7, opcode);
+	bits_to_str(instr->funct3, 3, funct3);
+	bits_to_str(instr->funct7, 7, funct7);
+
 	// Combine all arguments to a single string
-	sprintf(exp_line, "%u, \"%07b\", \"%03b\", \"%07b\", %u, %u, %u, %d, %d, '%c'\n",
-			pc, instr->opcode, instr->funct3, instr->funct7, regd, reg1, reg2, alu_out, wb_out, wb);
+	sprintf(exp_line, "%u, \"%s\", \"%s\", \"%s\", %u, %u, %u, %d, %d, '%c'\n",
+			pc, opcode, funct3, funct7, regd, reg1, reg2, alu_out, wb_out, wb);
 
 	fputs(exp_line, expected_out);
 
@@ -368,11 +377,21 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	printf("EXPECTED: %s\n", exp_line);
 }
 
+void bits_to_str(unsigned int value, int bits, char *out)
+{
+    for (int i = bits - 1; i >= 0; i--) {
+        *out++ = ((value >> i) & 1) ? '1' : '0';
+    }
+    *out = '\0';
+}
+
 /**
  * Writes instruction machine code to output file
  */
 void output_result(uint32_t result, FILE* output) {
 	char instruction[35];
-	sprintf(instruction, "%032b\n", result);
+	bits_to_str(result, 32, instruction);
+	instruction[32] = '\n';
+	instruction[33] = '\0';
 	fputs(instruction, output);
 }

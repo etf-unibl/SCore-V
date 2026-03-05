@@ -149,3 +149,9 @@ void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1,
 /** Prints expected output
  */
 void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, uint16_t imm, FILE* expected_out);
+
+/**
+ * Converts value to string of value's bits
+ * and fills with zeros to the bits(the second argument)
+ */
+void bits_to_str(unsigned int value, int bits, char *out);
