@@ -107,6 +107,8 @@ Ports</h2></td></tr>
 <tr class="memdesc:a29cc59c167033a8aced99be5458ab713"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Data read from data memory (DMEM)  <a href="#a29cc59c167033a8aced99be5458ab713"></a><br /></td></tr>
 <tr class="memitem:a4ffb278df1f730744f0d45d4feeb2c15"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classwb__mux.html#a4ffb278df1f730744f0d45d4feeb2c15">pc4_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a4ffb278df1f730744f0d45d4feeb2c15"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">PC + 4 (JAL/JALR)  <a href="#a4ffb278df1f730744f0d45d4feeb2c15"></a><br /></td></tr>
+<tr class="memitem:a0cd8900f45bde30e5dba68b27ac5c45c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classwb__mux.html#a0cd8900f45bde30e5dba68b27ac5c45c">imm_lui_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a0cd8900f45bde30e5dba68b27ac5c45c"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">rd = imm &lt;&lt; 12 (generated in imm generator) for LUI instruction  <a href="#a0cd8900f45bde30e5dba68b27ac5c45c"></a><br /></td></tr>
 <tr class="memitem:af75a24bd2ecb1b819199b98c9d00596b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classwb__mux.html#af75a24bd2ecb1b819199b98c9d00596b">wb_select_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">1</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:af75a24bd2ecb1b819199b98c9d00596b"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Selection input.  <a href="#af75a24bd2ecb1b819199b98c9d00596b"></a><br /></td></tr>
 <tr class="memitem:a7d43c92a865fb38d542c38613760be82"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classwb__mux.html#a7d43c92a865fb38d542c38613760be82">wb_data_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
@@ -156,6 +158,30 @@ Ports</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0cd8900f45bde30e5dba68b27ac5c45c" name="a0cd8900f45bde30e5dba68b27ac5c45c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cd8900f45bde30e5dba68b27ac5c45c">&#9670;&#160;</a></span>imm_lui_i</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classwb__mux.html#a0cd8900f45bde30e5dba68b27ac5c45c">imm_lui_i</a> <b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>rd = imm &lt;&lt; 12 (generated in imm generator) for LUI instruction </p>
 
 </div>
 </div>

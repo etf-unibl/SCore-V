@@ -93,7 +93,7 @@ Entities</h2></td></tr>
 <li>mem_data_i : Data read from data memory (DMEM)</li>
 <li>pc4_i : PC + 4 (JAL/JALR link address)</li>
 </ul>
-<p >Selection is controlled by a 2-bit select input: wb_select_i = "00" -&gt; mem_data_i (used for LOAD instructions) wb_select_i = "01" -&gt; alu_result_i (used for arithmetic instructions) wb_select_i = "10" -&gt; pc4_i wb_select_i = "11" -&gt; unused (drives zeros) </p>
+<p >Selection is controlled by a 2-bit select input: wb_select_i = "00" -&gt; mem_data_i (used for LOAD instructions) wb_select_i = "01" -&gt; alu_result_i (used for arithmetic instructions) wb_select_i = "10" -&gt; pc4_i wb_select_i = "11" -&gt; imm_lui_i </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
