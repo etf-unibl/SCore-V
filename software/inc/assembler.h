@@ -75,10 +75,10 @@ Instruction instr_table[] = {
 	{"ori",   I_TYPE, 0x13, 0x6, 0x00, 0, or_op, NULL},
 	{"andi",  I_TYPE, 0x13, 0x7, 0x00, 0, and_op, NULL},
 	{"slli",  I_TYPE, 0x13, 0x1, 0x00, 0, sll, NULL},
-	{"srli",  I_TYPE, 0x13, 0x5, 0x00, 0, NULL, srl},
+	{"srli",  I_TYPE, 0x13, 0x5, 0x00, 1, NULL, srl},
 	{"srai",  I_TYPE, 0x13, 0x5, 0x00, 0, sra, NULL},
 	{"slti",  I_TYPE, 0x13, 0x2, 0x00, 0, slt, NULL},
-	{"sltiu", I_TYPE, 0x13, 0x2, 0x00, 0, NULL, sltu},
+	{"sltiu", I_TYPE, 0x13, 0x2, 0x00, 1, NULL, sltu},
 
 	{"lb",    I_TYPE, 0x03, 0x0, 0x00, 1, NULL, addiu},
 	{"lh",    I_TYPE, 0x03, 0x1, 0x00, 1, NULL, addiu},
@@ -109,13 +109,13 @@ uint8_t get_reg(char reg_word[40]);
 /** Returns imm value from a string,
  * used in handle_x_type functions.
  */
-uint16_t get_imm(char word[40]);
+int16_t get_imm(char word[40]);
 
 /** Returns imm value from a string,
  * used in handle_x_type functions of load/store
  * type.
  */
-uint16_t get_imm_ls(char word[40]);
+int16_t get_imm_ls(char word[40]);
 
 /** Returns imm value from a string,
  * used in handle_x_type functions of load/store
@@ -139,16 +139,16 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
 /** Handles I_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint16_t imm, FILE* output, FILE* expected_out);
+void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int16_t imm, FILE* output, FILE* expected_out);
 
 /** Handles S_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_s_type(Instruction* instr, uint8_t regd, uint16_t imm, uint8_t reg1, FILE* output, FILE* expected_out);
+void handle_s_type(Instruction* instr, uint8_t regd, int16_t imm, uint8_t reg1, FILE* output, FILE* expected_out);
 
 /** Prints expected output
  */
-void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, uint16_t imm, FILE* expected_out);
+void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int16_t imm, FILE* expected_out);
 
 /**
  * Converts value to string of value's bits
