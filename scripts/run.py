@@ -27,5 +27,6 @@ IMEM_FILE = str((INIT_PATH / "instruction_memory.txt").resolve()).replace("\\", 
 # Pass the absolute path to the fetch_instruction testbench
 tb = testbench_lib.test_bench("fetch_instruction_tb")
 tb.set_generic("g_init_file", IMEM_FILE)
+testbench_lib.test_bench("score_v_tb").set_generic("g_init_file", IMEM_FILE)
 
 VU.main()

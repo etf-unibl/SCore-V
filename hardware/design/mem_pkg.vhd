@@ -84,6 +84,11 @@ package mem_pkg is
     19     => x"F0000000",
     20     => x"0000000F",
     21     => x"00000033",
+    25     => x"00000001",
+    26     => x"00000002",
+    27     => x"00000002",
+    28     => x"FFFFFFFF",
+    29     => x"FFFFFFFE",
     others => (others => '0')
   );
   --! @brief Maximums of DMEM memory and IMEM memory
@@ -131,6 +136,10 @@ package mem_pkg is
     33     => "00000000",
     34     => "00000000",
     35     => "00000000",
+    36     => "11110000",  -- 0x000000F0
+    37     => "00000000",
+    38     => "00000000",
+    39     => "00000000",
     others => (others => '0')
   );
 end mem_pkg;
