@@ -561,6 +561,34 @@ begin
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "STORE with unsupported funct3: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "STORE with unsupported funct3: ALU_NOP");
 
+        ---------------------------------------------------------------------------
+        -- 8) JALR opcode (1100111) but unsupported funct3 (must be 000)
+        ---------------------------------------------------------------------------
+        s_opcode <= "1100111";
+        s_funct3 <= "010";
+        s_imm_i_type <= (others => '0');
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "JALR unsupported funct3: must not write");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "JALR unsupported funct3: wb_select default");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "JALR unsupported funct3: ALU_NOP");
+
+        ---------------------------------------------------------------------------
+        -- 9) Reserved opcode similar to U-type (e.g., 1010111)
+        ---------------------------------------------------------------------------
+        s_opcode <= "1010111";
+        s_imm_i_type <= (others => '1');
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "Reserved U-like opcode: must not write");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Reserved U-like opcode: ALU_NOP");
+
+        ---------------------------------------------------------------------------
+        -- 10) Reserved opcode similar to J-type (e.g., 1101011)
+        ---------------------------------------------------------------------------
+        s_opcode <= "1101011";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "Reserved J-like opcode: must not write");
+        check_equal(to_integer(unsigned(s_imm_sel)), 0, "Reserved J-like: imm_sel default");
+
       elsif run("test_branch_instr") then
 
         ---------------------------------------------------------------------------
@@ -613,6 +641,54 @@ begin
         wait for 5 ns;
         check_equal(s_br_un, '1', "BGEU: br_un signal must be 1");
         check_equal(s_pc_sel, '0', "BGEU: pc_sel should be 0 when br_lt is 1");
+
+      elsif run("test_upper_and_jump_instr") then
+
+        -----------------------------------------------------------------------
+        -- UPPER IMMEDIATE: LUI, AUIPC (opcodes 0110111, 0010111)
+        -----------------------------------------------------------------------
+
+        -- LUI (Load Upper Immediate)
+        s_opcode <= "0110111";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LUI: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 4, "LUI: imm_sel must be U-type (100)");
+        check_equal(s_a_sel, '0', "LUI: a_sel must be 0 (rs1 is x0)");
+        check_equal(s_b_sel, '1', "LUI: b_sel must be 1 (immediate)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LUI: ALU_ADD to pass imm");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "LUI: wb_select must be ALU (01)");
+
+        -- AUIPC (Add Upper Immediate to PC)
+        s_opcode <= "0010111";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "AUIPC: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 4, "AUIPC: imm_sel must be U-type (100)");
+        check_equal(s_a_sel, '1', "AUIPC: a_sel must be 1 (PC source)");
+        check_equal(s_b_sel, '1', "AUIPC: b_sel must be 1 (immediate)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "AUIPC: ALU_ADD for PC+imm");
+
+        -----------------------------------------------------------------------
+        -- JUMPS: JAL, JALR (opcodes 1101111, 1100111)
+        -----------------------------------------------------------------------
+
+        -- JAL (Jump and Link)
+        s_opcode <= "1101111";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "JAL: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 5, "JAL: imm_sel must be J-type (101)");
+        check_equal(s_a_sel, '1', "JAL: a_sel must be 1 (PC source)");
+        check_equal(s_pc_sel, '1', "JAL: pc_sel must be 1 (always taken)");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JAL: wb_select must be PC+4 (10)");
+
+        -- JALR (Jump and Link Register)
+        s_opcode <= "1100111";
+        s_funct3 <= "000";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "JALR: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 1, "JALR: imm_sel must be I-type (001)");
+        check_equal(s_a_sel, '0', "JALR: a_sel must be 0 (rs1 source)");
+        check_equal(s_pc_sel, '1', "JALR: pc_sel must be 1 (always taken)");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JALR: wb_select must be PC+4 (10)");
 
       end if;
     end loop;
