@@ -1,15 +1,16 @@
 -----------------------------------------------------------------------------
 -- Faculty of Electrical Engineering
 -- PDS 2025
--- https://github.com/etf-unibl/SCore-V/
+-- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
--- unit name:     pc_next_instruction
+-- unit name:     mux2_1
 --
 -- description:
 --
---   This file implements next Program Counter (PC) calculation
---   logic.
+--   This file implements a generic 2-to-1 multiplexer.
+--   The multiplexer selects one of two input vectors and forwards
+--   the selected value to the output.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -36,28 +37,34 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+
+--! @file mux2_1.vhd
+--! @brief Generic 2-to-1 multiplexer
+--! @details
+--! This module implements a parameterizable-width 2:1 multiplexer.
+--! The data width is defined by the generic parameter g_WIDTH.
+--!
+--! Inputs:
+--!   - in0_i : First input vector
+--!   - in1_i : Second input vector
+--!
+--! Selection:
+--!   - sel_i = '0' -> out_o = in0_i
+--!   - sel_i = '1' -> out_o = in1_i
+
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
 
---! @file pc_next_instruction.vhd
---! @brief Next sequential Program Counter calculation
---! @details Computes the next instruction address by incrementing
---! the current PC value by 4.
-
-entity pc_next_instruction is
+entity mux2_1 is
   port (
-    pc_target_i     : in  std_logic_vector(31 downto 0); --! Target PC value
-    pc_sel_i        : in  std_logic;                     --! Selector for branch logic
-    pc_i            : in  std_logic_vector(31 downto 0); --! Current Program Counter value
-    pc_next_o       : out std_logic_vector(31 downto 0)  --! Next sequential PC value
+    in0_i : in  std_logic_vector(31 downto 0); --! First input
+    in1_i : in  std_logic_vector(31 downto 0); --! Second input
+    sel_i : in  std_logic;                            --! Select signal
+    out_o : out std_logic_vector(31 downto 0)  --! Selected output
   );
-end pc_next_instruction;
+end entity mux2_1;
 
---! @brief Architecture arch for next PC computation
---! @details Implements combinational logic for sequential PC increment.
-architecture arch of pc_next_instruction is
+architecture arch of mux2_1 is
 begin
-  --! @brief Output assignment
-  pc_next_o <= pc_target_i when pc_sel_i = '1' else std_logic_vector(unsigned(pc_i) + 4);
-end arch;
+  out_o <= in0_i when sel_i = '0' else in1_i;
+end architecture arch;
