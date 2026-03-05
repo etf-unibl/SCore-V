@@ -12,9 +12,7 @@
 --   Integrates Program Counter, Instruction Fetch, Decoder, Control Unit,
 --   Register File, and ALU. Provides instruction execution
 --   with register read/write and ALU computation.
---   Currently, this implementation only supports all arithmetic operations
---   and LW/SW operations.
---   Support for other instructions will be added in future expansions.
+--   This implementation supports all Base Integer Instructions (RV32I).
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
