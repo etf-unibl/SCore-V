@@ -249,6 +249,7 @@ architecture arch of score_v is
       alu_result_i : in  std_logic_vector(31 downto 0);
       mem_data_i   : in  std_logic_vector(31 downto 0);
       pc4_i        : in  std_logic_vector(31 downto 0);
+      imm_lui_i    : in  std_logic_vector(31 downto 0);
       wb_select_i  : in  std_logic_vector(1 downto 0);
       wb_data_o    : out std_logic_vector(31 downto 0)
     );
@@ -435,6 +436,7 @@ begin
       mem_data_i   => mem_data_sig,
       wb_select_i  => wb_select_sig,
       pc4_i        => pc_next_sig,
+      imm_lui_i    => imm_sig,
       wb_data_o    => final_wb_sig
     );
 

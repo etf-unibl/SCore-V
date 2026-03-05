@@ -53,7 +53,7 @@
 --!   wb_select_i = "00" -> mem_data_i (used for LOAD instructions)
 --!   wb_select_i = "01" -> alu_result_i (used for arithmetic instructions)
 --!   wb_select_i = "10" -> pc4_i
---!   wb_select_i = "11" -> unused (drives zeros)
+--!   wb_select_i = "11" -> imm_lui_i
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -63,6 +63,7 @@ entity wb_mux is
     alu_result_i  : in  std_logic_vector(31 downto 0); --! Result produced by the ALU
     mem_data_i    : in  std_logic_vector(31 downto 0); --! Data read from data memory (DMEM)
     pc4_i         : in  std_logic_vector(31 downto 0); --! PC + 4 (JAL/JALR)
+    imm_lui_i     : in  std_logic_vector(31 downto 0); --! rd = imm << 12 (generated in imm generator) for LUI instruction
     wb_select_i   : in  std_logic_vector(1 downto 0);  --! Selection input
     wb_data_o     : out std_logic_vector(31 downto 0)  --! Final write-back data to be written into destination register (rd)
   );
@@ -74,5 +75,5 @@ begin
     wb_data_o <= mem_data_i when "00",
                  alu_result_i  when "01",
                  pc4_i when "10",
-                 (others => '0') when others; -- "11" unused
+                 imm_lui_i when others; -- "11"
 end arch;
