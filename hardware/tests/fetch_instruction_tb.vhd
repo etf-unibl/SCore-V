@@ -44,6 +44,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use design_lib.mem_pkg.all;
 
+use std.textio.all;
+
+use ieee.std_logic_textio.all;
+
 --! @brief Top-level entity for the fetch instruction testbench.
 --! @details As a testbench, this entity has no ports.
 entity fetch_instruction_tb is
