@@ -90,6 +90,7 @@
 --!     "00" = Data memory output (DataR)
 --!     "01" = ALU result
 --!     "10" = PC+4
+--!     "11" = Imm from LUI instruction
 --!
 --! - pc_sel_o:
 --!     Next PC value selector.
@@ -352,8 +353,7 @@ begin
       imm_sel_o          <= "100";
       b_sel_o            <= '1';
       a_sel_o            <= '0';
-      alu_op_o           <= ALU_ADD;
-      wb_select_o        <= "01";
+      wb_select_o        <= "11";
 
     elsif opcode_i = "0010111" then
       reg_write_enable_o <= '1';
