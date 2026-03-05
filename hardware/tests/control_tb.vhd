@@ -655,8 +655,8 @@ begin
         check_equal(to_integer(unsigned(s_imm_sel)), 4, "LUI: imm_sel must be U-type (100)");
         check_equal(s_a_sel, '0', "LUI: a_sel must be 0 (rs1 is x0)");
         check_equal(s_b_sel, '1', "LUI: b_sel must be 1 (immediate)");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LUI: ALU_ADD to pass imm");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "LUI: wb_select must be ALU (01)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "LUI: ALU_ADD to pass imm");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 3, "LUI: wb_select must be ALU (11)");
 
         -- AUIPC (Add Upper Immediate to PC)
         s_opcode <= "0010111";

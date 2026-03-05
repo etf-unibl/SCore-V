@@ -54,10 +54,9 @@ architecture arch of wb_mux_tb is
   signal alu_result_i : std_logic_vector(31 downto 0) := (others => '0');
   signal mem_data_i   : std_logic_vector(31 downto 0) := (others => '0');
   signal pc4_i        : std_logic_vector(31 downto 0) := (others => '0');
+  signal imm_lui_i    : std_logic_vector(31 downto 0); 
   signal wb_select_i  : std_logic_vector(1 downto 0) := (others => '0');
   signal wb_data_o    : std_logic_vector(31 downto 0);
-
-  constant c_ZERO32 : std_logic_vector(31 downto 0) := (others => '0');
 
 begin
 
@@ -66,6 +65,7 @@ begin
     alu_result_i => alu_result_i,
     mem_data_i   => mem_data_i,
     pc4_i        => pc4_i,
+    imm_lui_i    => imm_lui_i,
     wb_select_i  => wb_select_i,
     wb_data_o    => wb_data_o
   );
@@ -99,7 +99,7 @@ begin
         -- "11" -> others => zero
         wb_select_i <= "11";
         wait for 1 ns;
-        check_equal(wb_data_o, c_ZERO32, "wb_select_i=11 must drive zeros");
+        check_equal(wb_data_o, imm_lui_i, "wb_select_i=11 must select imm_lui_i");
 
         -- case with negative values
         alu_result_i <= std_logic_vector(to_signed(-1, 32));
