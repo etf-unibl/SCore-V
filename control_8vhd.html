@@ -100,7 +100,7 @@ Entities</h2></td></tr>
 <li>mem_size_o: Specifies the data access width for memory load and store operations. "00" = Byte "01" = Halfword "10" = Word</li>
 <li>mem_unsigned_o: Determines if the data from memory should be sign-extended or zero-extended. '0' = Signed (sign-extended, e.g., LB, LH) '1' = Unsigned (zero-extended, e.g., LBU, LHU)</li>
 <li>mem_rw_o: Data memory control. '0' = Read '1' = Write</li>
-<li>wb_select_o: Write-back multiplexer select. '0' = Data memory output (DataR) '1' = ALU result</li>
+<li>wb_select_o: Write-back multiplexer select. "00" = Data memory output (DataR) "01" = ALU result "10" = PC+4</li>
 <li>pc_sel_o: Next PC value selector. '0' = PC + 4 '1' = ALU result (Target branch address)</li>
 <li>br_un_o: Selects branch comparison signedness. '0' = Signed comparison '1' = Unsigned comparison </li>
 </ul>
