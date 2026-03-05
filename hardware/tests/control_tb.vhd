@@ -62,7 +62,7 @@ architecture arch of control_tb is
   signal s_b_sel            : std_logic;
   signal s_alu_op           : t_alu_op;
   signal s_mem_rw_o         : std_logic;
-  signal s_wb_select_o      : std_logic;
+  signal s_wb_select_o      : std_logic_vector(1 downto 0);
   signal s_mem_size_o       : std_logic_vector(1 downto 0);
   signal s_mem_unsigned_o   : std_logic;
   signal s_br_eq            : std_logic := '0';
@@ -110,7 +110,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "ADD should enable reg write");
         check_equal(s_b_sel,            '0', "ADD uses rs2");
-        check_equal(s_wb_select_o,      '1', "ADD writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ADD writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADD -> ALU_ADD");
 
         -- R-type SUB
@@ -121,7 +121,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SUB should enable reg write");
         check_equal(s_b_sel,            '0', "SUB uses rs2");
-        check_equal(s_wb_select_o,      '1', "SUB writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SUB writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SUB), "SUB -> ALU_SUB");
 
         -- I-type ADDI
@@ -133,7 +133,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "ADDI should enable reg write");
         check_equal(s_b_sel,            '1', "ADDI uses immediate");
-        check_equal(s_wb_select_o,      '1', "ADDI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ADDI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "ADDI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADDI -> ALU_ADD");
 
@@ -146,7 +146,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SLT should enable reg write");
         check_equal(s_b_sel,            '0', "SLT uses rs2");
-        check_equal(s_wb_select_o,      '1', "SLT writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLT writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLT), "SLT -> ALU_SLT");
 
         -- R-type SLTU
@@ -157,7 +157,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SLTU should enable reg write");
         check_equal(s_b_sel,            '0', "SLTU uses rs2");
-        check_equal(s_wb_select_o,      '1', "SLTU writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLTU writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLTU), "SLTU -> ALU_SLTU");
 
         -- R-type AND
@@ -168,7 +168,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "AND should enable reg write");
         check_equal(s_b_sel,            '0', "AND uses rs2");
-        check_equal(s_wb_select_o,      '1', "AND writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "AND writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_AND), "AND -> ALU_AND");
 
         -- R-type OR
@@ -179,7 +179,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "OR should enable reg write");
         check_equal(s_b_sel,            '0', "OR uses rs2");
-        check_equal(s_wb_select_o,      '1', "OR writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "OR writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_OR), "OR -> ALU_OR");
 
         -- R-type XOR
@@ -190,7 +190,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "XOR should enable reg write");
         check_equal(s_b_sel,            '0', "XOR uses rs2");
-        check_equal(s_wb_select_o,      '1', "XOR writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "XOR writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_XOR), "XOR -> ALU_XOR");
 
         -- R-type SLL
@@ -201,7 +201,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SLL should enable reg write");
         check_equal(s_b_sel,            '0', "SLL uses rs2");
-        check_equal(s_wb_select_o,      '1', "SLL writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLL writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLL), "SLL -> ALU_SLL");
 
         -- R-type SRL
@@ -212,7 +212,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SRL should enable reg write");
         check_equal(s_b_sel,            '0', "SRL uses rs2");
-        check_equal(s_wb_select_o,      '1', "SRL writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRL writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRL), "SRL -> ALU_SRL");
 
         -- R-type SRA
@@ -223,7 +223,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SRA should enable reg write");
         check_equal(s_b_sel,            '0', "SRA uses rs2");
-        check_equal(s_wb_select_o,      '1', "SRA writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRA writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRA), "SRA -> ALU_SRA");
 
         -- I-type XORI
@@ -235,7 +235,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "XORI should enable reg write");
         check_equal(s_b_sel,            '1', "XORI uses immediate");
-        check_equal(s_wb_select_o,      '1', "XORI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "XORI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "XORI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_XOR), "XORI -> ALU_XOR");
 
@@ -247,7 +247,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "ORI should enable reg write");
         check_equal(s_b_sel,            '1', "ORI uses immediate");
-        check_equal(s_wb_select_o,      '1', "ORI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ORI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "ORI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_OR), "ORI -> ALU_OR");
 
@@ -259,7 +259,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "ANDI should enable reg write");
         check_equal(s_b_sel,            '1', "ANDI uses immediate");
-        check_equal(s_wb_select_o,      '1', "ANDI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ANDI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "ANDI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_AND), "ANDI -> ALU_AND");
 
@@ -271,7 +271,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SLTI should enable reg write");
         check_equal(s_b_sel,            '1', "SLTI uses immediate");
-        check_equal(s_wb_select_o,      '1', "SLTI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLTI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLTI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLT), "SLTI -> ALU_SLT");
 
@@ -283,7 +283,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SLTIU should enable reg write");
         check_equal(s_b_sel,            '1', "SLTIU uses immediate");
-        check_equal(s_wb_select_o,      '1', "SLTIU writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLTIU writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLTIU imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLTU), "SLTIU -> ALU_SLTU");
 
@@ -296,7 +296,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SLLI should enable reg write");
         check_equal(s_b_sel,            '1', "SLLI uses immediate");
-        check_equal(s_wb_select_o,      '1', "SLLI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLLI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLLI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLL), "SLLI -> ALU_SLL");
 
@@ -308,7 +308,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SRLI should enable reg write");
         check_equal(s_b_sel,            '1', "SRLI uses immediate");
-        check_equal(s_wb_select_o,      '1', "SRLI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRLI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SRLI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRL), "SRLI -> ALU_SRL");
 
@@ -320,7 +320,7 @@ begin
 
         check_equal(s_reg_write_enable, '1', "SRAI should enable reg write");
         check_equal(s_b_sel,            '1', "SRAI uses immediate");
-        check_equal(s_wb_select_o,      '1', "SRAI writeback from ALU");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRAI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SRAI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRA), "SRAI -> ALU_SRA");
 
@@ -346,7 +346,7 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '1', "LB should write rd");
         check_equal(s_mem_rw_o,         '0', "LB should read memory");
-        check_equal(s_wb_select_o,      '0', "LB wb from memory");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "LB wb from memory");
         check_equal(s_b_sel,            '1', "LB uses immediate");
         check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LB addr via ADD");
@@ -358,7 +358,7 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '1', "LH should write rd");
         check_equal(s_mem_rw_o,         '0', "LH should read memory");
-        check_equal(s_wb_select_o,      '0', "LH wb from memory");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "LH wb from memory");
         check_equal(s_b_sel,            '1', "LH uses immediate");
         check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LH addr via ADD");
@@ -370,7 +370,7 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '1', "LW should write rd");
         check_equal(s_mem_rw_o,         '0', "LW should read memory");
-        check_equal(s_wb_select_o,      '0', "LW wb from memory");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "LW wb from memory");
         check_equal(s_b_sel,            '1', "LW uses immediate");
         check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LW addr via ADD");
@@ -382,7 +382,7 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '1', "LBU should write rd");
         check_equal(s_mem_rw_o,         '0', "LBU should read memory");
-        check_equal(s_wb_select_o,      '0', "LBU wb from memory");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "LBU wb from memory");
         check_equal(s_b_sel,            '1', "LBU uses immediate");
         check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LBU addr via ADD");
@@ -394,7 +394,7 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '1', "LHU should write rd");
         check_equal(s_mem_rw_o,         '0', "LHU should read memory");
-        check_equal(s_wb_select_o,      '0', "LHU wb from memory");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "LHU wb from memory");
         check_equal(s_b_sel,            '1', "LHU uses immediate");
         check_equal(s_imm_sel, std_logic_vector'("001"), "LOAD imm_sel must be 001");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LHU addr via ADD");
@@ -459,7 +459,7 @@ begin
         check_equal(s_reg_write_enable, '0', "Invalid opcode: reg_write must be 0");
         check_equal(s_b_sel,            '0', "Invalid opcode: b_sel must be 0");
         check_equal(s_mem_rw_o,         '0', "Invalid opcode: mem_rw must be 0");
-        check_equal(s_wb_select_o,      '0', "Invalid opcode: wb_select must be 0");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "Invalid opcode: wb_select must be 0");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "Invalid opcode: imm_sel must be 000");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Invalid opcode: ALU must be NOP");
 
@@ -476,7 +476,7 @@ begin
 
         check_equal(s_reg_write_enable, '0', "R-type illegal funct7: must not write");
         check_equal(s_b_sel,            '0', "R-type illegal funct7: b_sel default");
-        check_equal(s_wb_select_o,      '0', "R-type illegal funct7: wb_select default");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "R-type illegal funct7: wb_select default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "R-type illegal funct7: ALU_NOP");
 
 
@@ -490,7 +490,7 @@ begin
         wait for 5 ns;
 
         check_equal(s_reg_write_enable, '0', "R-type shift illegal funct7: must not write");
-        check_equal(s_wb_select_o,      '0', "R-type shift illegal funct7: wb_select default");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "R-type shift illegal funct7: wb_select default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "R-type shift illegal funct7: ALU_NOP");
 
 
@@ -505,7 +505,7 @@ begin
 
         check_equal(s_reg_write_enable, '0', "SLLI illegal imm[11:5]: must not write");
         check_equal(s_b_sel,            '0', "SLLI illegal imm[11:5]: b_sel default");
-        check_equal(s_wb_select_o,      '0', "SLLI illegal imm[11:5]: wb_select default");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "SLLI illegal imm[11:5]: wb_select default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "SLLI illegal imm[11:5]: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "SLLI illegal imm[11:5]: ALU_NOP");
 
@@ -521,7 +521,7 @@ begin
 
         check_equal(s_reg_write_enable, '0', "SRLI/SRAI illegal imm[11:5]: must not write");
         check_equal(s_b_sel,            '0', "SRLI/SRAI illegal imm[11:5]: b_sel default");
-        check_equal(s_wb_select_o,      '0', "SRLI/SRAI illegal imm[11:5]: wb_select default");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "SRLI/SRAI illegal imm[11:5]: wb_select default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "SRLI/SRAI illegal imm[11:5]: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "SRLI/SRAI illegal imm[11:5]: ALU_NOP");
 
@@ -560,6 +560,34 @@ begin
         check_equal(s_b_sel,            '0', "STORE with unsupported funct3: b_sel default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "STORE with unsupported funct3: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "STORE with unsupported funct3: ALU_NOP");
+
+        ---------------------------------------------------------------------------
+        -- 8) JALR opcode (1100111) but unsupported funct3 (must be 000)
+        ---------------------------------------------------------------------------
+        s_opcode <= "1100111";
+        s_funct3 <= "010";
+        s_imm_i_type <= (others => '0');
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "JALR unsupported funct3: must not write");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "JALR unsupported funct3: wb_select default");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "JALR unsupported funct3: ALU_NOP");
+
+        ---------------------------------------------------------------------------
+        -- 9) Reserved opcode similar to U-type (e.g., 1010111)
+        ---------------------------------------------------------------------------
+        s_opcode <= "1010111";
+        s_imm_i_type <= (others => '1');
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "Reserved U-like opcode: must not write");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Reserved U-like opcode: ALU_NOP");
+
+        ---------------------------------------------------------------------------
+        -- 10) Reserved opcode similar to J-type (e.g., 1101011)
+        ---------------------------------------------------------------------------
+        s_opcode <= "1101011";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '0', "Reserved J-like opcode: must not write");
+        check_equal(to_integer(unsigned(s_imm_sel)), 0, "Reserved J-like: imm_sel default");
 
       elsif run("test_branch_instr") then
 
@@ -613,6 +641,54 @@ begin
         wait for 5 ns;
         check_equal(s_br_un, '1', "BGEU: br_un signal must be 1");
         check_equal(s_pc_sel, '0', "BGEU: pc_sel should be 0 when br_lt is 1");
+
+      elsif run("test_upper_and_jump_instr") then
+
+        -----------------------------------------------------------------------
+        -- UPPER IMMEDIATE: LUI, AUIPC (opcodes 0110111, 0010111)
+        -----------------------------------------------------------------------
+
+        -- LUI (Load Upper Immediate)
+        s_opcode <= "0110111";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "LUI: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 4, "LUI: imm_sel must be U-type (100)");
+        check_equal(s_a_sel, '0', "LUI: a_sel must be 0 (rs1 is x0)");
+        check_equal(s_b_sel, '1', "LUI: b_sel must be 1 (immediate)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LUI: ALU_ADD to pass imm");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "LUI: wb_select must be ALU (01)");
+
+        -- AUIPC (Add Upper Immediate to PC)
+        s_opcode <= "0010111";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "AUIPC: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 4, "AUIPC: imm_sel must be U-type (100)");
+        check_equal(s_a_sel, '1', "AUIPC: a_sel must be 1 (PC source)");
+        check_equal(s_b_sel, '1', "AUIPC: b_sel must be 1 (immediate)");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "AUIPC: ALU_ADD for PC+imm");
+
+        -----------------------------------------------------------------------
+        -- JUMPS: JAL, JALR (opcodes 1101111, 1100111)
+        -----------------------------------------------------------------------
+
+        -- JAL (Jump and Link)
+        s_opcode <= "1101111";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "JAL: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 5, "JAL: imm_sel must be J-type (101)");
+        check_equal(s_a_sel, '1', "JAL: a_sel must be 1 (PC source)");
+        check_equal(s_pc_sel, '1', "JAL: pc_sel must be 1 (always taken)");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JAL: wb_select must be PC+4 (10)");
+
+        -- JALR (Jump and Link Register)
+        s_opcode <= "1100111";
+        s_funct3 <= "000";
+        wait for 5 ns;
+        check_equal(s_reg_write_enable, '1', "JALR: reg_write must be 1");
+        check_equal(to_integer(unsigned(s_imm_sel)), 1, "JALR: imm_sel must be I-type (001)");
+        check_equal(s_a_sel, '0', "JALR: a_sel must be 0 (rs1 source)");
+        check_equal(s_pc_sel, '1', "JALR: pc_sel must be 1 (always taken)");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JALR: wb_select must be PC+4 (10)");
 
       end if;
     end loop;
