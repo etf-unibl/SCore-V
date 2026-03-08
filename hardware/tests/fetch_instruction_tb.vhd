@@ -124,11 +124,11 @@ begin
                               c_IMEM(addr_int + 2) &
                               c_IMEM(addr_int + 1) &
                               c_IMEM(addr_int);
-        end loop;
-        check_equal(test_out.opcode, full_instruction(6 downto 0),
+          check_equal(test_out.opcode, full_instruction(6 downto 0),
                     "Opcode mismatch at index " & integer'image(addr_int));
-        check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
-                    "Data bits mismatch at index " & integer'image(addr_int));
+          check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                    "Data bits mismatch at index " & integer'image(addr_int));                 
+        end loop;
       end if;
     end loop;
 
