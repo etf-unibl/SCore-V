@@ -87,8 +87,13 @@ begin
     while test_suite loop
 	  if run("test_exception_handler") then 
 	  
-	    misaligned_access_i <= '1';
         wait for c_T;
+        check_equal(halt_processor_o, '0',
+                    "Processor should be active with no exceptions");
+		  	    
+		misaligned_access_i <= '1';
+        wait for c_T;
+		misaligned_access_i <= '0';
 		check_equal(halt_processor_o, '1', 
 		           "MAC: Processor should be in HALT state, but halt_processor_o is still equal to 0!");
 	    
@@ -128,6 +133,25 @@ begin
 	    rst_i <= '0';
 		check_equal(halt_processor_o, '0', 
 		           "IIC: Processor should be activated, but halt_processor_o is still equal to 1!");
+		
+		misaligned_access_i <= '1';
+        invalid_address_i   <= '1';
+
+        wait for c_T;
+
+        check_equal(halt_processor_o, '1',
+                    "Processor should be in HALT state if multiple exceptions occur");
+
+        misaligned_access_i <= '0';
+        invalid_address_i <= '0';
+
+        rst_i <= '1';
+        wait for c_T;
+
+        check_equal(halt_processor_o, '0',
+                    "Reset should clear HALT state");
+
+        rst_i <= '0';
 		
 	  end if;
 	end loop;
