@@ -53,7 +53,12 @@ library design_lib;
 use design_lib.mem_pkg.all;
 
 entity score_v_tb is
-  generic (runner_cfg : string);
+  generic (
+    runner_cfg  : string;
+    g_init_file      : string := "instruction_memory.txt";
+    g_dmem_init_file : string := "data_memory.txt"
+  );
+
 end entity score_v_tb;
 
 architecture sim of score_v_tb is
@@ -89,7 +94,7 @@ architecture sim of score_v_tb is
     rs1     : integer;
     rs2     : integer;
     alu_out : integer;
-	  wb_out  : integer;
+    wb_out  : integer;
     we      : std_logic;
   end record;
 
@@ -161,6 +166,9 @@ architecture sim of score_v_tb is
 begin
 
   uut : entity design_lib.score_v
+    generic map (
+      g_dmem_init_file => g_dmem_init_file
+    )
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
@@ -180,6 +188,9 @@ begin
     );
 
   u_fetch : entity design_lib.fetch_instruction
+    generic map (
+      g_INIT_FILE => g_init_file
+    )
     port map(
       instruction_count_i => instr_addr_s,
       instruction_bits_o  => fetch_instr_s
