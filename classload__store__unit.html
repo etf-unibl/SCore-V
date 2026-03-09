@@ -70,6 +70,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#Generics">Generics</a> &#124;
 <a href="#Libraries">Libraries</a> &#124;
 <a href="#Ports">Ports</a> &#124;
 <a href="#Use_20Clauses">Use Clauses</a>  </div>
@@ -104,6 +105,13 @@ Use Clauses</h2></td></tr>
  <tr class="memitem:acd03516902501cd1c7296a98e22c6fcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#acd03516902501cd1c7296a98e22c6fcb">std_logic_1164</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
 <tr class="memitem:a2edc34402b573437d5f25fa90ba4013e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#a2edc34402b573437d5f25fa90ba4013e">numeric_std</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
 <tr class="memitem:abafacda428d973c04eff9cb53862d2c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#abafacda428d973c04eff9cb53862d2c8">mem_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classmem__pkg.html"> &lt;mem_pkg&gt;</a></td></tr>
+<tr class="memitem:aa8c4e25998323a84db5b1fa701b92fcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#aa8c4e25998323a84db5b1fa701b92fcb">textio</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
+<tr class="memitem:abc7d7fc2675847e1d861e3fda2b1990c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#abc7d7fc2675847e1d861e3fda2b1990c">std_logic_textio</a>&#160;</td><td class="memItemRight" valign="bottom">  </td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Generics" name="Generics"></a>
+Generics</h2></td></tr>
+ <tr class="memitem:ac0a3b5610607c1f4e7bc0f304115c2bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit.html#ac0a3b5610607c1f4e7bc0f304115c2bc">g_INIT_FILE</a> &#160;</td><td class="memItemRight" valign="bottom"><b><b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; data_memory.txt &quot;</span><span class="vhdlchar"> </span></b></b></td></tr>
+<tr class="memdesc:ac0a3b5610607c1f4e7bc0f304115c2bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute path to data_memory.txt, set by run.py.  <a href="#ac0a3b5610607c1f4e7bc0f304115c2bc"></a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="3"><h2 class="groupheader"><a id="Ports" name="Ports"></a>
 Ports</h2></td></tr>
@@ -221,6 +229,31 @@ Ports</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Data to be stored in memory. </p>
+
+</div>
+</div>
+<a id="ac0a3b5610607c1f4e7bc0f304115c2bc" name="ac0a3b5610607c1f4e7bc0f304115c2bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0a3b5610607c1f4e7bc0f304115c2bc">&#9670;&#160;</a></span>g_INIT_FILE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classload__store__unit.html#ac0a3b5610607c1f4e7bc0f304115c2bc">g_INIT_FILE</a> <b><span class="vhdlchar"> </span></b> <b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; data_memory.txt &quot;</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Generic</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Absolute path to data_memory.txt, set by run.py. </p>
+<p >Each line must contain one byte as a 2-digit hex value. Used in simulation only - Quartus ignores this. </p>
 
 </div>
 </div>
@@ -373,6 +406,50 @@ Ports</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classload__store__unit.html#acd03516902501cd1c7296a98e22c6fcb">std_logic_1164</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">use clause</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abc7d7fc2675847e1d861e3fda2b1990c" name="abc7d7fc2675847e1d861e3fda2b1990c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc7d7fc2675847e1d861e3fda2b1990c">&#9670;&#160;</a></span>std_logic_textio</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classload__store__unit.html#abc7d7fc2675847e1d861e3fda2b1990c">std_logic_textio</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">use clause</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa8c4e25998323a84db5b1fa701b92fcb" name="aa8c4e25998323a84db5b1fa701b92fcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8c4e25998323a84db5b1fa701b92fcb">&#9670;&#160;</a></span>textio</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classload__store__unit.html#aa8c4e25998323a84db5b1fa701b92fcb">textio</a></td>
         </tr>
       </table>
   </td>

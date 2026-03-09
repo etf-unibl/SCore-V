@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['enable_5fi_0',['enable_i',['../classcounter__vunit__example.html#aa4d5bbd60281e36188c0528a451703cd',1,'counter_vunit_example']]]
+  ['data_5fread_5fo_0',['data_read_o',['../classload__store__unit.html#ab6dfbf878ab7db3f37d91e12d73f37cd',1,'load_store_unit']]],
+  ['data_5fwrite_5fi_1',['data_write_i',['../classload__store__unit.html#af5d9c7872d2ce20e9d206b92e28003dd',1,'load_store_unit']]],
+  ['dmem_2',['DMEM',['../classload__store__unit_1_1arch.html#a8c2143f4208773a7e967dd64e2100c7d',1,'load_store_unit::arch']]]
 ];

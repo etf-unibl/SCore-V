@@ -74,22 +74,71 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#Functions">Functions</a> &#124;
 <a href="#Signals">Signals</a>  </div>
   <div class="headertitle"><div class="title">arch Architecture Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Architecture implementing the combinational lookup logic.  
+<p>RTL architecture for the instruction fetch unit.  
  <a href="classfetch__instruction_1_1arch.html#details">More...</a></p>
 <b>Architecture &gt;&gt; </b><a class="el" href="classfetch__instruction_1_1arch.html">arch</a><br />
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Functions" name="Functions"></a>
+Functions</h2></td></tr>
+ <tr class="memitem:aac9dca27099367760bdfe4b89662d027"><td class="memItemLeft" align="right" valign="top"><b><b><b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> <span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <a class="el" href="classfetch__instruction_1_1arch.html#aac9dca27099367760bdfe4b89662d027">initialize_memory</a><b> ( </b><b><span class="vhdlchar">file_name: </span><span class="stringliteral">in </span><span class="vhdlchar">in  string</span></b><b> )&#160;</td><td class="memItemRight" valign="bottom"><b>[ impure ]</b></b></td></tr>
+<tr class="memdesc:aac9dca27099367760bdfe4b89662d027"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads instruction memory from a binary text file.  <a href="#aac9dca27099367760bdfe4b89662d027"></a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Signals" name="Signals"></a>
 Signals</h2></td></tr>
- <tr class="memitem:aac9aa5e57a5a094301738f2d478d6cec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfetch__instruction_1_1arch.html#aac9aa5e57a5a094301738f2d478d6cec">full_instruction</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+ <tr class="memitem:ac68332b31393bec8317482286c0dec0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfetch__instruction_1_1arch.html#ac68332b31393bec8317482286c0dec0c">mem</a> &#160;</td><td class="memItemRight" valign="bottom"><b><b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar">initialize_memory</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><b><a class="el" href="classfetch__instruction.html#a07e25a6c79422cf9c053a64267129edf">g_INIT_FILE</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:ac68332b31393bec8317482286c0dec0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction memory array.  <a href="#ac68332b31393bec8317482286c0dec0c"></a><br /></td></tr>
+<tr class="memitem:aac9aa5e57a5a094301738f2d478d6cec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfetch__instruction_1_1arch.html#aac9aa5e57a5a094301738f2d478d6cec">full_instruction</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Architecture implementing the combinational lookup logic. </p>
-</div><h2 class="groupheader">Member Data Documentation</h2>
+<div class="textblock"><p >RTL architecture for the instruction fetch unit. </p>
+<p >Contains the instruction memory array and the asynchronous read logic. The initialize_memory function is defined locally so that both Quartus and ModelSim accept the impure function call as a signal initializer without elaboration order issues. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aac9dca27099367760bdfe4b89662d027" name="aac9dca27099367760bdfe4b89662d027"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac9dca27099367760bdfe4b89662d027">&#9670;&#160;</a></span>initialize_memory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"> <b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> initialize_memory</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><b><span class="vhdlchar">file_name</span><span class="vhdlchar"> </span></b><span class="stringliteral">in</span> <em><b><span class="keywordflow">in</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span></b></em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> impure</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Function</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Loads instruction memory from a binary text file. </p>
+<p >Called once at elaboration time (simulation time = 0) to populate the local mem signal. Each line of the file must contain exactly one 32-bit binary word. Bytes are stored in little-endian order: bits 7:0 of the word go to byte i*4, bits 15:8 to i*4+1, bits 23:16 to i*4+2, bits 31:24 to i*4+3. This function is simulation-only - Quartus ignores it and uses the ram_init_file attribute instead. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file_name</td><td>Path to the instruction memory text file. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Populated t_bytes array with instruction data. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
 <a id="aac9aa5e57a5a094301738f2d478d6cec" name="aac9aa5e57a5a094301738f2d478d6cec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aac9aa5e57a5a094301738f2d478d6cec">&#9670;&#160;</a></span>full_instruction</h2>
 
@@ -109,6 +158,31 @@ Signals</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac68332b31393bec8317482286c0dec0c" name="ac68332b31393bec8317482286c0dec0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac68332b31393bec8317482286c0dec0c">&#9670;&#160;</a></span>mem</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfetch__instruction_1_1arch.html#ac68332b31393bec8317482286c0dec0c">mem</a> <b><b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar">initialize_memory</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><b><a class="el" href="classfetch__instruction.html#a07e25a6c79422cf9c053a64267129edf">g_INIT_FILE</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Instruction memory array. </p>
+<p >Initialised from g_INIT_FILE at elaboration time in simulation. Declared as a signal inside this architecture so Quartus can infer MLAB storage. For synthesis initialisation use the ram_init_file attribute pointing to a .mif file. </p>
 
 </div>
 </div>

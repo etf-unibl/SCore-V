@@ -1,12 +1,9 @@
 var searchData=
 [
-  ['wb_5fdata_5fo_0',['wb_data_o',['../classscore__v.html#a7d43c92a865fb38d542c38613760be82',1,'score_v.wb_data_o()'],['../classwb__mux.html#a7d43c92a865fb38d542c38613760be82',1,'wb_mux.wb_data_o()']]],
-  ['wb_5fmux_1',['wb_mux',['../classwb__mux.html',1,'wb_mux'],['../classscore__v_1_1arch.html#ac9b4345234cb343d186be42d8c2d55d9',1,'score_v.arch.wb_mux()']]],
-  ['wb_5fmux_2evhd_2',['wb_mux.vhd',['../wb__mux_8vhd.html',1,'']]],
-  ['wb_5fselect_5fi_3',['wb_select_i',['../classwb__mux.html#af75a24bd2ecb1b819199b98c9d00596b',1,'wb_mux']]],
-  ['wb_5fselect_5fo_4',['wb_select_o',['../classcontrol.html#a7054bc5ad30cbd8ece571d5c48ae64ea',1,'control']]],
-  ['wb_5fselect_5fsig_5',['wb_select_sig',['../classscore__v_1_1arch.html#a22eaa9b52d7f6e096009882bdf365d93',1,'score_v::arch']]],
-  ['width_5fi_6',['width_i',['../classload__store__unit.html#a3b7c3ebf55e91939ebd79c0bb691599b',1,'load_store_unit']]],
-  ['width_5fs_7',['width_s',['../classscore__v_1_1arch.html#a4a562d4446e9d332363fd47a9172904c',1,'score_v::arch']]],
-  ['word_5fto_5fread_8',['word_to_read',['../classload__store__unit_1_1arch.html#a0bb2f49b566bca88f682e41793a98002',1,'load_store_unit::arch']]]
+  ['t_5falu_5fop_0',['t_alu_op',['../classalu__pkg.html#a76b719c1be2d1a517adaef52546ffeca',1,'alu_pkg']]],
+  ['t_5fbyte_1',['t_byte',['../classmem__pkg.html#a035297a06be6a2436d6945dbc434cd9e',1,'mem_pkg']]],
+  ['t_5fbytes_2',['t_bytes',['../classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985',1,'mem_pkg']]],
+  ['t_5finstruction_5frec_3',['t_instruction_rec',['../classmem__pkg.html#a3347bc436dedb097d5c7e8fd57707c3a',1,'mem_pkg']]],
+  ['t_5fregs_4',['t_regs',['../classmem__pkg.html#a8aeecb866f1b1cb57a74f4081333bd1e',1,'mem_pkg']]],
+  ['textio_5',['textio',['../classfetch__instruction.html#aa8c4e25998323a84db5b1fa701b92fcb',1,'fetch_instruction.textio()'],['../classload__store__unit.html#aa8c4e25998323a84db5b1fa701b92fcb',1,'load_store_unit.textio()'],['../classmem__pkg.html#aa8c4e25998323a84db5b1fa701b92fcb',1,'mem_pkg.textio()']]]
 ];

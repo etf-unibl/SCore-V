@@ -70,6 +70,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#Generics">Generics</a> &#124;
 <a href="#Libraries">Libraries</a> &#124;
 <a href="#Ports">Ports</a> &#124;
 <a href="#Use_20Clauses">Use Clauses</a>  </div>
@@ -113,6 +114,11 @@ Use Clauses</h2></td></tr>
 <tr class="memitem:abafacda428d973c04eff9cb53862d2c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#abafacda428d973c04eff9cb53862d2c8">mem_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classmem__pkg.html"> &lt;mem_pkg&gt;</a></td></tr>
 <tr class="memitem:a9021b1cfffc858cd17368b24b6418fd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a9021b1cfffc858cd17368b24b6418fd3">alu_pkg</a>&#160;</td><td class="memItemRight" valign="bottom">   <b>Package</b><em><a class="el" href="classalu__pkg.html"> &lt;alu_pkg&gt;</a></td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Generics" name="Generics"></a>
+Generics</h2></td></tr>
+ <tr class="memitem:aef37e586cf607c3da0a4a73539892ffd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#aef37e586cf607c3da0a4a73539892ffd">g_DMEM_INIT_FILE</a> &#160;</td><td class="memItemRight" valign="bottom"><b><b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; data_memory.txt &quot;</span><span class="vhdlchar"> </span></b></b></td></tr>
+<tr class="memdesc:aef37e586cf607c3da0a4a73539892ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute path to data_memory.txt, forwarded to <a class="el" href="classload__store__unit.html" title="Entity for the Load Store Unit (LSU).">load_store_unit</a>.  <a href="#aef37e586cf607c3da0a4a73539892ffd"></a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="3"><h2 class="groupheader"><a id="Ports" name="Ports"></a>
 Ports</h2></td></tr>
  <tr class="memitem:ae8d3e5458b0e3cd523d6461463e36fe8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#ae8d3e5458b0e3cd523d6461463e36fe8">clk_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
@@ -122,7 +128,7 @@ Ports</h2></td></tr>
 <tr class="memitem:ad655edd095eba6b4c45159f3c5cfef63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63">instr_addr_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:ad655edd095eba6b4c45159f3c5cfef63"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">PC output to memory.  <a href="#ad655edd095eba6b4c45159f3c5cfef63"></a><br /></td></tr>
 <tr class="memitem:a4560f5fc7c432d16115166623cbcd5d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">instr_data_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="vhdlchar">t_instruction_rec</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a4560f5fc7c432d16115166623cbcd5d9"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction input from <a class="el" href="classfetch__instruction.html" title="Entity for fetching instructions from memory.">fetch_instruction</a>.  <a href="#a4560f5fc7c432d16115166623cbcd5d9"></a><br /></td></tr>
+<tr class="memdesc:a4560f5fc7c432d16115166623cbcd5d9"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction input from <a class="el" href="classfetch__instruction.html" title="Instruction fetch unit for the SCore-V processor.">fetch_instruction</a>.  <a href="#a4560f5fc7c432d16115166623cbcd5d9"></a><br /></td></tr>
 <tr class="memitem:a3b1dd06064836b982a39318569cd4bad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a3b1dd06064836b982a39318569cd4bad">pc_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:a3b1dd06064836b982a39318569cd4bad"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Program counter value output.  <a href="#a3b1dd06064836b982a39318569cd4bad"></a><br /></td></tr>
 <tr class="memitem:a1a3d0af0ddeea5341f418100570092ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a1a3d0af0ddeea5341f418100570092ee">opcode_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">6</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
@@ -217,6 +223,30 @@ Ports</h2></td></tr>
 
 </div>
 </div>
+<a id="aef37e586cf607c3da0a4a73539892ffd" name="aef37e586cf607c3da0a4a73539892ffd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef37e586cf607c3da0a4a73539892ffd">&#9670;&#160;</a></span>g_DMEM_INIT_FILE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v.html#aef37e586cf607c3da0a4a73539892ffd">g_DMEM_INIT_FILE</a> <b><span class="vhdlchar"> </span></b> <b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; data_memory.txt &quot;</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Generic</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Absolute path to data_memory.txt, forwarded to <a class="el" href="classload__store__unit.html" title="Entity for the Load Store Unit (LSU).">load_store_unit</a>. </p>
+
+</div>
+</div>
 <a id="a0a6af6eef40212dbaf130d57ce711256" name="a0a6af6eef40212dbaf130d57ce711256"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a6af6eef40212dbaf130d57ce711256">&#9670;&#160;</a></span>ieee</h2>
 
@@ -283,7 +313,7 @@ Ports</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Instruction input from <a class="el" href="classfetch__instruction.html" title="Entity for fetching instructions from memory.">fetch_instruction</a>. </p>
+<p>Instruction input from <a class="el" href="classfetch__instruction.html" title="Instruction fetch unit for the SCore-V processor.">fetch_instruction</a>. </p>
 
 </div>
 </div>
