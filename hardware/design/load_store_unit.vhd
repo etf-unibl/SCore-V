@@ -98,11 +98,14 @@ architecture arch of load_store_unit is
   end function initialize_dmem;
 
   --! @brief Data memory array initialised from file at elaboration time.
-  signal DMEM : t_bytes := initialize_dmem(g_INIT_FILE);
+  signal DMEM          : t_bytes := initialize_dmem(g_INIT_FILE);
+  signal memory_bound  : integer;
 begin
   --! @brief Concurrent address conversion.
   address <= to_integer(signed(addr_i));
-
+  memory_bound <= c_TOTAL_BYTES - 2 when width_i = "00" else
+                  c_TOTAL_BYTES - 3 when width_i = "01" else
+                  c_TOTAL_BYTES - 4;
   --! @brief Data Read and Sign Extension Logic.
   --! @details Performs an asynchronous read from the byte-addressable DMEM.
   --! The process formats the output based on the requested data width and sign:
@@ -111,11 +114,11 @@ begin
   --! - **Word (10)**: Loads 32 bits directly from four consecutive memory locations.
   --! width_i = 11 is interpreted the same way as the width_i = 10.
   --! @note This process is combinatorial and updates whenever address, control signals, or memory content changes.
-  --! @warning Validates that the address is within [0, c_TOTAL_BYTES - 4] to prevent out-of-bounds array access during simulation.
+  --! @warning Validates that the address is within [0, memory_bound] to prevent out-of-bounds array access during simulation.
   process(address, sign_i, width_i, mem_RW_i, DMEM) is
     variable word_to_read_var : std_logic_vector(31 downto 0);
   begin
-    if address >= 0 and address <= c_TOTAL_BYTES - 4 then
+    if address >= 0 and address <= memory_bound then
       case width_i is
         when "00" =>
           if sign_i = '1' then
