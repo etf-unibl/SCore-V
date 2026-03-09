@@ -4,7 +4,7 @@
 -- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
--- unit name:     alu_operand_b_mux_tb
+-- unit name:     mux2_1_tb
 --
 -- description:
 --
@@ -46,11 +46,11 @@ context vunit_lib.vunit_context;
 
 library design_lib;
 
-entity alu_operand_b_mux_tb is
+entity mux2_1_tb is
   generic (runner_cfg : string);
-end alu_operand_b_mux_tb;
+end mux2_1_tb;
 
-architecture arch of alu_operand_b_mux_tb is
+architecture arch of mux2_1_tb is
 
   signal in0_i : std_logic_vector(31 downto 0) := (others => '0');
   signal in1_i : std_logic_vector(31 downto 0) := (others => '0');
@@ -59,7 +59,7 @@ architecture arch of alu_operand_b_mux_tb is
 
 begin
 
-  uut_alu_operand_b_mux: entity design_lib.alu_operand_b_mux
+  uut_mux2_1: entity design_lib.mux2_1
   port map (
     in0_i => in0_i,
     in1_i => in1_i,

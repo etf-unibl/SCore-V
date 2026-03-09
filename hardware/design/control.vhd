@@ -54,14 +54,31 @@
 --!     Immediate format selector for ImmGen.
 --!     "001" = I-type immediate
 --!     "010" = S-type immediate
+--!     "011" = B-type immediate
 --!
 --! - b_sel_o:
 --!     Selects ALU operand B source.
 --!     '0' = rs2_data
 --!     '1' = imm32
 --!
+--! - a_sel_o:
+--!     Selects ALU operand A source.
+--!     '0' = rs1_data
+--!     '1' = PC (Program Counter)
+--!
 --! - alu_op_o:
 --!     Selects ALU operation (e.g. ALU_ADD, ALU_NOP).
+--!
+--! - mem_size_o:
+--!     Specifies the data access width for memory load and store operations.
+--!     "00" = Byte
+--!     "01" = Halfword
+--!     "10" = Word
+--!
+--! - mem_unsigned_o:
+--!     Determines if the data from memory should be sign-extended or zero-extended.
+--!     '0' = Signed (sign-extended, e.g., LB, LH)
+--!     '1' = Unsigned (zero-extended, e.g., LBU, LHU)
 --!
 --! - mem_rw_o:
 --!     Data memory control.
@@ -70,8 +87,20 @@
 --!
 --! - wb_select_o:
 --!     Write-back multiplexer select.
---!     '0' = Data memory output (DataR)
---!     '1' = ALU result
+--!     "00" = Data memory output (DataR)
+--!     "01" = ALU result
+--!     "10" = PC+4
+--!     "11" = Imm from LUI instruction
+--!
+--! - pc_sel_o:
+--!     Next PC value selector.
+--!     '0' = PC + 4
+--!     '1' = ALU result (Target branch address)
+--!
+--! - br_un_o:
+--!     Selects branch comparison signedness.
+--!     '0' = Signed comparison
+--!     '1' = Unsigned comparison
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -84,14 +113,19 @@ entity control is
     funct3_i           : in  std_logic_vector(2 downto 0);  --! Instruction funct3 field
     funct7_i           : in  std_logic_vector(6 downto 0);  --! Instruction funct7 field
     imm_i_type_i       : in  std_logic_vector(11 downto 0); --! I-type immediate (instr[31:20])
+    br_eq_i            : in  std_logic;                      --! Equality indicator from Branch Comparator
+    br_lt_i            : in  std_logic;                      --! Less-than indicator from Branch Comparator
     reg_write_enable_o : out std_logic;                     --! Register write enable signal
     imm_sel_o          : out std_logic_vector(2 downto 0);  --! Immediate select/qualifier
     b_sel_o            : out std_logic;                     --! ALU operand B select (0=rs2_data, 1=immediate)
+    a_sel_o            : out std_logic;                     --! ALU operand A select (0=rs1_data, 1=PC)
     alu_op_o           : out t_alu_op;                      --! ALU operation select
     mem_rw_o           : out std_logic;                     --! Data memory control
     mem_size_o         : out std_logic_vector(1 downto 0);  --! 00=Byte, 01=Half, 10=Word
     mem_unsigned_o     : out std_logic;                     --! 1=Unsigned (LBU/LHU), 0=Signed
-    wb_select_o        : out std_logic                      --! Write-back multiplexer select
+    wb_select_o        : out std_logic_vector(1 downto 0);                     --! Write-back multiplexer select
+    pc_sel_o           : out std_logic;                     --! Next PC select (0=PC+4, 1=Branch target)
+    br_un_o            : out std_logic                      --! Unsigned branch comparison enable
   );
 end entity control;
 
@@ -102,16 +136,19 @@ end entity control;
 architecture arch of control is
 begin
 
-  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i)
+  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i, br_eq_i, br_lt_i)
   begin
     reg_write_enable_o <= '0';
     b_sel_o            <= '0';
+    a_sel_o            <= '0';
     alu_op_o           <= ALU_NOP;
     imm_sel_o          <= "000";
     mem_rw_o           <= '0';
-    wb_select_o        <= '0';
+    wb_select_o        <= "00";
     mem_size_o         <= "10"; -- Default Word
     mem_unsigned_o     <= '0';
+    pc_sel_o           <= '0';
+    br_un_o            <= '0';
 
 -- =========================================================
 --                 R-type ALU instructions
@@ -121,53 +158,53 @@ begin
       if funct3_i = "000" then
         if funct7_i = "0000000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_ADD;
         elsif funct7_i = "0100000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SUB;
         end if;
 
       elsif (funct3_i = "001") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLL;
 
       elsif (funct3_i = "010") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLT;
 
       elsif (funct3_i = "011") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLTU;
 
       elsif (funct3_i = "100") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_XOR;
 
       elsif funct3_i = "101" then
         if funct7_i = "0000000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRL;
         elsif funct7_i = "0100000" then
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRA;
         end if;
 
       elsif (funct3_i = "110") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_OR;
 
       elsif (funct3_i = "111") and (funct7_i = "0000000") then
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_AND;
       end if;
 
@@ -179,42 +216,42 @@ begin
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_ADD;
 
       elsif funct3_i = "010" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLT;
 
       elsif funct3_i = "011" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_SLTU;
 
       elsif funct3_i = "100" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_XOR;
 
       elsif funct3_i = "110" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_OR;
 
       elsif funct3_i = "111" then
         imm_sel_o          <= "001";
         b_sel_o            <= '1';
         reg_write_enable_o <= '1';
-        wb_select_o        <= '1';
+        wb_select_o        <= "01";
         alu_op_o           <= ALU_AND;
 
       elsif funct3_i = "001" then
@@ -222,7 +259,7 @@ begin
           imm_sel_o          <= "001";
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SLL;
         end if;
 
@@ -231,13 +268,13 @@ begin
           imm_sel_o          <= "001";
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRL;
         elsif imm_i_type_i(11 downto 5) = "0100000" then
           imm_sel_o          <= "001";
           b_sel_o            <= '1';
           reg_write_enable_o <= '1';
-          wb_select_o        <= '1';
+          wb_select_o        <= "01";
           alu_op_o           <= ALU_SRA;
         end if;
       end if;
@@ -252,7 +289,7 @@ begin
         imm_sel_o   <= "001";
         b_sel_o     <= '1';
         alu_op_o    <= ALU_ADD;
-        wb_select_o <= '0';
+        wb_select_o <= "00";
 
         reg_write_enable_o <= '1';
         mem_size_o         <= funct3_i(1 downto 0);
@@ -271,6 +308,82 @@ begin
         mem_size_o <= funct3_i(1 downto 0);
 
       end if;
+
+
+-- =========================================================
+--               BRANCH TYPE INSTRUCTIONS
+-- =========================================================
+
+    elsif opcode_i = "1100011" then
+      if funct3_i = "000" or funct3_i = "001" or funct3_i = "100" or funct3_i = "101" or funct3_i = "110" or funct3_i = "111" then
+
+        imm_sel_o <= "011";
+        b_sel_o   <= '1';
+        a_sel_o   <= '1';
+        alu_op_o  <= ALU_ADD;
+        reg_write_enable_o <= '0';
+
+        case funct3_i is
+          when "000" =>
+            pc_sel_o <= br_eq_i;
+          when "001" =>
+            pc_sel_o <= not br_eq_i;
+          when "100" =>
+            pc_sel_o <= br_lt_i;
+          when "101" =>
+            pc_sel_o <= not br_lt_i;
+          when "110" =>
+            br_un_o  <= '1';
+            pc_sel_o <= br_lt_i;
+          when "111" =>
+            br_un_o  <= '1';
+            pc_sel_o <= not br_lt_i;
+          when others =>
+            pc_sel_o <= '0';
+        end case;
+
+      end if;
+
+-- =========================================================
+--               U-type (LUI, AUIPC)
+-- =========================================================
+
+    elsif opcode_i = "0110111" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "100";
+      b_sel_o            <= '1';
+      a_sel_o            <= '0';
+      wb_select_o        <= "11";
+
+    elsif opcode_i = "0010111" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "100";
+      b_sel_o            <= '1';
+      a_sel_o            <= '1';
+      alu_op_o           <= ALU_ADD;
+      wb_select_o        <= "01";
+
+-- =========================================================
+--               JAL and JALR
+-- =========================================================
+
+    elsif opcode_i = "1101111" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "101";
+      a_sel_o            <= '1';
+      b_sel_o            <= '1';
+      alu_op_o           <= ALU_ADD;
+      pc_sel_o           <= '1';
+      wb_select_o        <= "10";
+
+    elsif opcode_i = "1100111" and funct3_i = "000" then
+      reg_write_enable_o <= '1';
+      imm_sel_o          <= "001";
+      a_sel_o            <= '0';
+      b_sel_o            <= '1';
+      alu_op_o           <= ALU_ADD;
+      pc_sel_o           <= '1';
+      wb_select_o        <= "10";
 
     end if;
 

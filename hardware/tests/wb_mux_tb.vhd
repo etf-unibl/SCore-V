@@ -52,9 +52,11 @@ end wb_mux_tb;
 architecture arch of wb_mux_tb is
 
   signal alu_result_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal mem_data_i : std_logic_vector(31 downto 0) := (others => '0');
-  signal wb_select_i : std_logic := '0';
-  signal wb_data_o : std_logic_vector(31 downto 0);
+  signal mem_data_i   : std_logic_vector(31 downto 0) := (others => '0');
+  signal pc4_i        : std_logic_vector(31 downto 0) := (others => '0');
+  signal imm_lui_i    : std_logic_vector(31 downto 0); 
+  signal wb_select_i  : std_logic_vector(1 downto 0) := (others => '0');
+  signal wb_data_o    : std_logic_vector(31 downto 0);
 
 begin
 
@@ -62,6 +64,8 @@ begin
   port map (
     alu_result_i => alu_result_i,
     mem_data_i   => mem_data_i,
+    pc4_i        => pc4_i,
+    imm_lui_i    => imm_lui_i,
     wb_select_i  => wb_select_i,
     wb_data_o    => wb_data_o
   );
@@ -71,34 +75,42 @@ begin
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
-	    if run("test_b_mux") then 
-	      alu_result_i <= std_logic_vector(to_signed(100, 32));
-        mem_data_i <= std_logic_vector(to_signed(200, 32));
-        wb_select_i <= '0';
-
-        wait for 5 ns;
-        check_equal(to_integer(signed(wb_data_o)), 200, "Failed to select mem_data_i");
+	    if run("test_b_mux") then
 
 	      alu_result_i <= std_logic_vector(to_signed(100, 32));
-        mem_data_i <= std_logic_vector(to_signed(200, 32));
-        wb_select_i <= '1';
+        mem_data_i   <= std_logic_vector(to_signed(200, 32));
+        pc4_i        <= std_logic_vector(to_signed(300, 32));
 
-        wait for 5 ns;
-        check_equal(to_integer(signed(wb_data_o)), 100, "Failed to select alu_result_i");
+        -- "00" -> mem_data_i
+        wb_select_i <= "00";
+        wait for 1 ns;
+        check_equal(wb_data_o, mem_data_i, "wb_select_i=00 must select mem_data_i");
 
-        alu_result_i <= x"00000000";
-        mem_data_i <= x"FFFFFFFF";
-        wb_select_i <= '1';
+        -- "01" -> alu_result_i
+        wb_select_i <= "01";
+        wait for 1 ns;
+        check_equal(wb_data_o, alu_result_i, "wb_select_i=01 must select alu_result_i");
 
-        wait for 5 ns;
-        check_equal(to_integer(signed(wb_data_o)), 0, "Failed to select alu_result_i for FFFFFFFF case");
+        -- "10" -> pc4_i
+        wb_select_i <= "10";
+        wait for 1 ns;
+        check_equal(wb_data_o, pc4_i, "wb_select_i=10 must select pc4_i");
 
-        alu_result_i <= std_logic_vector(to_signed(101, 32));
-        mem_data_i <= std_logic_vector(to_signed(102, 32));
-        wb_select_i <= 'U';
+        -- "11" -> others => zero
+        wb_select_i <= "11";
+        wait for 1 ns;
+        check_equal(wb_data_o, imm_lui_i, "wb_select_i=11 must select imm_lui_i");
 
-        wait for 5 ns;
-        check_equal(to_integer(signed(wb_data_o)), 101, "Failed to select alu_result_i for wb_select_i = U case");
+        -- case with negative values
+        alu_result_i <= std_logic_vector(to_signed(-1, 32));
+        mem_data_i   <= std_logic_vector(to_signed(-2, 32));
+        pc4_i        <= std_logic_vector(to_signed(-3, 32));
+
+        wb_select_i <= "01";
+        wait for 1 ns;
+        check_equal(wb_data_o, alu_result_i, "Negative value selection failed for ALU");
+
+
 	  end if;
 	  end loop;
 	
