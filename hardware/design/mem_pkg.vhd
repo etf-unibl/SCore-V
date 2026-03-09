@@ -69,6 +69,7 @@
 -- LW               xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
 -- LBU              xxxxxxxxxxxx             yyyyy              100                zzzzz          0000011
 -- LHU              xxxxxxxxxxxx             yyyyy              101                zzzzz          0000011
+-- JALR             xxxxxxxxxxxx             yyyyy              000                zzzzz          1100111
 --
 ------------------------------------------------  S - TYPE  ------------------------------------------------
 --
@@ -76,6 +77,27 @@
 -- SB                xxxxxxx          yyyyy         zzzzz         000             xxxxx          0100011
 -- SH                xxxxxxx          yyyyy         zzzzz         001             xxxxx          0100011
 -- SW                xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
+--
+------------------------------------------------  B - TYPE  ------------------------------------------------
+--
+-- instruction   |31|IMM[12|10:5]|25|  |24|RS2|20|  |19|RS1|15|  |14|FUNCT3|12|   |11|IMM[4:1|11]|7|  |6|OPCODE|0|
+-- BEQ                  xxxxxxx            yyyyy         zzzzz         000               xxxxx           1100011
+-- BNE                  xxxxxxx            yyyyy         zzzzz         001               xxxxx           1100011
+-- BLT                  xxxxxxx            yyyyy         zzzzz         004               xxxxx           1100011
+-- BGE                  xxxxxxx            yyyyy         zzzzz         005               xxxxx           1100011
+-- BLTU                 xxxxxxx            yyyyy         zzzzz         006               xxxxx           1100011
+-- BGEU                 xxxxxxx            yyyyy         zzzzz         007               xxxxx           1100011
+--
+------------------------------------------------  J - TYPE  ------------------------------------------------
+--
+-- instruction   |31|imm[20|10:1|11|19:12]|12|              |11|RD|7|        |6|OPCODE|0|
+-- JAL               xxxxxxxxxxxxxxxxxxxx                     yyyyy            1101111
+--
+------------------------------------------------  U - TYPE  ------------------------------------------------
+--
+-- instruction        |31|imm[31:12]|12|                |11|RD|7|        |6|OPCODE|0|
+-- LUI               xxxxxxxxxxxxxxxxxxxx                 zzzzz            0110111
+-- AUIPC             xxxxxxxxxxxxxxxxxxxx                 zzzzz            0010111
 --
 ------------------------------------------------------------------------------------------------------------
 
