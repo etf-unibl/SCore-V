@@ -1,5 +1,5 @@
 make:
 
 assembler:
-	mkdir ./obj/
+	mkdir -p ./obj/
 	gcc -Wall ./src/assembler.c ./inc/assembler.h -o ./obj/assembler

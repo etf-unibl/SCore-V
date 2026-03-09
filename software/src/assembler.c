@@ -315,11 +315,11 @@ void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 }
 
 /* Format of the expected result:
- * pc, opcode, f3, f7, rd, rs1, rs2, alu_out, wb_out, wb
+ * pc, opcode, f3, f7, rd, rs1, rs2, alu_out, wb_out, we
  */
 void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm, FILE* expected_out) {
 	char exp_line[400];
-	char wb;
+	char we;
 	int wb_out;
 	int alu_out;
 	uint32_t pc_old = pc;
@@ -330,9 +330,9 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	regd &= 0x1F;
 
 	if(instr->format == S_TYPE)
-		wb = '0';
+		we = '0';
 	else
-		wb = '1';
+		we = '1';
 
 	// If it's an R_TYPE instruction just calculate output using registers and signess of instruction
 	if(instr->format == R_TYPE) {
@@ -448,7 +448,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		pc += imm;
 		alu_out = pc;
 		wb_out = pc;
-		wb = '1';
+		we = '1';
 	}
 	else if(instr->format == B_TYPE) {
 		if(instr->signess == 0) {
@@ -468,7 +468,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 				pc+=4;
 		}
 		wb_out = 0;
-		wb = '0';
+		we = '0';
 	}
 	else if(instr->format == U_TYPE) {
 		if(strcmp(instr->name, "lui") == 0) {
@@ -481,7 +481,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 			alu_out = wb_out;
 			registers[regd] = alu_out;
 		}
-		wb = '1';
+		we = '1';
 	}
 
 	char funct3[4] = "";
@@ -492,9 +492,15 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	bits_to_str(instr->funct3, 3, funct3);
 	bits_to_str(instr->funct7, 7, funct7);
 
+	if(regd == 0 && we == 1) {
+		registers[regd] = 0;
+		alu_out = 0;
+		we = 0;
+	}
+
 	// Combine all arguments to a single string
 	sprintf(exp_line, "%u, \"%s\", \"%s\", \"%s\", %u, %u, %u, %d, %d, '%c'\n",
-			pc_old, opcode, funct3, funct7, regd, reg1, reg2, alu_out, wb_out, wb);
+			pc_old, opcode, funct3, funct7, regd, reg1, reg2, alu_out, wb_out, we);
 
 	fputs(exp_line, expected_out);
 
