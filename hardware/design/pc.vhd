@@ -51,6 +51,7 @@ entity pc is
     clk_i     : in  std_logic;                     --! Input clock signal
     rst_i     : in  std_logic;                     --! Active-high synchronous reset
     pc_next_i : in  std_logic_vector(31 downto 0); --! Next PC value input
+    halt_i    : in  std_logic;                     --! Exception occured and processor should go to HALT state
     pc_o      : out std_logic_vector(31 downto 0)  --! Current PC value output
   );
 end pc;
@@ -71,6 +72,8 @@ begin
     if rising_edge(clk_i) then
       if rst_i = '1' then
         pc_reg <= (others => '0');
+      elsif halt_i = '1' then
+        pc_reg <= pc_reg;
       else
         pc_reg <= pc_next_i;
       end if;
