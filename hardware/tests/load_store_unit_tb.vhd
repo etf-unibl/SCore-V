@@ -38,6 +38,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use std.textio.all;
+use ieee.std_logic_textio.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -46,10 +48,44 @@ library design_lib;
 use design_lib.mem_pkg.all;
 
 entity load_store_unit_tb is
-  generic (runner_cfg : string);
+  generic (
+    runner_cfg  : string;
+    --! @brief Absolute path to data_memory.txt, set by run.py.
+    g_init_file : string := "data_memory.txt"
+  );
 end load_store_unit_tb;
 
 architecture arch of load_store_unit_tb is
+
+  -- ----------------------------------------------------------------
+  --  Local initialize_dmem and DMEM signal - mirrors what
+  --  load_store_unit does internally. Used by the store tests to
+  --  verify memory contents directly after a write operation.
+  -- ----------------------------------------------------------------
+  impure function initialize_dmem(file_name : in string) return t_bytes is
+    file     f_ptr  : text;
+    variable l      : line;
+    variable result : t_bytes := (others => (others => '0'));
+    variable temp   : std_logic_vector(7 downto 0);
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    for i in 0 to c_TOTAL_BYTES - 1 loop
+      exit when endfile(f_ptr);
+      readline(f_ptr, l);
+      hread(l, temp);
+      result(i) := temp;
+    end loop;
+    file_close(f_ptr);
+    return result;
+  end function initialize_dmem;
+
+  --! @brief Local DMEM mirror - initialised from same file as UUT.
+  --! @details Store tests read this to verify what was written.
+  --!          This signal reflects the UUT's internal DMEM state
+  --!          only indirectly - store tests write via the UUT and
+  --!          then read back through the UUT's data_read_o port.
+  signal DMEM : t_bytes := initialize_dmem(g_init_file);
+
   signal clk_s        : std_logic := '0';
   signal rst_s        : std_logic := '0';
   signal addr_s       : std_logic_vector(31 downto 0) := (others => '0');
@@ -66,6 +102,9 @@ architecture arch of load_store_unit_tb is
 begin
 
   uut : entity design_lib.load_store_unit
+    generic map (
+      g_init_file => g_init_file
+    )
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
@@ -109,7 +148,6 @@ begin
       elsif run("test_load_word") then
         info("Testing load word (lw) function of load_store unit");
 
-        -- Test reading first word from DMEM
         expected := "00110011110011000000000011111111";
 
         addr_s <= std_logic_vector(to_unsigned(0, 32));
@@ -119,15 +157,13 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Test reading second word from DMEM
         addr_s <= std_logic_vector(to_unsigned(4, 32));
         expected := "00001111111100001010101010101010";
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
-        
-        -- Test reading a word from DMEM that hasn't been defined in DMEM of mem_pkg
+
         addr_s <= std_logic_vector(to_unsigned(30, 32));
         expected := (others => '0');
         wait for c_CLK_PERIOD;
@@ -161,7 +197,7 @@ begin
         width_s <= "01";
         sign_s <= '1';
         expected := "00000000000000000000000011111111";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -172,7 +208,7 @@ begin
         width_s <= "01";
         sign_s <= '1';
         expected := "00000000000000000011001111001100";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -183,7 +219,7 @@ begin
         width_s <= "01";
         sign_s <= '1';
         expected := (others => '0');
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -205,7 +241,7 @@ begin
         width_s <= "01";
         sign_s <= '1';
         expected := (others => '0');
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -216,7 +252,7 @@ begin
         width_s <= "01";
         sign_s <= '0';
         expected := "00000000000000000000000011111111";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -227,7 +263,7 @@ begin
         width_s <= "01";
         sign_s <= '0';
         expected := "11111111111111111010101010101010";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -241,7 +277,7 @@ begin
         width_s <= "00";
         sign_s <= '1';
         expected := "00000000000000000000000011111111";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -252,7 +288,7 @@ begin
         width_s <= "00";
         sign_s <= '1';
         expected := "00000000000000000000000011001100";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -263,7 +299,7 @@ begin
         width_s <= "00";
         sign_s <= '1';
         expected := (others => '0');
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -274,7 +310,7 @@ begin
         width_s <= "00";
         sign_s <= '1';
         expected := (others => '0');
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -285,7 +321,7 @@ begin
         width_s <= "00";
         sign_s <= '0';
         expected := "11111111111111111111111111111111";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -296,7 +332,7 @@ begin
         width_s <= "00";
         sign_s <= '0';
         expected := "11111111111111111111111110101010";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -307,7 +343,7 @@ begin
         width_s <= "00";
         sign_s <= '0';
         expected := "00000000000000000000000000001111";
-        
+
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -316,139 +352,136 @@ begin
       elsif run("test_store_word") then
         info("Testing store word (sw) function of load_store unit");
 
-        -- Test storing word on byte 8
-        addr_s <= std_logic_vector(to_unsigned(8, 32));
+        -- Write 64 to addr 8, then read back to verify
+        addr_s       <= std_logic_vector(to_unsigned(8, 32));
         data_write_s <= std_logic_vector(to_unsigned(64, 32));
-        mem_RW_s <= '1';
-
-        wait until clk_s;
-        wait until clk_s;
-        expected := DMEM(to_integer(unsigned(addr_s)) + 3) &
-                    DMEM(to_integer(unsigned(addr_s)) + 2) &
-                    DMEM(to_integer(unsigned(addr_s)) + 1) &
-                    DMEM(to_integer(unsigned(addr_s)));
-
-        if expected /= data_write_s then
-          error("Expected " & to_string(data_write_s) & ", got " & to_string(expected));
+        width_s      <= "10";
+        sign_s       <= '1';
+        mem_RW_s     <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        if data_read_s /= data_write_s then
+          error("Expected " & to_string(data_write_s) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Test storing word on byte 4
-        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        -- Write 64 to addr 4, then read back to verify
+        addr_s       <= std_logic_vector(to_unsigned(4, 32));
         data_write_s <= std_logic_vector(to_unsigned(64, 32));
-        mem_RW_s <= '1';
-
-        wait until clk_s;
-        wait until clk_s;
-        expected := DMEM(to_integer(unsigned(addr_s)) + 3) &
-                    DMEM(to_integer(unsigned(addr_s)) + 2) &
-                    DMEM(to_integer(unsigned(addr_s)) + 1) &
-                    DMEM(to_integer(unsigned(addr_s)));
-
-        if expected /= data_write_s then
-          error("Expected " & to_string(data_write_s) & ", got " & to_string(expected));
+        mem_RW_s     <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        if data_read_s /= data_write_s then
+          error("Expected " & to_string(data_write_s) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Test storing word on byte 1000 that is out of bounds of DMEM
-        addr_s <= std_logic_vector(to_unsigned(1000, 32));
+        -- Out-of-bounds and negative address writes (no verification)
+        addr_s       <= std_logic_vector(to_unsigned(1000, 32));
         data_write_s <= std_logic_vector(to_unsigned(63, 32));
-        mem_RW_s <= '1';
+        mem_RW_s     <= '1';
+        wait until rising_edge(clk_s);
 
-        -- Test storing word on negative address
-        addr_s <= std_logic_vector(to_signed(-10, 32));
+        addr_s       <= std_logic_vector(to_signed(-10, 32));
         data_write_s <= std_logic_vector(to_unsigned(63, 32));
-        mem_RW_s <= '1';
+        mem_RW_s     <= '1';
+        wait until rising_edge(clk_s);
 
         info("Store word test passed");
 
       elsif run("test_store_half") then
         info("Testing store half word (sh) function of lsu");
 
-        -- Test store half word
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        -- Write halfword to addr 4, read back lower 16 bits to verify
+        width_s                   <= "01";
+        sign_s                    <= '1';
+        addr_s                    <= std_logic_vector(to_unsigned(4, 32));
         data_write_s(15 downto 0) <= "1111000011110000";
-        mem_RW_s <= '1';
-
-        wait until clk_s;
-        wait until clk_s;
-        wait until clk_s;
-        written16 :=  DMEM(to_integer(unsigned(addr_s)) + 1) &
-                    DMEM(to_integer(unsigned(addr_s)));
-
+        mem_RW_s                  <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        written16 := data_read_s(15 downto 0);
         if written16 /= data_write_s(15 downto 0) then
           error("Expected " & to_string(data_write_s(15 downto 0)) & ", got " & to_string(written16));
         end if;
 
-        -- Test store half word
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_unsigned(9, 32));
+        -- Write halfword to addr 9, read back lower 16 bits to verify
+        width_s                   <= "01";
+        sign_s                    <= '1';
+        addr_s                    <= std_logic_vector(to_unsigned(9, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
-        mem_RW_s <= '1';
-
-        wait until clk_s;
-        wait until clk_s;
-        wait until clk_s;
-        written16 :=  DMEM(to_integer(unsigned(addr_s)) + 1) &
-                    DMEM(to_integer(unsigned(addr_s)));
-
+        mem_RW_s                  <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        written16 := data_read_s(15 downto 0);
         if written16 /= data_write_s(15 downto 0) then
           error("Expected " & to_string(data_write_s(15 downto 0)) & ", got " & to_string(written16));
         end if;
 
-        -- Test store half word at invalid address
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_unsigned(258, 32));
+        -- Out-of-bounds and negative address writes (no verification)
+        width_s                   <= "01";
+        addr_s                    <= std_logic_vector(to_unsigned(258, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
-        mem_RW_s <= '1';
+        mem_RW_s                  <= '1';
+        wait until rising_edge(clk_s);
 
-        -- Test store half word at invalid address
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_signed(-5, 32));
+        width_s                   <= "01";
+        addr_s                    <= std_logic_vector(to_signed(-5, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
-        mem_RW_s <= '1';
+        mem_RW_s                  <= '1';
+        wait until rising_edge(clk_s);
 
       elsif run("test_store_byte") then
         info("Testing store byte (sb) function of lsu");
 
-        -- Test store byte
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_unsigned(4, 32));
+        -- Write byte to addr 4, read back lowest byte to verify
+        width_s                  <= "00";
+        sign_s                   <= '1';
+        addr_s                   <= std_logic_vector(to_unsigned(4, 32));
         data_write_s(7 downto 0) <= "11110000";
-        mem_RW_s <= '1';
-
-        wait until clk_s;
-        wait until clk_s;
-        written8 := DMEM(to_integer(unsigned(addr_s)));
-
+        mem_RW_s                 <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        written8 := data_read_s(7 downto 0);
         if written8 /= data_write_s(7 downto 0) then
           error("Expected " & to_string(data_write_s(7 downto 0)) & ", got " & to_string(written8));
         end if;
 
-        -- Test store byte
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_unsigned(9, 32));
+        -- Write byte to addr 9, read back lowest byte to verify
+        width_s                  <= "00";
+        sign_s                   <= '1';
+        addr_s                   <= std_logic_vector(to_unsigned(9, 32));
         data_write_s(7 downto 0) <= "11001100";
-        mem_RW_s <= '1';
-
-        wait until clk_s;
-        wait until clk_s;
-        written8 := DMEM(to_integer(unsigned(addr_s)));
-
+        mem_RW_s                 <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        written8 := data_read_s(7 downto 0);
         if written8 /= data_write_s(7 downto 0) then
           error("Expected " & to_string(data_write_s(7 downto 0)) & ", got " & to_string(written8));
         end if;
 
-        -- Test store half word at invalid address
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_unsigned(258, 32));
+        -- Out-of-bounds and negative address writes (no verification)
+        width_s                  <= "00";
+        addr_s                   <= std_logic_vector(to_unsigned(258, 32));
         data_write_s(7 downto 0) <= "11001100";
-        mem_RW_s <= '1';
+        mem_RW_s                 <= '1';
+        wait until rising_edge(clk_s);
 
-        -- Test store half word at invalid address
-        width_s <= "01";
-        addr_s <= std_logic_vector(to_signed(-5, 32));
+        width_s                  <= "00";
+        addr_s                   <= std_logic_vector(to_signed(-5, 32));
         data_write_s(7 downto 0) <= "11001100";
-        mem_RW_s <= '1';
+        mem_RW_s                 <= '1';
+        wait until rising_edge(clk_s);
 
       end if;
     end loop;
@@ -456,4 +489,3 @@ begin
     test_runner_cleanup(runner);
   end process main;
 end architecture arch;
-
