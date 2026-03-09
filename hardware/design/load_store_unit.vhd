@@ -111,11 +111,11 @@ begin
   --! - **Word (10)**: Loads 32 bits directly from four consecutive memory locations.
   --! width_i = 11 is interpreted the same way as the width_i = 10.
   --! @note This process is combinatorial and updates whenever address, control signals, or memory content changes.
-  --! @warning Validates that the address is within [0, 252] to prevent out-of-bounds array access during simulation.
+  --! @warning Validates that the address is within [0, c_TOTAL_BYTES - 4] to prevent out-of-bounds array access during simulation.
   process(address, sign_i, width_i, mem_RW_i, DMEM) is
     variable word_to_read_var : std_logic_vector(31 downto 0);
   begin
-    if address >= 0 and address <= 252 then
+    if address >= 0 and address <= c_TOTAL_BYTES - 4 then
       case width_i is
         when "00" =>
           if sign_i = '1' then
