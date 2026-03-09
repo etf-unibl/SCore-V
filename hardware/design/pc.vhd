@@ -43,6 +43,7 @@ use ieee.numeric_std.all;
 --! @brief Program Counter (PC) register
 --! @details Implements a 32-bit synchronous Program Counter register.
 --! The PC value is updated on the rising edge of the clock.
+--! If an exception occurs (halt_i = '1'), the PC retains its current value to stop instruction execution.
 --! When reset is asserted, the PC is cleared to zero.
 --! Otherwise, the next PC value is loaded from the input.
 
