@@ -20,14 +20,14 @@ int main(int argc, char* argv[]) {
 void process_file(FILE* fptr) {
 	char line[256];
 	FILE* fout;
-	fout = fopen("../hardware/tests/program.txt", "w");
+	fout = fopen("../hardware/init_files/instruction_memory.txt", "w");
 	if(fout == NULL) {
 		printf("Unable to open program output file\n");
 		return;
 	}
 
 	FILE *expected_out;
-	expected_out = fopen("../hardware/tests/expected.txt", "w");
+	expected_out = fopen("../hardware/init_files/expected.txt", "w");
 	if(fptr == NULL) {
 		printf("Unable to open expected output file");
 		return;
