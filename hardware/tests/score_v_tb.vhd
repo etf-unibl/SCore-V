@@ -99,6 +99,122 @@ architecture sim of score_v_tb is
   end record;
 
   type expected_array is array (natural range <>) of expected_rec;
+--! @brief Maximum number of expected entries the file can contain.
+  constant c_MAX_EXPECTED : integer := 256;
+
+  --! @brief Empty record used to pad unused slots in the result array.
+  constant c_EMPTY_REC : expected_rec := (
+    pc      => 0,
+    opcode  => "0000000",
+    funct3  => "000",
+    funct7  => "0000000",
+    rd      => 0,
+    rs1     => 0,
+    rs2     => 0,
+    alu_out => 0,
+    wb_out  => 0,
+    we      => '0'
+  );
+
+  --! @brief Parses expected.txt (comma-separated) into an expected_array.
+  --! @details Each line format:
+  --!   pc, "opcode", "funct3", "funct7", rd, rs1, rs2, alu_out, wb_out, 'we'
+  --!   Binary fields are double-quoted, we is single-quoted.
+  --!   Integer fields may be negative. Blank lines are skipped.
+  --! @param file_name  Absolute path to the expected values file.
+  --! @param valid_rows Number of entries actually read from the file.
+  --! @return Populated expected_array padded with c_EMPTY_REC.
+  impure function parse_expected_file(
+    file_name  : in  string;
+    valid_rows : out integer
+  ) return expected_array is
+    file     f_ptr  : text;
+    variable l      : line;
+    variable result : expected_array(0 to c_MAX_EXPECTED - 1) := (others => c_EMPTY_REC);
+    variable row    : integer := 0;
+    variable c      : character;
+    variable good   : boolean;
+    variable slv7   : std_logic_vector(6 downto 0);
+    variable slv3   : std_logic_vector(2 downto 0);
+
+    --! Read one integer (possibly negative) stopping at next non-digit.
+    procedure get_int(variable l : inout line; variable val : out integer) is
+      variable c    : character;
+      variable good : boolean;
+      variable acc  : integer := 0;
+      variable neg  : boolean := false;
+    begin
+      while l'length > 0 loop read(l, c); exit when c /= ' ' and c /= ','; end loop;
+      if c = '-' then neg := true; read(l, c, good); end if;
+      while c >= '0' and c <= '9' loop
+        acc := acc * 10 + (character'pos(c) - character'pos('0'));
+        exit when l'length = 0;
+        read(l, c, good);
+      end loop;
+      if neg then val := -acc; else val := acc; end if;
+    end procedure;
+
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    while not endfile(f_ptr) and row < c_MAX_EXPECTED loop
+      readline(f_ptr, l);
+      next when l'length = 0;
+
+      -- pc
+      get_int(l, result(row).pc);
+
+      -- opcode (7-bit binary, double-quoted)
+      while l'length > 0 loop read(l, c); exit when c = '"'; end loop;
+      for i in 6 downto 0 loop
+        read(l, c, good);
+        slv7(i) := '1' when c = '1' else '0';
+      end loop;
+      read(l, c, good);
+      result(row).opcode := slv7;
+
+      -- funct3 (3-bit binary, double-quoted)
+      while l'length > 0 loop read(l, c); exit when c = '"'; end loop;
+      for i in 2 downto 0 loop
+        read(l, c, good);
+        slv3(i) := '1' when c = '1' else '0';
+      end loop;
+      read(l, c, good);
+      result(row).funct3 := slv3;
+
+      -- funct7 (7-bit binary, double-quoted)
+      while l'length > 0 loop read(l, c); exit when c = '"'; end loop;
+      for i in 6 downto 0 loop
+        read(l, c, good);
+        slv7(i) := '1' when c = '1' else '0';
+      end loop;
+      read(l, c, good);
+      result(row).funct7 := slv7;
+
+      -- rd, rs1, rs2, alu_out, wb_out
+      get_int(l, result(row).rd);
+      get_int(l, result(row).rs1);
+      get_int(l, result(row).rs2);
+      get_int(l, result(row).alu_out);
+      get_int(l, result(row).wb_out);
+
+      -- we (std_logic, single-quoted): skip to opening quote, read char
+      while l'length > 0 loop read(l, c); exit when c = '''; end loop;
+      read(l, c, good);
+      result(row).we := '1' when c = '1' else '0';
+
+      row := row + 1;
+    end loop;
+    file_close(f_ptr);
+    valid_rows := row;
+    return result;
+  end function parse_expected_file;
+
+  --! @brief Number of valid entries read from the expected file.
+  shared variable valid_count : integer := 0;
+
+  --! @brief Expected results loaded from file at elaboration time.
+  signal res : expected_array(0 to c_MAX_EXPECTED - 1) :=
+    parse_expected_file(g_expected_file, valid_count);
 
   -- res reference values correspond to the instruction sequence
   -- currently stored in IMEM. The expected PC, decode fields, ALU result
