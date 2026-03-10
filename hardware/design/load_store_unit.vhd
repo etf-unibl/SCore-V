@@ -109,10 +109,10 @@ architecture arch of load_store_unit is
 begin
   --! @brief Concurrent address conversion.
   address <= to_integer(signed(addr_i));
+
   memory_bound <= c_TOTAL_BYTES - 1 when width_i = "00" else
                   c_TOTAL_BYTES - 2 when width_i = "01" else
                   c_TOTAL_BYTES - 4;
-
   is_invalid_addr <= '1' when address < 0 or address > memory_bound else '0';
 
   --! @brief Misaligned address detection process
