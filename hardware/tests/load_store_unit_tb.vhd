@@ -86,15 +86,17 @@ architecture arch of load_store_unit_tb is
   --!          then read back through the UUT's data_read_o port.
   signal DMEM : t_bytes := initialize_dmem(g_init_file);
 
-  signal clk_s        : std_logic := '0';
-  signal rst_s        : std_logic := '0';
-  signal addr_s       : std_logic_vector(31 downto 0) := (others => '0');
-  signal mem_RW_s     : std_logic := '0';
-  signal data_write_s : std_logic_vector(31 downto 0) := (others => '0');
-  signal data_read_s  : std_logic_vector(31 downto 0) := (others => '0');
-  signal sim_stop_s   : std_logic := '0';
-  signal sign_s       : std_logic;
-  signal width_s      : std_logic_vector(1 downto 0);
+  signal clk_s               : std_logic := '0';
+  signal rst_s               : std_logic := '0';
+  signal addr_s              : std_logic_vector(31 downto 0) := (others => '0');
+  signal mem_RW_s            : std_logic := '0';
+  signal data_write_s        : std_logic_vector(31 downto 0) := (others => '0');
+  signal data_read_s         : std_logic_vector(31 downto 0) := (others => '0');
+  signal sim_stop_s          : std_logic := '0';
+  signal sign_s              : std_logic;
+  signal width_s             : std_logic_vector(1 downto 0);
+  signal invalid_addr_s      : std_logic := '0';
+  signal misaligned_access_s : std_logic := '0';
 
   signal word_to_write : std_logic_vector(31 downto 0) := (others => '0');
   constant c_CLK_PERIOD : time := 10 ns;
@@ -106,14 +108,16 @@ begin
       g_init_file => g_init_file
     )
     port map (
-      clk_i        => clk_s,
-      rst_i        => rst_s,
-      addr_i       => addr_s,
-      mem_RW_i     => mem_RW_s,
-      data_write_i => data_write_s,
-      data_read_o  => data_read_s,
-      sign_i       => sign_s,
-      width_i      => width_s
+      clk_i               => clk_s,
+      rst_i               => rst_s,
+      sign_i              => sign_s,
+      width_i             => width_s,
+      addr_i              => addr_s,
+      mem_RW_i            => mem_RW_s,
+      data_write_i        => data_write_s,
+      data_read_o         => data_read_s,
+      invalid_addr_o      => invalid_addr_s,
+      misaligned_access_o => misaligned_access_s
     );
 
   clk_process : process
@@ -136,6 +140,12 @@ begin
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
+      --! Default values
+      mem_RW_s <= '0';
+      width_s  <= "10"; -- Word
+      sign_s   <= '1';  -- Unsigned
+      addr_s   <= (others => '0');
+
       if run("test_reset") then
         info("Testing reset function of load_store unit");
         expected := (others => '0');
@@ -172,7 +182,7 @@ begin
         end if;
 
         -- Test reading a word out of bounds for DMEM
-        addr_s <= std_logic_vector(to_unsigned(1000, 32));
+        addr_s <= std_logic_vector(to_unsigned(50000, 32));
         expected := (others => '0');
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
@@ -183,6 +193,8 @@ begin
         addr_s <= std_logic_vector(to_signed(-199, 32));
         expected := (others => '0');
         wait for c_CLK_PERIOD;
+        check_equal(invalid_addr_s, '1', "Invalid address access should be detected for addr = -199");
+        check_equal(data_read_s, expected, "Default value of output should be zero in case of invalid address access");
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
@@ -193,8 +205,9 @@ begin
         info("Testing load half word (lh) function of load_store_unit");
 
         -- Read first 2 bytes of memory unsigned
-        addr_s <= std_logic_vector(to_unsigned(0, 32));
         width_s <= "01";
+        wait for 1 ns;   
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
         sign_s <= '1';
         expected := "00000000000000000000000011111111";
 
@@ -204,8 +217,9 @@ begin
         end if;
 
         -- Read second 2 bytes of memory unsigned
-        addr_s <= std_logic_vector(to_unsigned(2, 32));
         width_s <= "01";
+        wait for 1 ns;   
+        addr_s <= std_logic_vector(to_unsigned(2, 32));
         sign_s <= '1';
         expected := "00000000000000000011001111001100";
 
@@ -214,13 +228,14 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Read 2 bytes of unreachable memory unsigned
+        -- Read 2 bytes of misaligned address in memory unsigned
         addr_s <= std_logic_vector(to_unsigned(257, 32));
         width_s <= "01";
         sign_s <= '1';
         expected := (others => '0');
 
         wait for c_CLK_PERIOD;
+        check_equal(misaligned_access_s, '1', "Misaligned address access should be '0' for Byte at addr 32");
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
@@ -237,8 +252,9 @@ begin
         end if;
 
         -- Read 2 bytes of unreachable memory unsigned
-        addr_s <= std_logic_vector(to_signed(-4, 32));
         width_s <= "01";
+        wait for 1 ns;   
+        addr_s <= std_logic_vector(to_signed(-4, 32));
         sign_s <= '1';
         expected := (others => '0');
 
@@ -412,7 +428,7 @@ begin
         -- Write halfword to addr 9, read back lower 16 bits to verify
         width_s                   <= "01";
         sign_s                    <= '1';
-        addr_s                    <= std_logic_vector(to_unsigned(9, 32));
+        addr_s                    <= std_logic_vector(to_unsigned(10, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
         mem_RW_s                  <= '1';
         wait until rising_edge(clk_s);
@@ -426,7 +442,7 @@ begin
 
         -- Out-of-bounds and negative address writes (no verification)
         width_s                   <= "01";
-        addr_s                    <= std_logic_vector(to_unsigned(258, 32));
+        addr_s                    <= std_logic_vector(to_unsigned(50000, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
         mem_RW_s                  <= '1';
         wait until rising_edge(clk_s);
@@ -482,6 +498,32 @@ begin
         data_write_s(7 downto 0) <= "11001100";
         mem_RW_s                 <= '1';
         wait until rising_edge(clk_s);
+      elsif run("test_lsu_exceptions") then
+        
+        addr_s  <= std_logic_vector(to_unsigned(1, 32));
+        width_s <= "10";
+        wait for c_CLK_PERIOD;
+        check_equal(misaligned_access_s, '1',
+                    "Misaligned access should be detected for Word at addr 1");
+        
+        rst_s <= '0';
+
+        addr_s  <= std_logic_vector(to_unsigned(128000, 32));
+        width_s <= "00";
+        wait for c_CLK_PERIOD;
+        check_equal(invalid_addr_s, '1',
+                    "Invalid address access should be detected for Byte at addr 128000");
+        
+        rst_s <= '0';
+        
+        addr_s  <= std_logic_vector(to_unsigned(32, 32));
+        width_s <= "00";
+        wait for c_CLK_PERIOD;
+        check_equal(invalid_addr_s, '0', 
+                    "Invalid address access should be '0' for Byte at addr 32");
+        check_equal(misaligned_access_s, '0',
+                    "Misaligned address access should be '0' for Byte at addr 32");
+        
 
       end if;
     end loop;
