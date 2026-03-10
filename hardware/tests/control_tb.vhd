@@ -636,6 +636,22 @@ begin
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "Reserved J-like: imm_sel default");
         check_equal(s_invalid_instr,    '1', "Reserved opcode must assert invalid_instr_o");
 
+        ---------------------------------------------------------------------------
+        -- 11) BRANCH opcode but unsupported funct3 (010 is reserved)
+        ---------------------------------------------------------------------------
+        s_opcode     <= "1100011";
+        s_funct3     <= "010";  -- invalid branch funct3
+        s_funct7     <= (others => '0');
+        s_imm_i_type <= (others => '0');
+        wait for 5 ns;
+
+        check_equal(s_reg_write_enable, '0', "BRANCH with unsupported funct3 must not write regfile");
+        check_equal(s_pc_sel,           '0', "BRANCH with unsupported funct3 must not change PC");
+        check_equal(s_b_sel,            '0', "BRANCH with unsupported funct3: b_sel default");
+        check_equal(to_integer(unsigned(s_imm_sel)), 0, "BRANCH with unsupported funct3: imm_sel default");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "BRANCH with unsupported funct3: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "Unsupported BRANCH funct3 must assert invalid_instr_o");
+
       elsif run("test_branch_instr") then
 
         s_halt_i <= '0';
