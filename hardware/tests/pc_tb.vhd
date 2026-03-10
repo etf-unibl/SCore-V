@@ -61,6 +61,7 @@ architecture arch of pc_tb is
   signal sim_stop_s  : std_logic := '0';
   signal pc_sel_s    : std_logic := '0';
   signal pc_target_s : std_logic_vector(31 downto 0) := (others => '0');
+  signal halt_s      : std_logic := '0';
 
   constant c_CLK_PERIOD : time := 10 ns;
 
@@ -97,6 +98,7 @@ begin
       clk_i     => clk_i,
       rst_i     => rst_i,
       pc_next_i => pc_next,
+      halt_i    => halt_s,
       pc_o      => pc_out
     );
 
@@ -118,6 +120,7 @@ begin
   -- the result wraps around to 0x00000000.
   main : process
     variable expected_pc : std_logic_vector(31 downto 0);
+    variable frozen_pc   : std_logic_vector(31 downto 0);
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -126,38 +129,66 @@ begin
       -- Test reset
       if run("test_reset") then
         info("Testing reset");
+
+        halt_s      <= '0';
+        pc_sel_s    <= '0';
+        pc_target_s <= (others => '0');
+        rst_i       <= '1';
+        wait for 1 ns;
+        rst_i <= '0';
+
+        wait until rising_edge(clk_i);
+        wait until rising_edge(clk_i);
+        expected_pc := X"00000004";
+        check_equal(pc_out, expected_pc, "pc should increment before reset");
+
+        -- Assert reset between clock edges: output must clear immediately
+        wait for c_CLK_PERIOD / 4;
         rst_i <= '1';
-        wait until rising_edge(clk_i);
-        wait until rising_edge(clk_i);
+        wait for 1 ns;
+
         expected_pc := (others => '0');
-        check_equal(pc_out, expected_pc, "pc should be 0 after reset");
+        check_equal(pc_out, expected_pc, "pc should go to 0 immediately after async reset");
 
+        -- Hold reset active
         wait until rising_edge(clk_i);
-        check_equal(pc_out, expected_pc, "pc should still be 0");
+        check_equal(pc_out, expected_pc, "pc should remain 0 while reset is asserted");
 
+        rst_i <= '0';
+      
       -- Test increment
       elsif run("test_increment") then
         info("Testing incrementing");
+
+        halt_s      <= '0';
+
+        pc_sel_s    <= '0';
+        pc_target_s <= (others => '0');
+
         rst_i <= '1';
-        wait until rising_edge(clk_i);
-        wait until rising_edge(clk_i);
+        wait for 1 ns;
         rst_i <= '0';
+
         wait until rising_edge(clk_i);
 
         for i in 1 to 5 loop
           wait until rising_edge(clk_i);
           expected_pc := std_logic_vector(to_unsigned(i * 4, 32));
-          if pc_out /= expected_pc then
-            failure("FAIL: pc should be " & to_string(expected_pc) &
-                    " and not " & to_string(pc_out));
-          end if;
+          check_equal(pc_out, expected_pc,
+            "pc should be " & to_string(expected_pc));
         end loop;
 
+      
       -- Test increment + reset
       elsif run("test_increment_reset") then
+
+        halt_s      <= '0';
+
+        pc_sel_s    <= '0';
+        pc_target_s <= (others => '0');
+
         rst_i <= '1';
-        wait until rising_edge(clk_i);
-        wait until rising_edge(clk_i);
+        wait for 1 ns;
         rst_i <= '0';
         wait until rising_edge(clk_i);
 
@@ -167,22 +198,30 @@ begin
           check_equal(pc_out, expected_pc, "pc should be " & to_string(expected_pc));
         end loop;
 
+        -- Reset should clear immediately
+        wait for c_CLK_PERIOD / 4;
         rst_i <= '1';
-        wait until rising_edge(clk_i);
-        wait until rising_edge(clk_i);
+        wait for 1 ns;
         expected_pc := (others => '0');
-        check_equal(pc_out, expected_pc, "pc should be 0 after reset");
+        check_equal(pc_out, expected_pc, "pc should be 0 immediately after reset");
+
+        wait until rising_edge(clk_i);
+        check_equal(pc_out, expected_pc, "pc should remain 0 while reset is asserted");
+
+        rst_i <= '0';
 
       -- Test branch
       elsif run("test_branch") then
         info("Testing branch jump");
 
+        halt_s <= '0';
+
         rst_i <= '1';
-        wait until rising_edge(clk_i);
-        wait until rising_edge(clk_i);
+        wait for 1 ns;
+        rst_i <= '0';
+
         pc_target_s <= std_logic_vector(to_unsigned(100, 32));
         pc_sel_s    <= '1';
-        rst_i <= '0';
 
         wait until rising_edge(clk_i);
         wait until rising_edge(clk_i);
@@ -196,14 +235,12 @@ begin
         check_equal(pc_out, expected_pc, "pc should be " & to_string(expected_pc));
 
         rst_i <= '1';
-        wait until rising_edge(clk_i);
-        wait until rising_edge(clk_i);
+        wait for 1 ns;
         rst_i <= '0';
         wait until rising_edge(clk_i);
 
         -- Branch tests loop
         for i in branch_tests'range loop
-
           pc_target_s <= branch_tests(i).pc_start;
           pc_sel_s    <= '1';
           wait until rising_edge(clk_i);
@@ -216,8 +253,55 @@ begin
           check_equal(pc_out, branch_tests(i).expected,
             "PC branch test failed for start = " & to_string(branch_tests(i).pc_start) &
             " target = " & to_string(branch_tests(i).pc_target));
-
         end loop;
+
+        pc_sel_s <= '0';
+
+      -- Test halt
+      elsif run("test_halt") then
+        info("Testing halt behavior");
+
+        pc_sel_s    <= '0';
+        pc_target_s <= (others => '0');
+        halt_s      <= '0';
+
+        rst_i <= '1';
+        wait for 1 ns;
+        rst_i <= '0';
+
+        -- Move PC to known value
+
+        
+        wait until rising_edge(clk_i); -- 4
+        wait until rising_edge(clk_i); -- 8
+        wait until rising_edge(clk_i); -- 12
+        wait for 1 ns;
+        
+        expected_pc := X"0000000C";
+        check_equal(pc_out, expected_pc, "pc should reach 12 before halt");
+
+        -- Freeze PC
+        halt_s    <= '1';
+        frozen_pc := pc_out;
+
+        wait until rising_edge(clk_i);
+        check_equal(pc_out, frozen_pc, "pc must stay frozen during halt (1)");
+
+        wait until rising_edge(clk_i);
+        check_equal(pc_out, frozen_pc, "pc must stay frozen during halt (2)");
+
+        wait until rising_edge(clk_i);
+        check_equal(pc_out, frozen_pc, "pc must stay frozen during halt (3)");
+
+        -- Release halt
+
+        rst_i <= '1';
+        wait for 1 ns;
+        rst_i <= '0';
+        halt_s <= '0';
+        wait until rising_edge(clk_i);
+        expected_pc := X"00000000";
+        check_equal(pc_out, expected_pc, "pc should start over from 0 after halt release");
 
       end if;
     end loop;
