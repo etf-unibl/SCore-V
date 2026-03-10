@@ -64,6 +64,8 @@ entity fetch_instruction is
   (
     --! @brief Program counter input - byte address of current instruction.
     instruction_count_i : in  std_logic_vector(g_ADDR_WIDTH-1 downto 0);
+    --! @brief HALT state detected input
+    halt_i              : in  std_logic;
     --! @brief Fetched instruction output split into opcode and remaining bits.
     instruction_bits_o  : out t_instruction_rec
   );
@@ -125,9 +127,10 @@ begin
   --! @brief Asynchronous read from local mem signal.
   --! @description Behaviour identical to original c_IMEM read in mem_pkg.
   full_instruction <= mem(to_integer(unsigned(instruction_count_i)) + 3) &
-                      mem(to_integer(unsigned(instruction_count_i)) + 2) &
-                      mem(to_integer(unsigned(instruction_count_i)) + 1) &
-                      mem(to_integer(unsigned(instruction_count_i)));
+                        mem(to_integer(unsigned(instruction_count_i)) + 2) &
+                        mem(to_integer(unsigned(instruction_count_i)) + 1) &
+                        mem(to_integer(unsigned(instruction_count_i)))
+                      when halt_i = '0' else (others => '0');
 
   instruction_bits_o.opcode                 <= full_instruction(6 downto 0);
   instruction_bits_o.other_instruction_bits <= full_instruction(31 downto 7);
