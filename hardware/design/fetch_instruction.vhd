@@ -63,11 +63,15 @@ entity fetch_instruction is
   port
   (
     --! @brief Program counter input - byte address of current instruction.
-    instruction_count_i : in  std_logic_vector(g_ADDR_WIDTH-1 downto 0);
+    instruction_count_i     : in  std_logic_vector(g_ADDR_WIDTH-1 downto 0);
     --! @brief HALT state detected input
-    halt_i              : in  std_logic;
+    halt_i                  : in  std_logic;
     --! @brief Fetched instruction output split into opcode and remaining bits.
-    instruction_bits_o  : out t_instruction_rec
+    instruction_bits_o      : out t_instruction_rec;
+    --! Instruction fetch address is outside valid instruction memory range
+    invalid_instr_addr_o    : out std_logic;
+    --! Instruction fetch address is not 4-byte aligned (PC(1 downto 0) /= "00")
+    misaligned_instr_addr_o : out std_logic
   );
 end fetch_instruction;
 
@@ -122,17 +126,38 @@ architecture arch of fetch_instruction is
 
   signal full_instruction : std_logic_vector(31 downto 0);
 
+  signal addr_s            : integer;
+  signal invalid_addr_s    : std_logic;
+  signal misaligned_addr_s : std_logic;
+
 begin
 
-  --! @brief Asynchronous read from local mem signal.
-  --! @description Behaviour identical to original c_IMEM read in mem_pkg.
-  full_instruction <= mem(to_integer(unsigned(instruction_count_i)) + 3) &
-                        mem(to_integer(unsigned(instruction_count_i)) + 2) &
-                        mem(to_integer(unsigned(instruction_count_i)) + 1) &
-                        mem(to_integer(unsigned(instruction_count_i)))
-                      when halt_i = '0' else (others => '0');
+  addr_s <= to_integer(unsigned(instruction_count_i));
+
+  misaligned_addr_s <= '1' when instruction_count_i(1 downto 0) /= "00" else '0';
+  invalid_addr_s    <= '1' when addr_s > c_TOTAL_BYTES - 4 else '0';
+
+  comb_proc : process(mem, addr_s, invalid_addr_s, misaligned_addr_s, halt_i)
+  begin
+    if halt_i = '1' then
+      full_instruction <= (others => '0');
+
+    elsif invalid_addr_s = '0' and misaligned_addr_s = '0' then
+    --! @brief Asynchronous read from local mem signal.
+    --! @description Behaviour identical to original c_IMEM read in mem_pkg.
+      full_instruction <= mem(addr_s + 3) &
+                        mem(addr_s + 2) &
+                        mem(addr_s + 1) &
+                        mem(addr_s);
+    else
+      full_instruction <= (others => '0');
+    end if;
+  end process comb_proc;
 
   instruction_bits_o.opcode                 <= full_instruction(6 downto 0);
   instruction_bits_o.other_instruction_bits <= full_instruction(31 downto 7);
+
+  invalid_instr_addr_o    <= invalid_addr_s;
+  misaligned_instr_addr_o <= misaligned_addr_s;
 
 end arch;
