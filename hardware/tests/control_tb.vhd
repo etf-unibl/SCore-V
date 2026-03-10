@@ -70,6 +70,8 @@ architecture arch of control_tb is
   signal s_a_sel            : std_logic;
   signal s_pc_sel           : std_logic;
   signal s_br_un            : std_logic;
+  signal s_halt_i           : std_logic := '0';
+  signal s_invalid_instr    : std_logic;
 
 begin
   -- Instantiate the Unit Under Test (UUT)
@@ -91,7 +93,9 @@ begin
       mem_unsigned_o     => s_mem_unsigned_o,
       wb_select_o        => s_wb_select_o,
       pc_sel_o           => s_pc_sel,
-      br_un_o            => s_br_un
+      br_un_o            => s_br_un,
+      halt_i          => s_halt_i,
+      invalid_instr_o => s_invalid_instr
     );
 
   -- Stimulus process
@@ -101,6 +105,7 @@ begin
 
     while test_suite loop
       if run("test_arithmetic_instr") then
+        s_halt_i <= '0';
         -- R-type ADD
         s_opcode     <= "0110011";
         s_funct3     <= "000";
@@ -112,6 +117,7 @@ begin
         check_equal(s_b_sel,            '0', "ADD uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ADD writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADD -> ALU_ADD");
+        check_equal(s_invalid_instr,    '0', "ADD must be valid");
 
         -- R-type SUB
         s_opcode     <= "0110011";
@@ -123,6 +129,7 @@ begin
         check_equal(s_b_sel,            '0', "SUB uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SUB writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SUB), "SUB -> ALU_SUB");
+        check_equal(s_invalid_instr,    '0', "SUB must be valid");
 
         -- I-type ADDI
         s_opcode     <= "0010011";
@@ -136,8 +143,10 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ADDI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "ADDI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "ADDI -> ALU_ADD");
+        check_equal(s_invalid_instr,    '0', "ADDI must be valid");
 
       elsif run("test_logic_instr") then
+         s_halt_i <= '0';
         -- R-type SLT
         s_opcode     <= "0110011";
         s_funct3     <= "010";
@@ -148,6 +157,7 @@ begin
         check_equal(s_b_sel,            '0', "SLT uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLT writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLT), "SLT -> ALU_SLT");
+        check_equal(s_invalid_instr,    '0', "SLT must be valid");
 
         -- R-type SLTU
         s_opcode     <= "0110011";
@@ -159,6 +169,7 @@ begin
         check_equal(s_b_sel,            '0', "SLTU uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLTU writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLTU), "SLTU -> ALU_SLTU");
+        check_equal(s_invalid_instr,    '0', "SLTU must be valid");
 
         -- R-type AND
         s_opcode     <= "0110011";
@@ -170,6 +181,7 @@ begin
         check_equal(s_b_sel,            '0', "AND uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "AND writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_AND), "AND -> ALU_AND");
+        check_equal(s_invalid_instr,    '0', "AND must be valid");
 
         -- R-type OR
         s_opcode     <= "0110011";
@@ -181,6 +193,7 @@ begin
         check_equal(s_b_sel,            '0', "OR uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "OR writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_OR), "OR -> ALU_OR");
+        check_equal(s_invalid_instr,    '0', "OR must be valid");
 
         -- R-type XOR
         s_opcode     <= "0110011";
@@ -192,6 +205,7 @@ begin
         check_equal(s_b_sel,            '0', "XOR uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "XOR writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_XOR), "XOR -> ALU_XOR");
+        check_equal(s_invalid_instr,    '0', "XOR must be valid");
 
         -- R-type SLL
         s_opcode     <= "0110011";
@@ -203,6 +217,7 @@ begin
         check_equal(s_b_sel,            '0', "SLL uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLL writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLL), "SLL -> ALU_SLL");
+        check_equal(s_invalid_instr,    '0', "SLL must be valid");
 
         -- R-type SRL
         s_opcode     <= "0110011";
@@ -214,6 +229,7 @@ begin
         check_equal(s_b_sel,            '0', "SRL uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRL writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRL), "SRL -> ALU_SRL");
+        check_equal(s_invalid_instr,    '0', "SRL must be valid");
 
         -- R-type SRA
         s_opcode     <= "0110011";
@@ -225,6 +241,7 @@ begin
         check_equal(s_b_sel,            '0', "SRA uses rs2");
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRA writeback from ALU");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRA), "SRA -> ALU_SRA");
+        check_equal(s_invalid_instr,    '0', "SRA must be valid");
 
         -- I-type XORI
         s_opcode     <= "0010011";
@@ -238,6 +255,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "XORI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "XORI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_XOR), "XORI -> ALU_XOR");
+        check_equal(s_invalid_instr,    '0', "XORI must be valid");
 
         -- I-type ORI
         s_opcode     <= "0010011";
@@ -250,6 +268,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ORI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "ORI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_OR), "ORI -> ALU_OR");
+        check_equal(s_invalid_instr,    '0', "ORI must be valid");
 
         -- I-type ANDI
         s_opcode     <= "0010011";
@@ -262,6 +281,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "ANDI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "ANDI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_AND), "ANDI -> ALU_AND");
+        check_equal(s_invalid_instr,    '0', "ANDI must be valid");
 
         -- I-type SLTI
         s_opcode     <= "0010011";
@@ -274,6 +294,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLTI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLTI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLT), "SLTI -> ALU_SLT");
+        check_equal(s_invalid_instr,    '0', "SLTI must be valid");
 
         -- I-type SLTIU
         s_opcode     <= "0010011";
@@ -286,6 +307,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLTIU writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLTIU imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLTU), "SLTIU -> ALU_SLTU");
+        check_equal(s_invalid_instr,    '0', "SLTIU must be valid");
 
         -- I-type SLLI: funct3=001, imm[11:5]=0000000
         s_opcode     <= "0010011";
@@ -299,6 +321,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SLLI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SLLI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SLL), "SLLI -> ALU_SLL");
+        check_equal(s_invalid_instr,    '0', "SLLI must be valid");
 
         -- I-type SRLI: funct3=101, imm[11:5]=0000000
         s_opcode     <= "0010011";
@@ -311,6 +334,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRLI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SRLI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRL), "SRLI -> ALU_SRL");
+        check_equal(s_invalid_instr,    '0', "SLRI must be valid");
 
         -- I-type SRAI: funct3=101, imm[11:5]=0100000
         s_opcode     <= "0010011";
@@ -323,8 +347,11 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 1, "SRAI writeback from ALU");
         check_equal(to_integer(unsigned(s_imm_sel)), 1, "SRAI imm_sel should be I-type (001)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_SRA), "SRAI -> ALU_SRA");
+        check_equal(s_invalid_instr,    '0', "SRAI must be valid");
 
       elsif run("test_load_store_instr") then
+
+        s_halt_i <= '0';
 
         -----------------------------------------------------------------------
         -- LOADS: LB, LH, LW, LBU, LHU  (opcode = 0000011)
@@ -352,6 +379,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LB addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("00"), "LB mem_size byte");
         check_equal(s_mem_unsigned_o,   '0',  "LB signed");
+        check_equal(s_invalid_instr,    '0', "LB must be valid");
 
         -- LH (funct3=001)
         s_funct3 <= "001";
@@ -364,6 +392,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LH addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("01"), "LH mem_size half");
         check_equal(s_mem_unsigned_o,   '0',  "LH signed");
+        check_equal(s_invalid_instr,    '0', "LH must be valid");
 
         -- LW (funct3=010)
         s_funct3 <= "010";
@@ -376,6 +405,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LW addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("10"), "LW mem_size word");
         check_equal(s_mem_unsigned_o,   '0',  "LW signed");
+        check_equal(s_invalid_instr,    '0', "LW must be valid");
 
         -- LBU (funct3=100)
         s_funct3 <= "100";
@@ -388,6 +418,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LBU addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("00"), "LBU mem_size byte");
         check_equal(s_mem_unsigned_o,   '1',  "LBU unsigned");
+        check_equal(s_invalid_instr,    '0', "LBU must be valid");
 
         -- LHU (funct3=101)
         s_funct3 <= "101";
@@ -400,6 +431,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "LHU addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("01"), "LHU mem_size half");
         check_equal(s_mem_unsigned_o,   '1',  "LHU unsigned");
+        check_equal(s_invalid_instr,    '0', "LHU must be valid");
 
         -----------------------------------------------------------------------
         -- STORES: SB, SH, SW (opcode = 0100011)
@@ -423,6 +455,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "SB addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("00"), "SB mem_size byte");
         check_equal(s_mem_unsigned_o,   '0',  "SB unsigned flag unused -> default 0");
+        check_equal(s_invalid_instr,    '0', "SB must be valid");
 
         -- SH (funct3=001)
         s_funct3 <= "001";
@@ -434,6 +467,7 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "SH addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("01"), "SH mem_size half");
         check_equal(s_mem_unsigned_o,   '0',  "SH unsigned flag unused -> default 0");
+        check_equal(s_invalid_instr,    '0', "SH must be valid");
 
         -- SW (funct3=010)
         s_funct3 <= "010";
@@ -445,8 +479,12 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "SW addr via ADD");
         check_equal(s_mem_size_o, std_logic_vector'("10"), "SW mem_size word");
         check_equal(s_mem_unsigned_o,   '0',  "SW unsigned flag unused -> default 0");
+        check_equal(s_invalid_instr,    '0', "SB must be valid");
 
       elsif run("test_invalid_encodings") then
+
+        s_halt_i <= '0';
+
         ---------------------------------------------------------------------------
         -- 1) Completely invalid opcode
         ---------------------------------------------------------------------------
@@ -462,6 +500,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "Invalid opcode: wb_select must be 0");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "Invalid opcode: imm_sel must be 000");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Invalid opcode: ALU must be NOP");
+        check_equal(s_invalid_instr,    '1', "Invalid opcode must assert invalid_instr_o");
 
 
         ---------------------------------------------------------------------------
@@ -478,6 +517,7 @@ begin
         check_equal(s_b_sel,            '0', "R-type illegal funct7: b_sel default");
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "R-type illegal funct7: wb_select default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "R-type illegal funct7: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "R-type illegal funct7 must assert invalid_instr_o");
 
 
         ---------------------------------------------------------------------------
@@ -492,6 +532,7 @@ begin
         check_equal(s_reg_write_enable, '0', "R-type shift illegal funct7: must not write");
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "R-type shift illegal funct7: wb_select default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "R-type shift illegal funct7: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "R-type shift illegal funct7 must assert invalid_instr_o");
 
 
         ---------------------------------------------------------------------------
@@ -508,6 +549,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "SLLI illegal imm[11:5]: wb_select default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "SLLI illegal imm[11:5]: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "SLLI illegal imm[11:5]: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "Illegal SLLI must assert invalid_instr_o");
 
 
         ---------------------------------------------------------------------------
@@ -524,6 +566,7 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "SRLI/SRAI illegal imm[11:5]: wb_select default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "SRLI/SRAI illegal imm[11:5]: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "SRLI/SRAI illegal imm[11:5]: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "Illegal SRLI/SRAI must assert invalid_instr_o");
 
         ---------------------------------------------------------------------------
         -- 6) LOAD opcode but unsupported funct3
@@ -542,6 +585,7 @@ begin
         check_equal(s_b_sel,            '0', "LOAD with unsupported funct3: b_sel default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "LOAD with unsupported funct3: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "LOAD with unsupported funct3: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "Unsupported LOAD funct3 must assert invalid_instr_o");
 
         ---------------------------------------------------------------------------
         -- 7) STORE opcode but unsupported funct3
@@ -560,6 +604,7 @@ begin
         check_equal(s_b_sel,            '0', "STORE with unsupported funct3: b_sel default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "STORE with unsupported funct3: imm_sel default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "STORE with unsupported funct3: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "Unsupported STORE funct3 must assert invalid_instr_o");
 
         ---------------------------------------------------------------------------
         -- 8) JALR opcode (1100111) but unsupported funct3 (must be 000)
@@ -571,6 +616,7 @@ begin
         check_equal(s_reg_write_enable, '0', "JALR unsupported funct3: must not write");
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "JALR unsupported funct3: wb_select default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "JALR unsupported funct3: ALU_NOP");
+        check_equal(s_invalid_instr,    '1', "Unsupported JALR funct3 must assert invalid_instr_o");
 
         ---------------------------------------------------------------------------
         -- 9) Reserved opcode similar to U-type (e.g., 1010111)
@@ -580,7 +626,7 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '0', "Reserved U-like opcode: must not write");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "Reserved U-like opcode: ALU_NOP");
-
+        check_equal(s_invalid_instr,    '1', "Reserved opcode must assert invalid_instr_o");
         ---------------------------------------------------------------------------
         -- 10) Reserved opcode similar to J-type (e.g., 1101011)
         ---------------------------------------------------------------------------
@@ -588,8 +634,11 @@ begin
         wait for 5 ns;
         check_equal(s_reg_write_enable, '0', "Reserved J-like opcode: must not write");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "Reserved J-like: imm_sel default");
+        check_equal(s_invalid_instr,    '1', "Reserved opcode must assert invalid_instr_o");
 
       elsif run("test_branch_instr") then
+
+        s_halt_i <= '0';
 
         ---------------------------------------------------------------------------
         -- BRANCH Instructions: BEQ, BNE, BLT, BGE, BLTU, BGEU (opcode = 1100011)
@@ -610,16 +659,19 @@ begin
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "B-type: ALU_ADD for target calculation");
         check_equal(s_reg_write_enable, '0', "B-type: reg_write must be 0");
         check_equal(to_integer(unsigned(s_imm_sel)), 3, "B-type: imm_sel must be 011");
+        check_equal(s_invalid_instr, '0', "BEQ must be valid");
 
         -- BNE (funct3 = 001): Branch if rs1 != rs2
         s_funct3 <= "001";
         s_br_eq  <= '1'; -- Inputs are equal, condition is false
         wait for 5 ns;
         check_equal(s_pc_sel, '0', "BNE: pc_sel should be 0 when br_eq is 1");
+        check_equal(s_invalid_instr, '0', "BNE must be valid");
 
         s_br_eq  <= '0'; -- Inputs are not equal, condition is true
         wait for 5 ns;
         check_equal(s_pc_sel, '1', "BNE: pc_sel should be 1 when br_eq is 0");
+        check_equal(s_invalid_instr, '0', "BNE must be valid");
 
         -- BLT (funct3 = 100): Branch if rs1 < rs2 (signed)
         s_funct3 <= "100";
@@ -627,6 +679,7 @@ begin
         wait for 5 ns;
         check_equal(s_pc_sel, '1', "BLT: pc_sel should be 1 when br_lt is 1");
         check_equal(s_br_un, '0', "BLT: br_un signal must be 0 (signed)");
+        check_equal(s_invalid_instr, '0', "BLT must be valid");
 
         -- BLTU (funct3 = 110): Branch if rs1 < rs2 (unsigned)
         s_funct3 <= "110";
@@ -634,6 +687,7 @@ begin
         wait for 5 ns;
         check_equal(s_br_un, '1', "BLTU: br_un signal must be 1 (unsigned)");
         check_equal(s_pc_sel, '1', "BLTU: pc_sel should be 1 when br_lt is 1");
+        check_equal(s_invalid_instr, '0', "BLTU must be valid");
 
         -- BGEU (funct3 = 111): Branch if rs1 >= rs2 (unsigned)
         s_funct3 <= "111";
@@ -641,8 +695,11 @@ begin
         wait for 5 ns;
         check_equal(s_br_un, '1', "BGEU: br_un signal must be 1");
         check_equal(s_pc_sel, '0', "BGEU: pc_sel should be 0 when br_lt is 1");
+        check_equal(s_invalid_instr, '0', "BGEU must be valid");
 
       elsif run("test_upper_and_jump_instr") then
+
+        s_halt_i <= '0';
 
         -----------------------------------------------------------------------
         -- UPPER IMMEDIATE: LUI, AUIPC (opcodes 0110111, 0010111)
@@ -657,6 +714,7 @@ begin
         check_equal(s_b_sel, '1', "LUI: b_sel must be 1 (immediate)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "LUI: ALU_ADD to pass imm");
         check_equal(to_integer(unsigned(s_wb_select_o)), 3, "LUI: wb_select must be ALU (11)");
+        check_equal(s_invalid_instr, '0', "LUI must be valid");
 
         -- AUIPC (Add Upper Immediate to PC)
         s_opcode <= "0010111";
@@ -666,7 +724,7 @@ begin
         check_equal(s_a_sel, '1', "AUIPC: a_sel must be 1 (PC source)");
         check_equal(s_b_sel, '1', "AUIPC: b_sel must be 1 (immediate)");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "AUIPC: ALU_ADD for PC+imm");
-
+        check_equal(s_invalid_instr, '0', "AUIPC must be valid");
         -----------------------------------------------------------------------
         -- JUMPS: JAL, JALR (opcodes 1101111, 1100111)
         -----------------------------------------------------------------------
@@ -679,6 +737,7 @@ begin
         check_equal(s_a_sel, '1', "JAL: a_sel must be 1 (PC source)");
         check_equal(s_pc_sel, '1', "JAL: pc_sel must be 1 (always taken)");
         check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JAL: wb_select must be PC+4 (10)");
+        check_equal(s_invalid_instr, '0', "JAL must be valid");
 
         -- JALR (Jump and Link Register)
         s_opcode <= "1100111";
@@ -689,6 +748,29 @@ begin
         check_equal(s_a_sel, '0', "JALR: a_sel must be 0 (rs1 source)");
         check_equal(s_pc_sel, '1', "JALR: pc_sel must be 1 (always taken)");
         check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JALR: wb_select must be PC+4 (10)");
+        check_equal(s_invalid_instr, '0', "JALR must be valid");
+
+      elsif run("test_halt_behavior") then
+
+        s_halt_i     <= '1';
+        s_opcode     <= "1111111";
+        s_funct3     <= "111";
+        s_funct7     <= (others => '1');
+        s_imm_i_type <= (others => '1');
+        s_br_eq      <= '1';
+        s_br_lt      <= '1';
+        wait for 5 ns;
+
+        check_equal(s_reg_write_enable, '0', "HALT: reg_write must stay default");
+        check_equal(s_b_sel,            '0', "HALT: b_sel must stay default");
+        check_equal(s_a_sel,            '0', "HALT: a_sel must stay default");
+        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "HALT: ALU must stay NOP");
+        check_equal(s_mem_rw_o,         '0', "HALT: mem_rw must stay default");
+        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "HALT: wb_select must stay default");
+        check_equal(to_integer(unsigned(s_imm_sel)), 0, "HALT: imm_sel must stay default");
+        check_equal(s_pc_sel,           '0', "HALT: pc_sel must stay default");
+        check_equal(s_br_un,            '0', "HALT: br_un must stay default");
+        check_equal(s_invalid_instr,    '0', "HALT: invalid_instr_o must remain 0");
 
       end if;
     end loop;
