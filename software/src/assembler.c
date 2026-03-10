@@ -451,7 +451,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	}
 	else if(instr->format == J_TYPE) {
 		imm *= 2;
-		regd = pc + 4;
+		registers[regd] = pc + 4;
 		pc += imm;
 		alu_out = pc;
 		wb_out = pc;
