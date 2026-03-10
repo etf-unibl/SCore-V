@@ -68,12 +68,12 @@ begin
   --! @details Updates PC on rising clock edge.
   --! If reset is asserted, PC is cleared to zero.
   --! Otherwise, loads the next PC value.
-  pc_reg_p : process(clk_i)
+  pc_reg_p : process(clk_i, rst_i)
   begin
-    if rising_edge(clk_i) then
-      if rst_i = '1' then
-        pc_reg <= (others => '0');
-      elsif halt_i = '1' then
+    if rst_i = '1' then
+      pc_reg <= (others => '0');
+    elsif rising_edge(clk_i) then
+      if halt_i = '1' then
         pc_reg <= pc_reg;
       else
         pc_reg <= pc_next_i;
