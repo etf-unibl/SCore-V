@@ -149,7 +149,7 @@ begin
   process(address, sign_i, width_i, mem_RW_i, DMEM, is_invalid_addr, is_misaligned_addr) is
     variable word_to_read_var : std_logic_vector(31 downto 0);
   begin
-    if is_invalid_addr = '0' and is_misaligned_addr = '0' then
+    if address >= 0 and address <= memory_bound and is_misaligned_addr = '0' then
       case width_i is
         when "00" =>
           if sign_i = '1' then
@@ -179,7 +179,7 @@ begin
   --! @details Handles writing 32-bit words into the byte-oriented DMEM array.
   --! The operation is only performed on the rising edge of clk_i when mem_RW_i is active.
   --! @param clk_i Sensitivity to the system clock.
-  process(rst_i, clk_i) is
+  process(rst_i, clk_i, is_invalid_addr) is
   begin
     if rst_i = '1' then
     --! Empty
