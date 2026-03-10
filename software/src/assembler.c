@@ -70,8 +70,6 @@ void process_file(FILE* fptr) {
  * in how those functions are handled in I_TYPE handling
  */
 void process_line(char line[256], FILE* fout, FILE* expected_out) {
-	printf("%s", line);	
-
 	char pom_word[40];
 	char line_copy[256];
 	strcpy(line_copy, line);
@@ -235,8 +233,6 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
              ((regd          & 0x1F) << 7)  |
              (instr->opcode  & 0x7F);
 
-	printf("0x%X\n\n", result);
-
 	output_result(result, output);
 	output_expected(instr, regd, reg1, reg2, 0, expected_out);
 }
@@ -256,8 +252,6 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE
              ((instr->funct3 & 0x07)  << 12) |
              ((regd          & 0x1F)  << 7)  |
              (instr->opcode  & 0x7F);
-
-	printf("0x%X\n\n", result);
 
 	output_result(result, output);
 	output_expected(instr, regd, reg1, 0, imm, expected_out);
@@ -280,8 +274,6 @@ void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE
 	         ((imm           & 0x1F)  << 7) |
              (instr->opcode  & 0x7F);
 
-	printf("0x%X\n\n", result);
-
 	output_result(result, output);
 	output_expected(instr, regd, reg1, 0, imm, expected_out);
 }
@@ -298,7 +290,6 @@ void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE
 			 ((imm           & 0x800)  << 7)   |
 			 (instr->opcode & 0x7F);
 
-	printf("0x%X\n\n", result);
 	output_result(result, output);
 	output_expected(instr, 0, reg1, reg2, imm, expected_out);
 }
@@ -313,7 +304,6 @@ void handle_j_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 			 ((regd & 0x1F) << 7) |
 			 (instr->opcode & 0x7F);
 
-	printf("0x%X\n\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, 0, 0, imm, expected_out);
 }
@@ -325,7 +315,6 @@ void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 			 ((regd & 0x1F) << 7) |
 			 (instr->opcode & 0x7F);
 
-	printf("0x%X\n\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, 0, 0, imm, expected_out);
 }
@@ -519,10 +508,6 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 			pc_old, opcode, funct3, funct7, regd, reg1, reg2, alu_out, wb_out, we);
 
 	fputs(exp_line, expected_out);
-
-	// increment program counter
-
-	printf("EXPECTED: %s\n", exp_line);
 }
 
 void bits_to_str(unsigned int value, int bits, char *out)

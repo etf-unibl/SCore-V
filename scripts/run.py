@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+import os
 
 from pathlib import Path
 from vunit import VUnit
+
+command = "./compile.sh"
+os.system(command)
 
 VU = VUnit.from_argv()
 VU.add_vhdl_builtins()
