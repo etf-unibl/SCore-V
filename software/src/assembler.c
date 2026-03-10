@@ -19,20 +19,36 @@ int main(int argc, char* argv[]) {
 
 void process_file(FILE* fptr) {
 	char line[256];
+	char line_dmem[5];
 	FILE* fout;
-	fout = fopen("../hardware/tests/program.txt", "w");
+	fout = fopen("../hardware/init_files/instruction_memory.txt", "w");
 	if(fout == NULL) {
 		printf("Unable to open program output file\n");
 		return;
 	}
 
 	FILE *expected_out;
-	expected_out = fopen("../hardware/tests/expected.txt", "w");
+	expected_out = fopen("../hardware/init_files/expected.txt", "w");
 	if(fptr == NULL) {
 		printf("Unable to open expected output file");
 		return;
 	}
 
+	// Load DMEM
+	FILE *fdmem;
+	fdmem = fopen("../hardware/init_files/data_memory.txt", "r");
+	if(fdmem == NULL) {
+		printf("Unable to load data_memory file, dmem will be empty");
+		return;
+	}
+	else {
+		int i=0;
+		while(fgets(line_dmem, sizeof(line_dmem), fdmem)) {
+			dmem[i++] = (uint8_t)strtol(line_dmem, NULL, 16);
+		}
+
+		fclose(fdmem);
+	}
 
 	while(fgets(line, sizeof(line), fptr)) {
 		process_line(line, fout, expected_out);
