@@ -269,7 +269,7 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE
 void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
-	result = ((imm           & 0xFE0) << 25) |
+	result = ((imm           & 0xFE0) << 20) |
              ((regd          & 0x1F)  << 20) |
              ((reg1          & 0x1F)  << 15) |
              ((instr->funct3 & 0x07)  << 12) |
@@ -283,13 +283,13 @@ void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE
 void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
-	result = ((imm           & 0x1000) << 31)  |
-			 ((imm           & 0x7E0)  << 25)  |
+	result = ((imm           & 0x1000) << 19)  |
+			 ((imm           & 0x7E0)  << 20)  |
              ((reg2          & 0x1F)   << 20)  |
              ((reg1          & 0x1F)   << 15)  |
 			 ((instr->funct3 & 0x07)   << 12)  |
-			 ((imm           & 0x1E)   << 8)   |
-			 ((imm           & 0x800)  << 7)   |
+			 ((imm           & 0x1E)   << 7)   |
+			 ((imm           & 0x800)  << 4)   |
 			 (instr->opcode & 0x7F);
 
 	output_result(result, output);
@@ -299,11 +299,11 @@ void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE
 void handle_j_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
-	result = ((imm & 0x100000) << 31) |
-			 ((imm & 0x7FE) << 21) |
-			 ((imm & 0x800) << 20) |
-			 ((imm & 0xFF000) << 12) |
-			 ((regd & 0x1F) << 7) |
+	result = ((imm & 0x100000) << 11) |
+			 ((imm & 0x7FE)    << 20) |
+			 ((imm & 0x800)    << 9) |
+			 ((imm & 0xFF000)  << 0) |
+			 ((regd & 0x1F)    << 7) |
 			 (instr->opcode & 0x7F);
 
 	output_result(result, output);
@@ -314,7 +314,7 @@ void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 	uint32_t result;
 
 	result = ((imm & 0xFFFFF ) << 12) |
-			 ((regd & 0x1F) << 7) |
+			 ((regd & 0x1F)    << 7)  |
 			 (instr->opcode & 0x7F);
 
 	output_result(result, output);
