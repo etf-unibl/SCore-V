@@ -51,6 +51,8 @@ void process_file(FILE* fptr) {
 	}
 
 	while(fgets(line, sizeof(line), fptr)) {
+		if(strcmp(line, ""))
+			continue;
 		process_line(line, fout, expected_out);
 	}
 
