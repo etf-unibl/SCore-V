@@ -53,8 +53,10 @@ void process_file(FILE* fptr) {
 	while(fgets(line, sizeof(line), fptr)) {
 		if(strcmp(line, "\n") == 0)
 			continue;
-		process_line(line, fout, expected_out);
+		process_line(line, fout);
 	}
+
+	generate_expected(expected_out);
 
 	fclose(fout);
 	fclose(expected_out);
@@ -72,8 +74,7 @@ int i=0;
  * that is why there is distinction
  * in how those functions are handled in I_TYPE handling
  */
-void process_line(char line[256], FILE* fout, FILE* expected_out) {
-	printf("Stigao do %d\n", i++);
+void process_line(char line[256], FILE* fout) {
 	char pom_word[40];
 	char line_copy[256];
 	strcpy(line_copy, line);
@@ -99,7 +100,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_r_type(instr, regd, reg1, reg2, fout, expected_out);
+			handle_r_type(instr, regd, reg1, reg2, fout);
 			break;
 		case I_TYPE :
 			memset(pom_word, 0, sizeof(pom_word));
@@ -115,7 +116,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 					printf("Error passing args at [%s]\n", line);
 					return;
 				}
-				handle_i_type(instr, regd, reg1, imm, fout, expected_out);
+				handle_i_type(instr, regd, reg1, imm, fout);
 				break;
 			}
 
@@ -126,7 +127,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_i_type(instr, regd, reg1, imm, fout, expected_out);
+			handle_i_type(instr, regd, reg1, imm, fout);
 			break;
 		case S_TYPE :
 			memset(pom_word, 0, sizeof(pom_word));
@@ -138,7 +139,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_s_type(instr, reg2, imm, reg1, fout, expected_out);
+			handle_s_type(instr, reg2, imm, reg1, fout);
 			break;
 		case B_TYPE :
 			reg1 = get_reg(words[1]);
@@ -148,7 +149,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_b_type(instr, imm, reg1, reg2, fout, expected_out);
+			handle_b_type(instr, imm, reg1, reg2, fout);
 			break;
 		case J_TYPE :
 			regd = get_reg(words[1]);
@@ -157,7 +158,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_j_type(instr, regd, imm, fout, expected_out);
+			handle_j_type(instr, regd, imm, fout);
 			break;
 		case U_TYPE :
 			regd = get_reg(words[1]);
@@ -166,7 +167,7 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_u_type(instr, regd, imm, fout, expected_out);
+			handle_u_type(instr, regd, imm, fout);
 			break;
 		default :
 			break;
@@ -227,7 +228,7 @@ uint8_t get_reg_ls(char word[40]) {
  * Then writes expected result to other output file using
  * function output_expected.
  */
-void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out) {
+void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output) {
 	uint32_t result;
 
 	result = ((instr->funct7 & 0x7F) << 25) |
@@ -237,9 +238,8 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
              ((regd          & 0x1F) << 7)  |
              (instr->opcode  & 0x7F);
 
-	printf("RTYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, regd, reg1, reg2, 0, expected_out);
+	store_instruction(instr, regd, reg1, reg2, 0);
 }
 
 /**
@@ -249,7 +249,7 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
  * Then writes expected result to other output file using
  * function output_expected.
  */
-void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE* output, FILE* expected_out) {
+void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE* output) {
 	uint32_t result;
 
 	result = ((imm           & 0xFFF) << 20) |
@@ -258,9 +258,8 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE
              ((regd          & 0x1F)  << 7)  |
              (instr->opcode  & 0x7F);
 
-	printf("ITYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, regd, reg1, 0, imm, expected_out);
+	store_instruction(instr, regd, reg1, 0, imm);
 }
 
 /**
@@ -270,7 +269,7 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE
  * Then writes expected result to other output file using
  * function output_expected.
  */
-void handle_s_type(Instruction* instr, uint8_t reg2, int imm, uint8_t reg1, FILE* output, FILE* expected_out) {
+void handle_s_type(Instruction* instr, uint8_t reg2, int imm, uint8_t reg1, FILE* output) {
 	uint32_t result;
 
 	result = ((imm           & 0xFE0) << 20) |
@@ -280,12 +279,11 @@ void handle_s_type(Instruction* instr, uint8_t reg2, int imm, uint8_t reg1, FILE
 	         ((imm           & 0x1F)  << 7) |
              (instr->opcode  & 0x7F);
 
-	printf("STYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, 0, reg1, reg2, imm, expected_out);
+	store_instruction(instr, 0, reg1, reg2, imm);
 }
 
-void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out) {
+void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE* output) {
 	uint32_t result;
 
 	result = ((imm           & 0x1000) << 19)  |
@@ -294,15 +292,14 @@ void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE
              ((reg1          & 0x1F)   << 15)  |
 			 ((instr->funct3 & 0x07)   << 12)  |
 			 ((imm           & 0x1E)   << 7)   |
-			 ((imm           & 0x800)  << 4)   |
+			 ((imm           & 0x800)  >> 4)   |
 			 (instr->opcode & 0x7F);
 
-	printf("BTYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, 0, reg1, reg2, imm, expected_out);
+	store_instruction(instr, 0, reg1, reg2, imm);
 }
 
-void handle_j_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE* expected_out) {
+void handle_j_type(Instruction* instr, uint8_t regd, int imm, FILE* output) {
 	uint32_t result;
 
 	result = ((imm & 0x100000) << 11) |
@@ -312,27 +309,25 @@ void handle_j_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 			 ((regd & 0x1F)    << 7) |
 			 (instr->opcode & 0x7F);
 
-	printf("JTYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, regd, 0, 0, imm, expected_out);
+	store_instruction(instr, regd, 0, 0, imm);
 }
 
-void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE* expected_out) {
+void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output) {
 	uint32_t result;
 
 	result = ((imm & 0xFFFFF ) << 12) |
 			 ((regd & 0x1F)    << 7)  |
 			 (instr->opcode & 0x7F);
 
-	printf("UTYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, regd, 0, 0, imm, expected_out);
+	store_instruction(instr, regd, 0, 0, imm);
 }
 
 /* Format of the expected result:
  * pc, opcode, f3, f7, rd, rs1, rs2, alu_out, wb_out, we
  */
-void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm, FILE* expected_out) {
+void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm, FILE* expected_out, int pc) {
 	char exp_line[400];
 	char we;
 	int wb_out;
@@ -360,7 +355,6 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 			registers[regd] = alu_out;
 		}
 		wb_out = alu_out;
-		pc += 4;
 	}
 	// If the instruction is of I_TYPE, but NOT a LOAD instruction, do the same as for R_TYPE, except imm instead of reg2
 	else if(instr->format == I_TYPE && strstr(instr->name, "lb") == NULL
@@ -368,26 +362,21 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 									&& strstr(instr->name, "lw") == NULL
 									&& strstr(instr->name, "lbu") == NULL
 									&& strstr(instr->name, "lhu") == NULL) {
-		if ((imm & 0xFFF) == 0xFFF)
-			imm = -1;
-		else if((imm & 0xFFF) == 0x000)
-			imm = 0;
+		imm = (imm << 20) >> 20;
+
 		if(strcmp(instr->name, "jalr") == 0) {
 			registers[regd] = pc + 4;
-			pc = reg1 + imm;
 			alu_out = pc;
 		}
 		else if(instr->signess == 0) {
 			alu_out = instr->signed_operation(registers[reg1], imm);
 			registers[regd] = alu_out;
-			printf("%d + %d = %d", registers[reg1], imm, registers[regd]);
 		}
 		else {
 			alu_out = instr->unsigned_operation(registers[reg1], imm);
 			registers[regd] = alu_out;
 		}
 		wb_out = alu_out;
-		pc += 4;
 	}
 	// If it's Load or Store instruction
 	else if(instr->format == S_TYPE || strcmp(instr->name, "lb") == 0 
@@ -395,10 +384,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
                                     || strcmp(instr->name, "lw") == 0
                                     || strcmp(instr->name, "lbu") == 0
                                     || strcmp(instr->name, "lhu") == 0)  {
-		if ((imm & 0xFFF) == 0xFFF)
-			imm = -1;
-		else if((imm & 0xFFF) == 0x000)
-			imm = 0;
+		imm = (imm << 20) >> 20;
 
 		alu_out = imm + registers[reg1];
 		if(instr->format == S_TYPE) {
@@ -469,38 +455,19 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 				registers[regd] = 0x000000FF & (dmem[alu_out]);
 				wb_out = registers[regd];
 			}
-			registers[regd] = dmem[alu_out];
-			wb_out = registers[regd];
 		}
-		pc += 4;
 	}
 	else if(instr->format == J_TYPE) {
-		imm &= 0xFFFFFF;
-		imm *= 2;
-		registers[regd] = pc + 4;
-		pc += imm;
-		alu_out = pc;
-		wb_out = pc;
+		uint32_t return_addr = pc + 4;
+		registers[regd] = return_addr;
+		alu_out = pc+imm;
+		wb_out = pc+imm;
 		we = '1';
 	}
 	else if(instr->format == B_TYPE) {
-		imm &= 0xFFF;
-		if(instr->signess == 0) {
-			alu_out = pc + (imm * 2);
-			if(instr->signed_operation(reg1, reg2)) {
-				pc += (imm * 2);
-			}
-			else
-				pc+=4;
-		}
-		else {
-			alu_out = pc + (imm * 2);
-			if(instr->unsigned_operation(reg1, reg2)) {
-				pc += (imm * 2);
-			}
-			else
-				pc+=4;
-		}
+		imm = (imm << 19) >> 19;
+		unsigned int branch_target = pc + imm;
+		alu_out = branch_target;
 		wb_out = 0;
 		we = '0';
 	}
@@ -558,4 +525,45 @@ void output_result(uint32_t result, FILE* output) {
 	instruction[32] = '\n';
 	instruction[33] = '\0';
 	fputs(instruction, output);
+}
+
+void store_instruction(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm) {
+    stored_instructions[total_instructions++] = (StoredInstruction){instr, regd, reg1, reg2, imm};
+}
+
+void generate_expected(FILE* expected_out) {
+    int pc = 0;
+    while(pc < total_instructions * 4) {
+        StoredInstruction* s = &stored_instructions[pc / 4];
+
+        output_expected(s->instr, s->regd, s->reg1, s->reg2, s->imm, expected_out, pc);
+
+        if(s->instr->format == J_TYPE) {
+            pc += s->imm;
+		}
+        else if(s->instr->format == B_TYPE && branch_taken(s)) {
+            pc += s->imm;
+		}
+		else if(s->instr->opcode == 0x67) {
+            pc = (registers[s->reg1] + s->imm) & ~1;
+		}
+        else {
+            pc += 4;
+		}
+    }
+}
+
+int branch_taken(StoredInstruction* s) {
+    uint32_t rs1 = registers[s->reg1];
+    uint32_t rs2 = registers[s->reg2];
+
+    switch(s->instr->funct3) {
+        case 0x0: return rs1 == rs2;
+        case 0x1: return rs1 != rs2;
+		case 0x4: return (int32_t)rs1 <  (int32_t)rs2;
+        case 0x5: return (int32_t)rs1 >= (int32_t)rs2;
+        case 0x6: return rs1 <  rs2;
+        case 0x7: return rs1 >= rs2;
+        default:  return 0;
+    }
 }
