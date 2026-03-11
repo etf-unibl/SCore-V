@@ -85,3 +85,33 @@ Selects which result (ALU output, memory data, etc.) is written back to the regi
 
 **Next PC Logic**  
 Determines the next value of the program counter based on sequential execution, branches, or jumps.
+
+## Instruction Execution Example
+
+Example instruction:
+
+> `lw x5, 0(x1)`
+
+This instruction loads a 32-bit word from memory at the address stored in register x1 and writes the result into register x5.
+
+**IF – Instruction Fetch**
+In the instruction fetch stage, the Program Counter (PC) provides the address of the current instruction.
+This address is sent to the Instruction Memory (IMEM), which returns the instruction stored at that location.
+The PC is then updated to point to the next instruction.
+
+**ID – Instruction Decode**
+In the decode stage, the Instruction Decoder extracts fields from the instruction, including the opcode, source registers, destination register, and immediate value.
+The Register File reads the value stored in register x1.
+At the same time, the Immediate Generator produces the immediate value from the instruction.
+The Control Unit generates control signals that determine how the datapath components will operate during execution.
+
+**EX – Execute**
+During the execute stage, the ALU calculates the effective memory address.
+For the lw instruction, the ALU adds the value from register x1 and the immediate offset to produce the memory address where the data is located.
+
+**MEM – Memory Access**
+In this stage, the Load/Store Unit (DMEM) reads the data from memory using the address produced by the ALU.
+The requested word is retrieved from data memory.
+
+**WB – Write Back**
+In the final stage, the Write-Back Multiplexer selects the data read from memory and writes it back into the destination register x5 in the Register File.
