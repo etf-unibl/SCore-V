@@ -24,7 +24,7 @@ typedef enum {
 int32_t registers[32];
 
 /// Data memory used in expected result generator
-uint8_t dmem[256];
+uint8_t dmem[1024];
 
 // Below functions are used in calculating expected output
 int add(int a, int b) { return a+b; }

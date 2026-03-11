@@ -51,7 +51,7 @@ void process_file(FILE* fptr) {
 	}
 
 	while(fgets(line, sizeof(line), fptr)) {
-		if(strcmp(line, ""))
+		if(strcmp(line, "\n") == 0)
 			continue;
 		process_line(line, fout, expected_out);
 	}
@@ -60,6 +60,7 @@ void process_file(FILE* fptr) {
 	fclose(expected_out);
 }
 
+int i=0;
 /**
  * Splits line by spaces, uses first argument to determine
  * the type of instruction using find_instruction.
@@ -72,6 +73,7 @@ void process_file(FILE* fptr) {
  * in how those functions are handled in I_TYPE handling
  */
 void process_line(char line[256], FILE* fout, FILE* expected_out) {
+	printf("Stigao do %d\n", i++);
 	char pom_word[40];
 	char line_copy[256];
 	strcpy(line_copy, line);
@@ -235,6 +237,7 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
              ((regd          & 0x1F) << 7)  |
              (instr->opcode  & 0x7F);
 
+	printf("RTYPE 0x%X\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, reg1, reg2, 0, expected_out);
 }
@@ -249,12 +252,13 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
 void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
-	result = ((imm           & 0x7FF) << 20) |
+	result = ((imm           & 0xFFF) << 20) |
              ((reg1          & 0x1F)  << 15) |
              ((instr->funct3 & 0x07)  << 12) |
              ((regd          & 0x1F)  << 7)  |
              (instr->opcode  & 0x7F);
 
+	printf("ITYPE 0x%X\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, reg1, 0, imm, expected_out);
 }
@@ -276,6 +280,7 @@ void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE
 	         ((imm           & 0x1F)  << 7) |
              (instr->opcode  & 0x7F);
 
+	printf("STYPE 0x%X\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, reg1, 0, imm, expected_out);
 }
@@ -292,6 +297,7 @@ void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE
 			 ((imm           & 0x800)  << 4)   |
 			 (instr->opcode & 0x7F);
 
+	printf("BTYPE 0x%X\n", result);
 	output_result(result, output);
 	output_expected(instr, 0, reg1, reg2, imm, expected_out);
 }
@@ -306,6 +312,7 @@ void handle_j_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 			 ((regd & 0x1F)    << 7) |
 			 (instr->opcode & 0x7F);
 
+	printf("JTYPE 0x%X\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, 0, 0, imm, expected_out);
 }
@@ -317,6 +324,7 @@ void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE
 			 ((regd & 0x1F)    << 7)  |
 			 (instr->opcode & 0x7F);
 
+	printf("UTYPE 0x%X\n", result);
 	output_result(result, output);
 	output_expected(instr, regd, 0, 0, imm, expected_out);
 }
@@ -360,7 +368,11 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 									&& strstr(instr->name, "lw") == NULL
 									&& strstr(instr->name, "lbu") == NULL
 									&& strstr(instr->name, "lhu") == NULL) {
-		if(strstr(instr->name, "jalr") != NULL) {
+		if ((imm & 0xFFF) == 0xFFF)
+			imm = -1;
+		else if((imm & 0xFFF) == 0x000)
+			imm = 0;
+		if(strcmp(instr->name, "jalr") == 0) {
 			registers[regd] = pc + 4;
 			pc = reg1 + imm;
 			alu_out = pc;
@@ -368,6 +380,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		else if(instr->signess == 0) {
 			alu_out = instr->signed_operation(registers[reg1], imm);
 			registers[regd] = alu_out;
+			printf("%d + %d = %d", registers[reg1], imm, registers[regd]);
 		}
 		else {
 			alu_out = instr->unsigned_operation(registers[reg1], imm);
@@ -377,7 +390,12 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		pc += 4;
 	}
 	// If it's Load or Store instruction
-	else if(strstr(instr->name, "l") != NULL || instr->format == S_TYPE) {
+	else if(instr->format == S_TYPE || strcmp(instr->name, "lb") == 0 
+                                    || strcmp(instr->name, "lh") == 0
+                                    || strcmp(instr->name, "lw") == 0
+                                    || strcmp(instr->name, "lbu") == 0
+                                    || strcmp(instr->name, "lhu") == 0)  {
+		imm &= 0xFFF;
 		alu_out = imm + registers[reg1];
 		if(instr->format == S_TYPE) {
 			// Store value of register regd to 4 bytes of dmem (because of word)
@@ -450,6 +468,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		pc += 4;
 	}
 	else if(instr->format == J_TYPE) {
+		imm &= 0xFFFFFF;
 		imm *= 2;
 		registers[regd] = pc + 4;
 		pc += imm;
@@ -458,6 +477,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		we = '1';
 	}
 	else if(instr->format == B_TYPE) {
+		imm &= 0xFFF;
 		if(instr->signess == 0) {
 			alu_out = pc + (imm * 2);
 			if(instr->signed_operation(reg1, reg2)) {
@@ -498,6 +518,8 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 	bits_to_str(instr->opcode, 7, opcode);
 	bits_to_str(instr->funct3, 3, funct3);
 	bits_to_str(instr->funct7, 7, funct7);
+
+	registers[0] = 0;
 
 	if(regd == 0 && we == 1) {
 		registers[regd] = 0;
