@@ -131,14 +131,14 @@ void process_line(char line[256], FILE* fout, FILE* expected_out) {
 		case S_TYPE :
 			memset(pom_word, 0, sizeof(pom_word));
 			strcpy(pom_word, words[2]);
-			regd = get_reg(words[1]);
+			reg2 = get_reg(words[1]);
 			imm = get_imm_ls(words[2]);
 			reg1 = get_reg_ls(pom_word);
-			if(regd == 255 || reg1 == 255) {
+			if(reg2 == 255 || reg1 == 255) {
 				printf("Error passing args at [%s]\n", line);
 				return;
 			}
-			handle_s_type(instr, regd, imm, reg1, fout, expected_out);
+			handle_s_type(instr, reg2, imm, reg1, fout, expected_out);
 			break;
 		case B_TYPE :
 			reg1 = get_reg(words[1]);
@@ -270,11 +270,11 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE
  * Then writes expected result to other output file using
  * function output_expected.
  */
-void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE* output, FILE* expected_out) {
+void handle_s_type(Instruction* instr, uint8_t reg2, int imm, uint8_t reg1, FILE* output, FILE* expected_out) {
 	uint32_t result;
 
 	result = ((imm           & 0xFE0) << 20) |
-             ((regd          & 0x1F)  << 20) |
+             ((reg2          & 0x1F)  << 20) |
              ((reg1          & 0x1F)  << 15) |
              ((instr->funct3 & 0x07)  << 12) |
 	         ((imm           & 0x1F)  << 7) |
@@ -282,7 +282,7 @@ void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE
 
 	printf("STYPE 0x%X\n", result);
 	output_result(result, output);
-	output_expected(instr, regd, reg1, 0, imm, expected_out);
+	output_expected(instr, 0, reg1, reg2, imm, expected_out);
 }
 
 void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out) {
@@ -395,26 +395,33 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
                                     || strcmp(instr->name, "lw") == 0
                                     || strcmp(instr->name, "lbu") == 0
                                     || strcmp(instr->name, "lhu") == 0)  {
-		imm &= 0xFFF;
+		if ((imm & 0xFFF) == 0xFFF)
+			imm = -1;
+		else if((imm & 0xFFF) == 0x000)
+			imm = 0;
+
 		alu_out = imm + registers[reg1];
 		if(instr->format == S_TYPE) {
-			// Store value of register regd to 4 bytes of dmem (because of word)
+			// Store value of register reg2 to 4 bytes of dmem (because of word)
 			if(strcmp(instr->name, "sw") == 0) {
-				dmem[alu_out + 3] = ((registers[regd] & 0xFF000000) >> 24);
-				dmem[alu_out + 2] = ((registers[regd] & 0xFF0000) >> 16);
-				dmem[alu_out + 1] = ((registers[regd] & 0xFF00) >> 8);
-				dmem[alu_out] = registers[regd] & 0xFF;
-				wb_out = dmem[alu_out+3] | dmem[alu_out+2] | dmem[alu_out+1] | dmem[alu_out];
+				dmem[alu_out + 3] = ((registers[reg2] & 0xFF000000) >> 24);
+				dmem[alu_out + 2] = ((registers[reg2] & 0xFF0000) >> 16);
+				dmem[alu_out + 1] = ((registers[reg2] & 0xFF00) >> 8);
+				dmem[alu_out] = registers[reg2] & 0xFF;
+				wb_out = (((uint32_t)dmem[alu_out+3]) << 24) |
+         				 (((uint32_t)dmem[alu_out+2]) << 16) |
+         				 (((uint32_t)dmem[alu_out+1]) << 8)  |
+         				 (((uint32_t)dmem[alu_out]));
 			}
-			// Store value of register regd to 2 bytes of dmem (because of half)
+			// Store value of register reg2 to 2 bytes of dmem (because of half)
 			else if(strcmp(instr->name, "sh") == 0) {
-				dmem[alu_out + 1] = ((registers[regd] & 0xFF00) >> 8);
-				dmem[alu_out] = registers[regd] & 0xFF;
-				wb_out = ((0x00001111 & (dmem[alu_out+1] | dmem[alu_out])));
+				dmem[alu_out + 1] = ((registers[reg2] & 0xFF00) >> 8);
+				dmem[alu_out] = registers[reg2] & 0xFF;
+				wb_out = ((0x00001111 & (((uint32_t)(dmem[alu_out+1] << 8)) | dmem[alu_out])));
 			}
-			// Store value of register regd to a byte of dmem (because of byte)
+			// Store value of register reg2 to a byte of dmem (because of byte)
 			else if(strcmp(instr->name, "sb") == 0) {
-				dmem[alu_out] = registers[regd] & 0xFF;
+				dmem[alu_out] = registers[reg2] & 0xFF;
 				wb_out = (0x00000011 & dmem[alu_out]);
 			}
 		}
@@ -422,9 +429,9 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 			int sign_pom;
 			// Load value from 4 bytes of dmem, signed.
 			if(strcmp(instr->name, "lw") == 0) {
-				registers[regd] = (dmem[alu_out + 3] << 24) |
-								  (dmem[alu_out + 2] << 16) |
-								  (dmem[alu_out + 1] << 8)  |
+				registers[regd] = (((uint32_t)dmem[alu_out + 3]) << 24) |
+								  (((uint32_t)dmem[alu_out + 2]) << 16) |
+								  (((uint32_t)dmem[alu_out + 1]) << 8)  |
 								  (dmem[alu_out]);
 				wb_out = registers[regd];
 			}
@@ -436,7 +443,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 					sign_pom = 0x0000FFFF;
 
 				registers[regd] = sign_pom & 
-					              	((dmem[alu_out + 1] << 8)  |
+					              	(((uint32_t)dmem[alu_out + 1] << 8)  |
 								  	(dmem[alu_out]));
 				wb_out = registers[regd];
 			}

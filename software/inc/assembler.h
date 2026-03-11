@@ -110,7 +110,7 @@ Instruction instr_table[] = {
 													   //
 	{"jal",   J_TYPE, 0x6F, 0x0, 0x00, 0, add, NULL}, //fja
 	
-	{"lui",   U_TYPE, 0x37, 0x0, 0x00, 0, utype_fun, NULL}, //fja
+	{"lui",   U_TYPE, 0x37, 0x4, 0x00, 0, utype_fun, NULL}, //fja
 	{"auipc", U_TYPE, 0x17, 0x0, 0x00, 0, utype_fun, NULL}, //fja
 };
 
@@ -167,7 +167,7 @@ void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE
 /** Handles S_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE* output, FILE* expected_out);
+void handle_s_type(Instruction* instr, uint8_t reg2, int imm, uint8_t reg1, FILE* output, FILE* expected_out);
 
 /** Handles B_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
