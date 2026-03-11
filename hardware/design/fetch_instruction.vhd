@@ -37,13 +37,12 @@
 -----------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
+use work.mem_pkg.all;
 use ieee.numeric_std.all;
+
 use std.textio.all;
 
-library design_lib;
-
-use design_lib.mem_pkg.all;
-
+use ieee.std_logic_textio.all;
 
 --! @brief Instruction fetch unit for the SCore-V processor.
 --! @details Reads a binary instruction file at simulation elaboration time
@@ -87,36 +86,37 @@ architecture arch of fetch_instruction is
   --!          uses the ram_init_file attribute instead.
   --! @param file_name Path to the instruction memory text file.
   --! @return Populated t_bytes array with instruction data.
-  --! @brief Loads instruction memory from a hex byte file.
-  --! @details Each line must contain exactly one byte as a 2-digit hex value
-  --!          (e.g. 37). Bytes are stored sequentially so that the 32-bit
-  --!          instruction at word index i is assembled little-endian from
-  --!          bytes i*4 .. i*4+3. Simulation only.
-  --! @param file_name Absolute path to instruction_memory.txt.
-  --! @return Populated t_bytes array sized to c_TOTAL_BYTES_IMEM.
   impure function initialize_memory(file_name : in string) return t_bytes
   is
-    file     f_ptr  : text;
-    variable l      : line;
-    variable result : t_bytes(0 to c_TOTAL_BYTES_IMEM - 1) := (others => (others => '0'));
-    variable temp   : std_logic_vector(7 downto 0);
-    variable i      : integer := 0;
+    file     f_ptr            : text;
+    variable l                : line;
+    variable result           : t_bytes := (others => (others => '0'));
+    variable temp             : std_logic_vector(31 downto 0);
+    variable v_max_word_index : integer := (c_TOTAL_BYTES / 4) - 1;
   begin
     file_open(f_ptr, file_name, read_mode);
-    while not endfile(f_ptr) and i < c_TOTAL_BYTES_IMEM loop
-      readline(f_ptr, l);
-      next when l'length = 0;
-      hread(l, temp);
-      result(i) := temp;
-      i := i + 1;
+    for i in 0 to v_max_word_index loop
+      if not endfile(f_ptr) then
+        readline(f_ptr, l);
+        read(l, temp);
+        result(i*4)     := temp(7  downto 0);
+        result(i*4 + 1) := temp(15 downto 8);
+        result(i*4 + 2) := temp(23 downto 16);
+        result(i*4 + 3) := temp(31 downto 24);
+      else
+        exit;
+      end if;
     end loop;
     file_close(f_ptr);
     return result;
   end function initialize_memory;
 
-  --! @brief Instruction memory array sized to c_TOTAL_BYTES_IMEM.
+  --! @brief Instruction memory array.
   --! @details Initialised from g_INIT_FILE at elaboration time in simulation.
-  signal mem : t_bytes(0 to c_TOTAL_BYTES_IMEM - 1) := initialize_memory(g_INIT_FILE);
+  --!          Declared as a signal inside this architecture so Quartus can
+  --!          infer MLAB storage. For synthesis initialisation use the
+  --!          ram_init_file attribute pointing to a .mif file.
+  signal mem : t_bytes := initialize_memory(g_INIT_FILE);
 
   signal full_instruction : std_logic_vector(31 downto 0);
 

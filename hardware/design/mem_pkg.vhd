@@ -42,79 +42,38 @@
 --
 -- instruction    |31|FUNCT7|25|    |24|RS2|20|      |19|RS1|15|   |14|FUNCT3|12|   |11|RD|7|   |6|OPCODE|0|
 -- ADD                0000000          xxxxx            yyyyy           000           zzzzz       0110011
--- SUB                0000010          xxxxx            yyyyy           000           zzzzz       0110011
--- XOR                0000000          xxxxx            yyyyy           100           zzzzz       0110011
--- OR                 0000000          xxxxx            yyyyy           110           zzzzz       0110011
--- AND                0000000          xxxxx            yyyyy           111           zzzzz       0110011
--- SLL                0000000          xxxxx            yyyyy           001           zzzzz       0110011
--- SRL                0000000          xxxxx            yyyyy           101           zzzzz       0110011
--- SRA                0000010          xxxxx            yyyyy           101           zzzzz       0110011
--- SLT                0000000          xxxxx            yyyyy           010           zzzzz       0110011
--- SLTU               0000000          xxxxx            yyyyy           011           zzzzz       0110011
 --
 ------------------------------------------------  I - TYPE  ------------------------------------------------
 --
 -- instruction    |31|IMM[11:0]|20|       |19|RS1|15|       |14|FUNCT3|12|       |11|RD|7|      |6|OPCODE|0|
 -- ADDI             xxxxxxxxxxxx             yyyyy              000                zzzzz          0010011
--- XORI             xxxxxxxxxxxx             yyyyy              100                zzzzz          0010011
--- ORI              xxxxxxxxxxxx             yyyyy              110                zzzzz          0010011
--- ANDI             xxxxxxxxxxxx             yyyyy              111                zzzzz          0010011
--- SLLI             xxxxxxxxxxxx             yyyyy              001                zzzzz          0010011
--- SRLI             xxxxxxxxxxxx             yyyyy              101                zzzzz          0010011
--- SRAI             xxxxxxxxxxxx             yyyyy              101                zzzzz          0010011
--- SLTI             xxxxxxxxxxxx             yyyyy              010                zzzzz          0010011
--- SLTIU            xxxxxxxxxxxx             yyyyy              011                zzzzz          0010011
--- LB               xxxxxxxxxxxx             yyyyy              000                zzzzz          0000011
--- LH               xxxxxxxxxxxx             yyyyy              001                zzzzz          0000011
--- LW               xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
--- LBU              xxxxxxxxxxxx             yyyyy              100                zzzzz          0000011
--- LHU              xxxxxxxxxxxx             yyyyy              101                zzzzz          0000011
--- JALR             xxxxxxxxxxxx             yyyyy              000                zzzzz          1100111
+-- LOAD WORD        xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
 --
 ------------------------------------------------  S - TYPE  ------------------------------------------------
 --
 -- instruction   |31|IMM[11:5]|25|  |24|RS2|20|  |19|RS1|15|  |14|FUNCT3|12|   |11|IMM[4:0]|7|  |6|OPCODE|0|
--- SB                xxxxxxx          yyyyy         zzzzz         000             xxxxx          0100011
--- SH                xxxxxxx          yyyyy         zzzzz         001             xxxxx          0100011
--- SW                xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
---
-------------------------------------------------  B - TYPE  ------------------------------------------------
---
--- instruction   |31|IMM[12|10:5]|25|  |24|RS2|20|  |19|RS1|15|  |14|FUNCT3|12|   |11|IMM[4:1|11]|7|  |6|OPCODE|0|
--- BEQ                  xxxxxxx            yyyyy         zzzzz         000               xxxxx           1100011
--- BNE                  xxxxxxx            yyyyy         zzzzz         001               xxxxx           1100011
--- BLT                  xxxxxxx            yyyyy         zzzzz         100               xxxxx           1100011
--- BGE                  xxxxxxx            yyyyy         zzzzz         101               xxxxx           1100011
--- BLTU                 xxxxxxx            yyyyy         zzzzz         110               xxxxx           1100011
--- BGEU                 xxxxxxx            yyyyy         zzzzz         111               xxxxx           1100011
---
-------------------------------------------------  J - TYPE  ------------------------------------------------
---
--- instruction   |31|imm[20|10:1|11|19:12]|12|              |11|RD|7|        |6|OPCODE|0|
--- JAL               xxxxxxxxxxxxxxxxxxxx                     yyyyy            1101111
---
-------------------------------------------------  U - TYPE  ------------------------------------------------
---
--- instruction        |31|imm[31:12]|12|                |11|RD|7|        |6|OPCODE|0|
--- LUI               xxxxxxxxxxxxxxxxxxxx                 zzzzz            0110111
--- AUIPC             xxxxxxxxxxxxxxxxxxxx                 zzzzz            0010111
+-- STORE WORD         xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
 --
 ------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
+
 use std.textio.all;
+
+use ieee.std_logic_textio.all;
 
 --! @brief Global definitions for instruction formats and memory.
 package mem_pkg is
-
   --! @brief Generic instruction record representing raw fetch data.
   type t_instruction_rec is record
-    opcode                 : std_logic_vector(6 downto 0);  --! Instruction opcode (bits 6:0)
-    other_instruction_bits : std_logic_vector(24 downto 0); --! Remaining bits (31:7)
+
+    opcode                      : std_logic_vector(6 downto 0);  --! Instruction opcode (bits 6:0)
+    other_instruction_bits      : std_logic_vector(24 downto 0); --! Remaining bits (31:7)
+
   end record t_instruction_rec;
 
-  --! @brief Array type representing the register file storage.
+  --! @brief Array type representing the registers storage.
   type t_regs is array (0 to 31) of std_logic_vector(31 downto 0);
   signal regs : t_regs := (
     0      => x"00000000",
@@ -132,69 +91,15 @@ package mem_pkg is
     29     => x"FFFFFFFE",
     others => (others => '0')
   );
+  --! @brief Maximums of DMEM memory and IMEM memory
+  constant c_TOTAL_BYTES : integer := 1024;
 
-  --! @brief Byte subtype and unconstrained array type used for both IMEM and DMEM.
-  subtype t_byte is std_logic_vector(7 downto 0);
-  type t_bytes   is array (natural range <>) of t_byte;
+  --! @brief Array type representing the instruction memory storage.
+  subtype t_byte  is std_logic_vector(7 downto 0);
+  type t_bytes    is array (0 to c_TOTAL_BYTES - 1) of t_byte;
 
-  --! @brief Maximum size for DMEM in bytes (2 MB).
-  constant c_TOTAL_BYTES_DMEM : integer := 2097152;
-
-  --! @brief Maximum size for IMEM in bytes (2 MB).
-  constant c_TOTAL_BYTES_IMEM : integer := 2097152;
-
-  --! @brief Package-level DMEM shared between load_store_unit and testbenches.
-  --! @details load_store_unit initialises and operates on this signal.
-  --!          score_v_sig_tb reads it directly after simulation to produce
-  --!          the signature dump. Sized to c_TOTAL_BYTES_DMEM (2 MB).
-  signal DMEM : t_bytes(0 to c_TOTAL_BYTES_DMEM - 1);
-
-  --! @brief Count non-blank lines in instruction_memory.txt (1 line = 1 byte).
-  --! @param file_name Absolute path to instruction_memory.txt.
-  --! @return Number of non-blank lines = number of IMEM bytes.
-  impure function count_imem_bytes(file_name : in string) return integer;
-
-  --! @brief Count non-blank lines in data_memory.txt and multiply by 4 (1 line = 4 bytes).
-  --! @param file_name Absolute path to data_memory.txt.
-  --! @return Number of non-blank lines * 4 = number of DMEM bytes.
-  impure function count_dmem_bytes(file_name : in string) return integer;
-
-end package mem_pkg;
+  --! @brief Array representing the data memory storage.
+end mem_pkg;
 
 package body mem_pkg is
-
-  impure function count_imem_bytes(file_name : in string) return integer
-  is
-    file     f_ptr : text;
-    variable l     : line;
-    variable n     : integer := 0;
-  begin
-    file_open(f_ptr, file_name, read_mode);
-    while not endfile(f_ptr) loop
-      readline(f_ptr, l);
-      if l'length > 0 then
-        n := n + 1;
-      end if;
-    end loop;
-    file_close(f_ptr);
-    return n;
-  end function count_imem_bytes;
-
-  impure function count_dmem_bytes(file_name : in string) return integer
-  is
-    file     f_ptr : text;
-    variable l     : line;
-    variable n     : integer := 0;
-  begin
-    file_open(f_ptr, file_name, read_mode);
-    while not endfile(f_ptr) loop
-      readline(f_ptr, l);
-      if l'length > 0 then
-        n := n + 1;
-      end if;
-    end loop;
-    file_close(f_ptr);
-    return n * 4;
-  end function count_dmem_bytes;
-
 end package body mem_pkg;

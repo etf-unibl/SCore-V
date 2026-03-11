@@ -9,8 +9,6 @@
 -- description:
 --
 --   This file implements load and store operations on DMEM.
---   DMEM is declared as a package-level signal in mem_pkg so that
---   simulation testbenches can read it directly for signature dumps.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -40,86 +38,83 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.mem_pkg.all;
+
 use std.textio.all;
 
 use ieee.std_logic_textio.all;
 
-library design_lib;
-use design_lib.mem_pkg.all;
-
 --! @brief Entity for the Load Store Unit (LSU).
---! @details Interfaces with the package-level DMEM signal in mem_pkg.
---!          Supports byte, halfword and word reads (with sign extension)
---!          and synchronous byte, halfword and word writes.
+--! @details This unit interfaces with the Data Memory (DMEM) defined in mem_pkg.
+--! It supports 32-bit (word) synchronous writes and asynchronous reads.
 entity load_store_unit is
   generic (
     --! @brief Absolute path to data_memory.txt, set by run.py.
-    --! @details Each line must contain one 32-bit word as an 8-digit hex value
-    --!          (e.g. 7D5C0837). Used in simulation only.
+    --! @details Each line must contain one byte as a 2-digit hex value.
+    --!          Used in simulation only - Quartus ignores this.
     g_INIT_FILE : string := "data_memory.txt"
   );
   port (
     clk_i        : in  std_logic;                     --! Global clock signal
     rst_i        : in  std_logic;                     --! Asynchronous reset, active high
-    sign_i       : in  std_logic;                     --! '1' = unsigned read, '0' = signed read
-    width_i      : in  std_logic_vector(1 downto 0);  --! Access width: byte=00, halfword=01, word=10
-    addr_i       : in  std_logic_vector(31 downto 0); --! Byte address for the memory access
-    mem_RW_i     : in  std_logic;                     --! '1' = write, '0' = read
-    data_write_i : in  std_logic_vector(31 downto 0); --! Data to write to memory
-    data_read_o  : out std_logic_vector(31 downto 0)  --! Data read from memory
+    sign_i       : in  std_logic;                     --! Bit telling the sign of the data to be read (1 = unsigned, 0 = signed)
+    width_i      : in  std_logic_vector(1 downto 0);  --! Type of the data to be read (byte=00, halfword=01, word=10)
+    addr_i       : in  std_logic_vector(31 downto 0); --! Memory address for access
+    mem_RW_i     : in  std_logic;                     --! Read/Write control: '1' for Write, '0' for Read
+    data_write_i : in  std_logic_vector(31 downto 0); --! Data to be stored in memory
+    data_read_o  : out std_logic_vector(31 downto 0)  --! Data loaded from memory
   );
 end load_store_unit;
 
 --! @brief Architecture implementing the LSU logic.
 architecture arch of load_store_unit is
-
+  --! Internal signal to hold the 32-bit word assembled from byte-addressable DMEM.
   signal word_to_read : std_logic_vector(31 downto 0);
   signal address      : integer;
-  signal memory_bound : integer;
-
-  --! @brief Initialise the package-level DMEM from data_memory.txt at elaboration time.
-  --! @details Each line contains one 32-bit word as 8 hex chars (e.g. 7D5C0837).
-  --!          The word is stored in little-endian byte order:
-  --!            DMEM(base+0) = bits  7:0  (LSB)
-  --!            DMEM(base+1) = bits 15:8
-  --!            DMEM(base+2) = bits 23:16
-  --!            DMEM(base+3) = bits 31:24 (MSB)
+  --! @brief Loads DMEM from a hex byte file at elaboration time.
   --! @param file_name Absolute path to data_memory.txt.
-  --! @return Populated t_bytes array sized to c_TOTAL_BYTES_DMEM.
+  --! @return Populated t_bytes array.
+  --! @brief Loads DMEM from a hex byte file at elaboration time.
+  --! @details Each line must contain one byte as a 2-digit hex value (e.g. FF).
+  --!          SIMULATION ONLY - Quartus ignores this function.
+  --! @param file_name Absolute path to data_memory.txt.
+  --! @return Populated t_bytes array.
   impure function initialize_dmem(file_name : in string) return t_bytes
   is
     file     f_ptr  : text;
     variable l      : line;
-    variable result : t_bytes(0 to c_TOTAL_BYTES_DMEM - 1) := (others => (others => '0'));
-    variable word   : std_logic_vector(31 downto 0);
-    variable i      : integer := 0;
+    variable result : t_bytes := (others => (others => '0'));
+    variable temp   : std_logic_vector(7 downto 0);
   begin
     file_open(f_ptr, file_name, read_mode);
-    while not endfile(f_ptr) and i < c_TOTAL_BYTES_DMEM - 3 loop
+    for i in 0 to c_TOTAL_BYTES - 1 loop
+      exit when endfile(f_ptr);
       readline(f_ptr, l);
-      next when l'length = 0;
-      hread(l, word);
-      result(i)     := word(7  downto 0);
-      result(i + 1) := word(15 downto 8);
-      result(i + 2) := word(23 downto 16);
-      result(i + 3) := word(31 downto 24);
-      i := i + 4;
+      hread(l, temp);
+      result(i) := temp;
     end loop;
     file_close(f_ptr);
     return result;
   end function initialize_dmem;
 
+  --! @brief Data memory array initialised from file at elaboration time.
+  signal DMEM          : t_bytes := initialize_dmem(g_INIT_FILE);
+  signal memory_bound  : integer;
 begin
-
-  --! @brief Initialise package-level DMEM from file at elaboration time.
-  DMEM <= initialize_dmem(g_INIT_FILE);
-
-  address      <= to_integer(signed(addr_i));
-  memory_bound <= c_TOTAL_BYTES_DMEM - 2 when width_i = "00" else
-                  c_TOTAL_BYTES_DMEM - 3 when width_i = "01" else
-                  c_TOTAL_BYTES_DMEM - 4;
-
-  --! @brief Asynchronous read with sign extension.
+  --! @brief Concurrent address conversion.
+  address <= to_integer(signed(addr_i));
+  memory_bound <= c_TOTAL_BYTES - 2 when width_i = "00" else
+                  c_TOTAL_BYTES - 3 when width_i = "01" else
+                  c_TOTAL_BYTES - 4;
+  --! @brief Data Read and Sign Extension Logic.
+  --! @details Performs an asynchronous read from the byte-addressable DMEM.
+  --! The process formats the output based on the requested data width and sign:
+  --! - **Byte (00)**: Loads 8 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.
+  --! - **Halfword (01)**: Loads 16 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.
+  --! - **Word (10)**: Loads 32 bits directly from four consecutive memory locations.
+  --! width_i = 11 is interpreted the same way as the width_i = 10.
+  --! @note This process is combinatorial and updates whenever address, control signals, or memory content changes.
+  --! @warning Validates that the address is within [0, memory_bound] to prevent out-of-bounds array access during simulation.
   process(address, sign_i, width_i, mem_RW_i, DMEM) is
     variable word_to_read_var : std_logic_vector(31 downto 0);
   begin
@@ -148,22 +143,24 @@ begin
     end if;
     word_to_read <= word_to_read_var;
   end process;
-
-  --! @brief Synchronous write process.
+  --! @brief Synchronous Store Process.
+  --! @details Handles writing 32-bit words into the byte-oriented DMEM array.
+  --! The operation is only performed on the rising edge of clk_i when mem_RW_i is active.
+  --! @param clk_i Sensitivity to the system clock.
   process(rst_i, clk_i) is
   begin
     if rst_i = '1' then
-      null;
+    --! Empty
     elsif rising_edge(clk_i) then
-      if mem_RW_i = '1' and address >= 0 and address <= c_TOTAL_BYTES_DMEM - 4 then
+      if mem_RW_i = '1' and address >= 0 and address <= 252 then
         case width_i is
-          when "00" =>
-            DMEM(address)     <= data_write_i(7  downto 0);
-          when "01" =>
-            DMEM(address)     <= data_write_i(7  downto 0);
+          when "00" => --! STORE BYTE (SB)
+            DMEM(address)     <= data_write_i(7 downto 0);
+          when "01" => --! STORE HALFWORD (SH)
+            DMEM(address)     <= data_write_i(7 downto 0);
             DMEM(address + 1) <= data_write_i(15 downto 8);
-          when others =>
-            DMEM(address)     <= data_write_i(7  downto 0);
+          when others => --! STORE WORD (SW)
+            DMEM(address)     <= data_write_i(7 downto 0);
             DMEM(address + 1) <= data_write_i(15 downto 8);
             DMEM(address + 2) <= data_write_i(23 downto 16);
             DMEM(address + 3) <= data_write_i(31 downto 24);
@@ -172,6 +169,7 @@ begin
     end if;
   end process;
 
+  --! @brief Output multiplexer.
+  --! @details Drives data_read_o with the loaded word if reading, or zero if writing.
   data_read_o <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
-
 end arch;
