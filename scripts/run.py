@@ -4,7 +4,9 @@ import os
 from pathlib import Path
 from vunit import VUnit
 
-command = "./compile.sh"
+script_dir = Path(__file__).parent.resolve()
+
+command = str(script_dir / "compile.sh")
 os.system(command)
 
 VU = VUnit.from_argv()
