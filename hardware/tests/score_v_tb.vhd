@@ -307,7 +307,12 @@ begin
           if step <= c_VALID_COUNT - 1 then
             check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
             check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
-            check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
+
+            if opcode_s = "0110111" or opcode_s = "0010111" then
+              check_equal(0, res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
+            else
+              check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
+            end if;
 
             if opcode_s = "0110011" then
               check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
