@@ -42,17 +42,62 @@
 --
 -- instruction    |31|FUNCT7|25|    |24|RS2|20|      |19|RS1|15|   |14|FUNCT3|12|   |11|RD|7|   |6|OPCODE|0|
 -- ADD                0000000          xxxxx            yyyyy           000           zzzzz       0110011
+-- SUB                0000010          xxxxx            yyyyy           000           zzzzz       0110011
+-- XOR                0000000          xxxxx            yyyyy           100           zzzzz       0110011
+-- OR                 0000000          xxxxx            yyyyy           110           zzzzz       0110011
+-- AND                0000000          xxxxx            yyyyy           111           zzzzz       0110011
+-- SLL                0000000          xxxxx            yyyyy           001           zzzzz       0110011
+-- SRL                0000000          xxxxx            yyyyy           101           zzzzz       0110011
+-- SRA                0000010          xxxxx            yyyyy           101           zzzzz       0110011
+-- SLT                0000000          xxxxx            yyyyy           010           zzzzz       0110011
+-- SLTU               0000000          xxxxx            yyyyy           011           zzzzz       0110011
 --
 ------------------------------------------------  I - TYPE  ------------------------------------------------
 --
 -- instruction    |31|IMM[11:0]|20|       |19|RS1|15|       |14|FUNCT3|12|       |11|RD|7|      |6|OPCODE|0|
 -- ADDI             xxxxxxxxxxxx             yyyyy              000                zzzzz          0010011
--- LOAD WORD        xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
+-- XORI             xxxxxxxxxxxx             yyyyy              100                zzzzz          0010011
+-- ORI              xxxxxxxxxxxx             yyyyy              110                zzzzz          0010011
+-- ANDI             xxxxxxxxxxxx             yyyyy              111                zzzzz          0010011
+-- SLLI             xxxxxxxxxxxx             yyyyy              001                zzzzz          0010011
+-- SRLI             xxxxxxxxxxxx             yyyyy              101                zzzzz          0010011
+-- SRAI             xxxxxxxxxxxx             yyyyy              101                zzzzz          0010011
+-- SLTI             xxxxxxxxxxxx             yyyyy              010                zzzzz          0010011
+-- SLTIU            xxxxxxxxxxxx             yyyyy              011                zzzzz          0010011
+-- LB               xxxxxxxxxxxx             yyyyy              000                zzzzz          0000011
+-- LH               xxxxxxxxxxxx             yyyyy              001                zzzzz          0000011
+-- LW               xxxxxxxxxxxx             yyyyy              010                zzzzz          0000011
+-- LBU              xxxxxxxxxxxx             yyyyy              100                zzzzz          0000011
+-- LHU              xxxxxxxxxxxx             yyyyy              101                zzzzz          0000011
+-- JALR             xxxxxxxxxxxx             yyyyy              000                zzzzz          1100111
 --
 ------------------------------------------------  S - TYPE  ------------------------------------------------
 --
 -- instruction   |31|IMM[11:5]|25|  |24|RS2|20|  |19|RS1|15|  |14|FUNCT3|12|   |11|IMM[4:0]|7|  |6|OPCODE|0|
--- STORE WORD         xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
+-- SB                xxxxxxx          yyyyy         zzzzz         000             xxxxx          0100011
+-- SH                xxxxxxx          yyyyy         zzzzz         001             xxxxx          0100011
+-- SW                xxxxxxx          yyyyy         zzzzz         010             xxxxx          0100011
+--
+------------------------------------------------  B - TYPE  ------------------------------------------------
+--
+-- instruction   |31|IMM[12|10:5]|25|  |24|RS2|20|  |19|RS1|15|  |14|FUNCT3|12|   |11|IMM[4:1|11]|7|  |6|OPCODE|0|
+-- BEQ                  xxxxxxx            yyyyy         zzzzz         000               xxxxx           1100011
+-- BNE                  xxxxxxx            yyyyy         zzzzz         001               xxxxx           1100011
+-- BLT                  xxxxxxx            yyyyy         zzzzz         004               xxxxx           1100011
+-- BGE                  xxxxxxx            yyyyy         zzzzz         005               xxxxx           1100011
+-- BLTU                 xxxxxxx            yyyyy         zzzzz         006               xxxxx           1100011
+-- BGEU                 xxxxxxx            yyyyy         zzzzz         007               xxxxx           1100011
+--
+------------------------------------------------  J - TYPE  ------------------------------------------------
+--
+-- instruction   |31|imm[20|10:1|11|19:12]|12|              |11|RD|7|        |6|OPCODE|0|
+-- JAL               xxxxxxxxxxxxxxxxxxxx                     yyyyy            1101111
+--
+------------------------------------------------  U - TYPE  ------------------------------------------------
+--
+-- instruction        |31|imm[31:12]|12|                |11|RD|7|        |6|OPCODE|0|
+-- LUI               xxxxxxxxxxxxxxxxxxxx                 zzzzz            0110111
+-- AUIPC             xxxxxxxxxxxxxxxxxxxx                 zzzzz            0010111
 --
 ------------------------------------------------------------------------------------------------------------
 
@@ -76,27 +121,12 @@ package mem_pkg is
   --! @brief Array type representing the registers storage.
   type t_regs is array (0 to 31) of std_logic_vector(31 downto 0);
   signal regs : t_regs := (
-    0      => x"00000000",
-    1      => x"00000003",
-    2      => x"00000005",
-    4      => x"00000003",
-    5      => x"00000007",
-    19     => x"F0000000",
-    20     => x"0000000F",
-    21     => x"00000033",
-    25     => x"00000001",
-    26     => x"00000002",
-    27     => x"00000002",
-    28     => x"FFFFFFFF",
-    29     => x"FFFFFFFE",
     others => (others => '0')
   );
-  --! @brief Maximums of DMEM memory and IMEM memory
-  constant c_TOTAL_BYTES : integer := 1024;
 
   --! @brief Array type representing the instruction memory storage.
   subtype t_byte  is std_logic_vector(7 downto 0);
-  type t_bytes    is array (0 to c_TOTAL_BYTES - 1) of t_byte;
+  type t_bytes    is array (natural range <>) of t_byte;
 
   --! @brief Array representing the data memory storage.
 end mem_pkg;
