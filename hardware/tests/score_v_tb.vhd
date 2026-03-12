@@ -16,6 +16,12 @@
 --   The monitor process reconstructs the 32-bit instruction from the
 --   instruction record and reports decoded fields and execution results.
 --
+--   Expected results are loaded at elaboration time from a comma-separated
+--   file whose path is passed via the g_expected_file generic. The file
+--   format per line is:
+--     pc, "opcode", "funct3", "funct7", rd, rs1, rs2, alu_out, wb_out, 'we'
+--   Blank lines are ignored. Integer fields may be negative.
+--
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
 -----------------------------------------------------------------------------
@@ -44,21 +50,21 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use std.textio.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
-library design_lib;
 
 library design_lib;
 use design_lib.mem_pkg.all;
 
 entity score_v_tb is
   generic (
-    runner_cfg  : string;
+    runner_cfg       : string;
     g_init_file      : string := "instruction_memory.txt";
-    g_dmem_init_file : string := "data_memory.txt"
+    g_dmem_init_file : string := "data_memory.txt";
+    g_expected_file  : string := "expected.txt"
   );
-
 end entity score_v_tb;
 
 architecture sim of score_v_tb is
@@ -100,68 +106,136 @@ architecture sim of score_v_tb is
 
   type expected_array is array (natural range <>) of expected_rec;
 
-  -- res reference values correspond to the instruction sequence
-  -- currently stored in IMEM. The expected PC, decode fields, ALU result
-  -- and write-enable behavior are verified according to the program
-  -- preloaded in instruction memory.
-  -- IMPORTANT:
-  -- If the content of c_IMEM changes, this table must be updated
-  -- accordingly, since verification is strictly bound to that program.
-  constant res : expected_array := (
-    0  => (0,   "0110011", "000", "0000000", 15, 1, 1, 6,        6,        '1'),
-    1  => (4,   "0110011", "000", "0000000", 7,  3, 1, 3,        3,        '1'),
-    2  => (8,   "0110011", "000", "0000000", 15, 7, 1, 6,        6,        '1'),
-    3  => (12,  "0110011", "000", "0000000", 15, 15,1, 9,        9,        '1'),
-    4  => (16,  "0110011", "000", "0000000", 15, 31,1, 3,        3,        '1'),
-    5  => (20,  "0010011", "000", "0000000", 1,  0, 0, 10,       10,       '1'),
-    6  => (24,  "0010011", "000", "0000000", 2,  0, 0, -5,       -5,       '1'),
-    7  => (28,  "0010011", "000", "0000000", 3,  1, 0, 12,       12,       '1'),
-    8  => (32,  "0000011", "010", "0000000", 2,  0, 0, 0,        869007615,'1'),
-    9  => (36,  "0000011", "010", "0000000", 1,  0, 0, 8,        128,      '1'),
-    10 => (40,  "0100011", "010", "0000000", 0,  0, 1, 25,       25,       '0'),
-    11 => (44,  "0110011", "000", "0100000", 16, 4, 5, -4,       -4,       '1'),
-    12 => (48,  "0110011", "100", "0000000", 22, 20,21, 60,       60,       '1'),
-    13 => (52,  "0010011", "100", "0000000", 23, 20,0, 10,       10,       '1'),
-    14 => (56,  "0110011", "110", "0000000", 22, 20,21, 63,       63,       '1'),
-    15 => (60,  "0010011", "110", "0000000", 23, 20,0, 15,       15,       '1'),
-    16 => (64,  "0110011", "111", "0000000", 22, 20,21, 3,        3,        '1'),
-    17 => (68,  "0010011", "111", "0000000", 23, 20,0, 5,        5,        '1'),
-    18 => (72,  "0110011", "001", "0000000", 22, 20,21, 7864320,  7864320,  '1'),
-    19 => (76,  "0010011", "001", "0000000", 23, 20,0, 480,      480,      '1'),
-    20 => (80,  "0110011", "101", "0000000", 22, 20,21, 0,        0,        '1'),
-    21 => (84,  "0010011", "101", "0000000", 23, 20,0, 0,        0,        '1'),
-    22 => (88,  "0110011", "101", "0100000", 22, 16,21, -1,       -1,       '1'),
-    23 => (92,  "0010011", "101", "0100000", 23, 16,0, -1,       -1,       '1'),
-    24 => (96,  "0110011", "010", "0000000", 22, 16,21, 1,        1,        '1'),
-    25 => (100, "0010011", "010", "0000000", 23, 20,0, 0,        0,        '1'),
-    26 => (104, "0110011", "011", "0000000", 22, 20,21, 1,        1,        '1'),
-    27 => (108, "0010011", "011", "0000000", 23, 20,0, 0,        0,        '1'),
-    28 => (112, "0000011", "000", "0000010", 24, 0,0, 36,       -16,        '1'),
-    29 => (116, "0100011", "000", "0000101",  0, 4,24, 36,        0,        '0'),
-    30 => (120, "0000011", "001", "0000010", 24, 0, 0, 36,       240,        '1'),
-    31 => (124, "0000011", "101", "0000000", 24, 0, 0, 36,       240,        '1'),
-    32 => (128, "0100011", "001", "0000000",  0, 0, 24, 36,       0,        '0'),
-    33 => (132, "0000011", "100", "0000000", 24, 0, 0, 36,       240,        '1'),
-    34 => (136, "1100011", "000", "0000000", 0, 27, 26, 140,      0,        '0'),
-    35 => (140, "1100011", "000", "0000000", 0, 27, 25, 148,      0,        '0'),
-    36 => (144, "1100011", "001", "0000000", 0, 25, 26, 152,      0,        '0'),
-    37 => (152, "1100011", "100", "0000000", 0, 25, 26, 160,      0,        '0'),
-    38 => (160, "1100011", "101", "0000000", 0, 27, 25, 168,      0,        '0'), -- branch taken
-    39 => (168, "1100011", "101", "0000000", 0, 25, 25, 176,      0,        '0'), -- branch taken
-    40 => (176, "1100011", "101", "0000000", 0, 25, 26, 184,      0,        '0'), -- branch not taken
-    41 => (180, "1100011", "101", "0000000", 0, 28, 29, 188,      0,        '0'),
-    42 => (188, "1100011", "101", "0000000", 0, 29, 29, 196,      0,        '0'), -- branch taken
-    43 => (196, "1100011", "101", "0000000", 0, 28, 29, 204,      0,        '0'), -- branch taken
-    44 => (204, "1100011", "110", "0000000", 0, 25, 26, 212,      0,        '0'), -- BLTU taken
-    45 => (212, "1100011", "110", "0000000", 0, 27, 25, 220,      0,        '0'), -- BLTU not taken
-    46 => (216, "1100011", "111", "0000000", 0, 27, 25, 224,      0,        '0'), -- BGEU taken
-    47 => (224, "1100011", "111", "0000000", 0, 25, 25, 232,      0,        '0'), -- BGEU taken
-    48 => (232, "1100011", "111", "0000000", 0, 25, 26, 240,      0,        '0'), -- BGEU not taken
-    49 => (236, "1101111", "000", "0000000", 6,  0,  0, 240,    240,        '1'), -- JAL
-    50 => (240, "1100111", "000", "0000000", 2,  1,  0,   1,      5,        '1'), -- JALR
-    51 => (244, "0010111", "000", "0000000", 7,  0,  0, 4340,  4340,        '1'), -- AUIPC
-    52 => (248, "0110111", "000", "0000000", 14, 0,  0,   0,  16384,        '1')  -- LUI
+  --! @brief Maximum number of expected entries the file can contain.
+  constant c_MAX_EXPECTED : integer := 256;
+
+  --! @brief Empty record used to pad unused slots in the result array.
+  constant c_EMPTY_REC : expected_rec := (
+    pc      => 0,
+    opcode  => "0000000",
+    funct3  => "000",
+    funct7  => "0000000",
+    rd      => 0,
+    rs1     => 0,
+    rs2     => 0,
+    alu_out => 0,
+    wb_out  => 0,
+    we      => '0'
   );
+
+  --! @brief Counts the number of non-blank lines in the expected file.
+  --! @param file_name Absolute path to the expected values file.
+  --! @return Number of non-blank lines found.
+  impure function count_expected_rows(file_name : in string) return integer is
+    file     f_ptr : text;
+    variable l     : line;
+    variable n     : integer := 0;
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    while not endfile(f_ptr) loop
+      readline(f_ptr, l);
+      if l'length > 0 then
+        n := n + 1;
+      end if;
+    end loop;
+    file_close(f_ptr);
+    return n;
+  end function count_expected_rows;
+
+  --! @brief Parses a comma-separated expected-results file into an expected_array.
+  --! @details Each line format:
+  --!   pc, "opcode", "funct3", "funct7", rd, rs1, rs2, alu_out, wb_out, 'we'
+  --!   Binary fields are double-quoted, we is single-quoted.
+  --!   Integer fields may be negative. Blank lines are skipped.
+  --! @param file_name Absolute path to the expected values file.
+  --! @return Populated expected_array padded with c_EMPTY_REC up to c_MAX_EXPECTED.
+  impure function parse_expected_file(file_name : in string) return expected_array is
+    file     f_ptr  : text;
+    variable l      : line;
+    variable result : expected_array(0 to c_MAX_EXPECTED - 1) := (others => c_EMPTY_REC);
+    variable row    : integer := 0;
+    variable ch     : character;
+    variable good   : boolean;
+    variable slv7   : std_logic_vector(6 downto 0);
+    variable slv3   : std_logic_vector(2 downto 0);
+
+    --! @brief Read one integer (possibly negative) stopping at the next non-digit.
+    procedure get_int(variable li : inout line; variable val : out integer) is
+      variable ci   : character;
+      variable gi   : boolean;
+      variable acc  : integer := 0;
+      variable neg  : boolean := false;
+    begin
+      while li'length > 0 loop read(li, ci); exit when ci /= ' ' and ci /= ','; end loop;
+      if ci = '-' then neg := true; read(li, ci, gi); end if;
+      while ci >= '0' and ci <= '9' loop
+        acc := acc * 10 + (character'pos(ci) - character'pos('0'));
+        exit when li'length = 0;
+        read(li, ci, gi);
+      end loop;
+      if neg then val := -acc; else val := acc; end if;
+    end procedure;
+
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    while not endfile(f_ptr) and row < c_MAX_EXPECTED loop
+      readline(f_ptr, l);
+      next when l'length = 0;
+
+      -- pc
+      get_int(l, result(row).pc);
+
+      -- opcode (7-bit binary, double-quoted)
+      while l'length > 0 loop read(l, ch); exit when ch = '"'; end loop;
+      for i in 6 downto 0 loop
+        read(l, ch, good);
+        slv7(i) := '1' when ch = '1' else '0';
+      end loop;
+      read(l, ch, good);
+      result(row).opcode := slv7;
+
+      -- funct3 (3-bit binary, double-quoted)
+      while l'length > 0 loop read(l, ch); exit when ch = '"'; end loop;
+      for i in 2 downto 0 loop
+        read(l, ch, good);
+        slv3(i) := '1' when ch = '1' else '0';
+      end loop;
+      read(l, ch, good);
+      result(row).funct3 := slv3;
+
+      -- funct7 (7-bit binary, double-quoted)
+      while l'length > 0 loop read(l, ch); exit when ch = '"'; end loop;
+      for i in 6 downto 0 loop
+        read(l, ch, good);
+        slv7(i) := '1' when ch = '1' else '0';
+      end loop;
+      read(l, ch, good);
+      result(row).funct7 := slv7;
+
+      -- rd, rs1, rs2, alu_out, wb_out
+      get_int(l, result(row).rd);
+      get_int(l, result(row).rs1);
+      get_int(l, result(row).rs2);
+      get_int(l, result(row).alu_out);
+      get_int(l, result(row).wb_out);
+
+      -- we (std_logic, single-quoted)
+      while l'length > 0 loop read(l, ch); exit when ch = '''; end loop;
+      read(l, ch, good);
+      result(row).we := '1' when ch = '1' else '0';
+
+      row := row + 1;
+    end loop;
+    file_close(f_ptr);
+    return result;
+  end function parse_expected_file;
+
+  --! @brief Number of valid entries in res, counted from g_expected_file.
+  constant c_VALID_COUNT : integer := count_expected_rows(g_expected_file);
+
+  --! @brief Expected results loaded from g_expected_file at elaboration time.
+  constant res : expected_array(0 to c_MAX_EXPECTED - 1) :=
+    parse_expected_file(g_expected_file);
 
 begin
 
@@ -191,7 +265,7 @@ begin
     generic map (
       g_INIT_FILE => g_init_file
     )
-    port map(
+    port map (
       instruction_count_i => instr_addr_s,
       instruction_bits_o  => fetch_instr_s
     );
@@ -225,12 +299,12 @@ begin
         wait until rising_edge(clk_s);
         rst_s <= '0';
 
-        for i in 0 to 48 loop
+        for i in 0 to c_VALID_COUNT - 1 loop
           wait until rising_edge(clk_s);
 
           full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
-          if step <= res'high then
+          if step <= c_VALID_COUNT - 1 then
             check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
             check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
             check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
