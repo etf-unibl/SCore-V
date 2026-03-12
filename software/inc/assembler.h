@@ -24,7 +24,7 @@ typedef enum {
 int32_t registers[32];
 
 /// Data memory used in expected result generator
-uint8_t dmem[256];
+uint8_t dmem[1024];
 
 // Below functions are used in calculating expected output
 int add(int a, int b) { return a+b; }
@@ -47,11 +47,6 @@ unsigned int bltu(unsigned int a, unsigned int b) { return a<b; }
 unsigned int bgeu(unsigned int a, unsigned int b) { return a<b; }
 
 /**
- * Program Counter, used for expected result generator
- */
-unsigned int pc = 0;
-
-/**
  * Struct used for defining different types of instructions.
  */
 typedef struct {
@@ -64,6 +59,15 @@ typedef struct {
 	int (*signed_operation)(int, int);
     unsigned int (*unsigned_operation)(unsigned int, unsigned int);
 } Instruction;
+
+typedef struct {
+	Instruction* instr;
+	uint8_t regd, reg1, reg2;
+	int imm;
+} StoredInstruction;
+
+StoredInstruction stored_instructions[1024];
+int total_instructions = 0;
 
 /**
  * Table of currently supported functions
@@ -101,17 +105,17 @@ Instruction instr_table[] = {
 	{"sh",    S_TYPE, 0x23, 0x1, 0x00, 1, NULL, addiu},
 	{"sw",    S_TYPE, 0x23, 0x2, 0x00, 1, NULL, addiu},
 
-	{"beq",   B_TYPE, 0x63, 0x0, 0x00, 0, beq, NULL}, //fja
-	{"bne",   B_TYPE, 0x63, 0x1, 0x00, 0, bne, NULL}, //fja
-	{"blt",   B_TYPE, 0x63, 0x4, 0x00, 0, blt, NULL}, //fja
-	{"bge",   B_TYPE, 0x63, 0x5, 0x00, 0, bge, NULL}, //fja
-	{"bltu",  B_TYPE, 0x63, 0x6, 0x00, 1, NULL, bltu}, //fja
-	{"bgeu",  B_TYPE, 0x63, 0x7, 0x00, 1, NULL, bgeu}, //fja
-													   //
-	{"jal",   J_TYPE, 0x6F, 0x0, 0x00, 0, add, NULL}, //fja
+	{"beq",   B_TYPE, 0x63, 0x0, 0x00, 0, beq, NULL},
+	{"bne",   B_TYPE, 0x63, 0x1, 0x00, 0, bne, NULL},
+	{"blt",   B_TYPE, 0x63, 0x4, 0x00, 0, blt, NULL},
+	{"bge",   B_TYPE, 0x63, 0x5, 0x00, 0, bge, NULL},
+	{"bltu",  B_TYPE, 0x63, 0x6, 0x00, 1, NULL, bltu},
+	{"bgeu",  B_TYPE, 0x63, 0x7, 0x00, 1, NULL, bgeu},
+												
+	{"jal",   J_TYPE, 0x6F, 0x0, 0x00, 0, add, NULL},
 	
-	{"lui",   U_TYPE, 0x37, 0x0, 0x00, 0, utype_fun, NULL}, //fja
-	{"auipc", U_TYPE, 0x17, 0x0, 0x00, 0, utype_fun, NULL}, //fja
+	{"lui",   U_TYPE, 0x37, 0x0, 0x00, 0, utype_fun, NULL},
+	{"auipc", U_TYPE, 0x17, 0x0, 0x00, 0, utype_fun, NULL},
 };
 
 /** Function that call process_line function on each line
@@ -119,10 +123,10 @@ Instruction instr_table[] = {
  */
 void process_file(FILE *fptr);
 
-/** Function that find type of instruction (R, I or S) and
+/** Function that find type of instruction (R, I, S, J, B or U) and
  * converts it to machine code approprietely.
  */
-void process_line(char line[256], FILE* fout, FILE* expected_out);
+void process_line(char line[256], FILE* fout);
 
 /** Returns register number from a string,
  * used in handle_x_type functions.
@@ -151,42 +155,56 @@ uint8_t get_reg_ls(char word[40]);
  */
 void output_result(uint32_t result, FILE* output);
 
+/** Stores instruction on first pass (when generating machine code)
+ */
+void store_instruction(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm);
+
+/**
+ * Generates expected results and writes them to expected.txt.
+ */
+void generate_expected(FILE* expected_out);
+
+/**
+ * Checks if branch occured
+ */
+int branch_taken(StoredInstruction* s);
+
 /** Helper function that finds type of instrucion */
 Instruction* find_instruction(const char *name);
 
 /** Handles R_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out);
+void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, FILE* output);
 
 /** Handles I_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE* output, FILE* expected_out);
+void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE* output);
 
 /** Handles S_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_s_type(Instruction* instr, uint8_t regd, int imm, uint8_t reg1, FILE* output, FILE* expected_out);
+void handle_s_type(Instruction* instr, uint8_t reg2, int imm, uint8_t reg1, FILE* output);
 
 /** Handles B_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE* output, FILE* expected_out);
+void handle_b_type(Instruction* instr, int imm, uint8_t reg1, uint8_t reg2, FILE* output);
 
 /** Handles J_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_j_type(Instruction* instr, uint8_t regd, int imm,  FILE* output, FILE* expected_out);
+void handle_j_type(Instruction* instr, uint8_t regd, int imm,  FILE* output);
 
 /** Handles U_TYPE instructions, fills uint32_t result and
  *  calls output_result function.
  */
-void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output, FILE* expected_out);
+void handle_u_type(Instruction* instr, uint8_t regd, int imm, FILE* output);
 
 /** Prints expected output
  */
-void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm, FILE* expected_out);
+void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm, FILE* expected_out, int pc);
 
 /**
  * Converts value to string of value's bits

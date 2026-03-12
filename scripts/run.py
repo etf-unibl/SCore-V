@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 
 from pathlib import Path
 from vunit import VUnit
@@ -38,6 +39,5 @@ score_v_tb = testbench_lib.test_bench("score_v_tb")
 score_v_tb.set_generic("g_init_file",      IMEM_FILE)
 score_v_tb.set_generic("g_dmem_init_file", DMEM_FILE)
 score_v_tb.set_generic("g_expected_file",  EXPECTED_FILE)
-
 
 VU.main()

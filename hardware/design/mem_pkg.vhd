@@ -121,19 +121,6 @@ package mem_pkg is
   --! @brief Array type representing the registers storage.
   type t_regs is array (0 to 31) of std_logic_vector(31 downto 0);
   signal regs : t_regs := (
-    0      => x"00000000",
-    1      => x"00000003",
-    2      => x"00000005",
-    4      => x"00000003",
-    5      => x"00000007",
-    19     => x"F0000000",
-    20     => x"0000000F",
-    21     => x"00000033",
-    25     => x"00000001",
-    26     => x"00000002",
-    27     => x"00000002",
-    28     => x"FFFFFFFF",
-    29     => x"FFFFFFFE",
     others => (others => '0')
   );
 

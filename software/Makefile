@@ -2,4 +2,8 @@ make:
 
 assembler:
 	mkdir -p ./obj/
-	gcc -Wall ./src/assembler.c ./inc/assembler.h -o ./obj/assembler
+	gcc -Wall -Wextra ./src/assembler.c ./inc/assembler.h -o ./obj/assembler
+
+debug:
+	mkdir -p ./obj/
+	gcc -g -O0 -Wall -Wextra ./src/assembler.c ./inc/assembler.h -o ./obj/assembler
