@@ -39,7 +39,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use std.textio.all;
-use ieee.std_logic_textio.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -56,35 +55,6 @@ entity load_store_unit_tb is
 end load_store_unit_tb;
 
 architecture arch of load_store_unit_tb is
-
-  -- ----------------------------------------------------------------
-  --  Local initialize_dmem and DMEM signal - mirrors what
-  --  load_store_unit does internally. Used by the store tests to
-  --  verify memory contents directly after a write operation.
-  -- ----------------------------------------------------------------
-  impure function initialize_dmem(file_name : in string) return t_bytes is
-    file     f_ptr  : text;
-    variable l      : line;
-    variable result : t_bytes := (others => (others => '0'));
-    variable temp   : std_logic_vector(7 downto 0);
-  begin
-    file_open(f_ptr, file_name, read_mode);
-    for i in 0 to c_TOTAL_BYTES - 1 loop
-      exit when endfile(f_ptr);
-      readline(f_ptr, l);
-      hread(l, temp);
-      result(i) := temp;
-    end loop;
-    file_close(f_ptr);
-    return result;
-  end function initialize_dmem;
-
-  --! @brief Local DMEM mirror - initialised from same file as UUT.
-  --! @details Store tests read this to verify what was written.
-  --!          This signal reflects the UUT's internal DMEM state
-  --!          only indirectly - store tests write via the UUT and
-  --!          then read back through the UUT's data_read_o port.
-  signal DMEM : t_bytes := initialize_dmem(g_init_file);
 
   signal clk_s        : std_logic := '0';
   signal rst_s        : std_logic := '0';
