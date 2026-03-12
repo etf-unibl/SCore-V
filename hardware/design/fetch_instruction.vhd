@@ -37,9 +37,12 @@
 -----------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-library design_lib;
-use design_lib.mem_pkg.all;
 use ieee.numeric_std.all;
+
+library design_lib;
+
+use design_lib.mem_pkg.all;
+
 
 --! @brief Instruction fetch unit for the SCore-V processor.
 --! @details Wraps the IMEM entity and splits the fetched 32-bit word into

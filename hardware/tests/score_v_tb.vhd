@@ -126,7 +126,8 @@ architecture sim of score_v_tb is
   --! @brief Counts the number of non-blank lines in the expected file.
   --! @param file_name Absolute path to the expected values file.
   --! @return Number of non-blank lines found.
-  impure function count_expected_rows(file_name : in string) return integer is
+  impure function count_expected_rows(file_name : in string) return integer
+  is
     file     f_ptr : text;
     variable l     : line;
     variable n     : integer := 0;

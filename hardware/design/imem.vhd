@@ -42,9 +42,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-library design_lib;
-use design_lib.mem_pkg.all;
 use std.textio.all;
+
+library design_lib;
+
+use design_lib.mem_pkg.all;
+
 
 --! @brief Instruction Memory (IMEM) entity for the SCore-V processor.
 --! @details Initialised from a hex byte file (one byte per line) at
@@ -71,7 +74,7 @@ architecture arch of imem is
 
   --! @brief Counts non-blank lines in the init file to determine memory size.
   impure function count_bytes(file_name : in string) return integer
-is
+  is
     file     f_ptr : text;
     variable l     : line;
     variable n     : integer := 0;
@@ -112,14 +115,14 @@ is
   constant c_MEM_SIZE : integer := count_bytes(g_INIT_FILE);
 
   --! @brief Instruction memory contents, initialised at elaboration time.
-  constant mem : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
+  constant c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
 
 begin
 
   --! @brief Asynchronous little-endian 32-bit read.
-  data_o <= mem(to_integer(unsigned(addr_i)) + 3) &
-            mem(to_integer(unsigned(addr_i)) + 2) &
-            mem(to_integer(unsigned(addr_i)) + 1) &
-            mem(to_integer(unsigned(addr_i)));
+  data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
+            c_MEM(to_integer(unsigned(addr_i)) + 2) &
+            c_MEM(to_integer(unsigned(addr_i)) + 1) &
+            c_MEM(to_integer(unsigned(addr_i)));
 
 end arch;

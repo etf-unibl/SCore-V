@@ -39,12 +39,16 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-library design_lib;
-use design_lib.mem_pkg.all;
 use std.textio.all;
+
+library design_lib;
+
+use design_lib.mem_pkg.all;
+
 
 --! @brief Data Memory (DMEM) entity for the SCore-V processor.
 --! @details Initialised from a hex word file (one 32-bit word per line) at
