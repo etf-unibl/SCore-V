@@ -37,27 +37,19 @@
 -----------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use work.mem_pkg.all;
+library design_lib;
+use design_lib.mem_pkg.all;
 use ieee.numeric_std.all;
 
-use std.textio.all;
-
-use ieee.std_logic_textio.all;
-
 --! @brief Instruction fetch unit for the SCore-V processor.
---! @details Reads a binary instruction file at simulation elaboration time
---!          and provides asynchronous instruction word output based on the
---!          current program counter address. The memory array is local to
---!          this architecture so Quartus can infer MLAB storage instead of
---!          consuming ALMs. For synthesis, replace g_INIT_FILE with a .mif
---!          file and add the ram_init_file attribute.
+--! @details Wraps the IMEM entity and splits the fetched 32-bit word into
+--!          the t_instruction_rec record expected by the rest of the pipeline.
 entity fetch_instruction is
   generic
   (
     g_ADDR_WIDTH : integer := 32;
+    --! @brief Size of instruction memory in bytes.
     --! @brief Path to the instruction memory initialisation file.
-    --! @details Used in simulation only. Each line must contain one
-    --!          32-bit binary word. Ignored by Quartus at synthesis.
     g_INIT_FILE  : string  := "instruction_memory.txt"
   );
   port
@@ -69,65 +61,21 @@ entity fetch_instruction is
   );
 end fetch_instruction;
 
---! @brief RTL architecture for the instruction fetch unit.
---! @details Contains the instruction memory array and the asynchronous
---!          read logic. The initialize_memory function is defined locally
---!          so that both Quartus and ModelSim accept the impure function
---!          call as a signal initializer without elaboration order issues.
 architecture arch of fetch_instruction is
-
-  --! @brief Loads instruction memory from a binary text file.
-  --! @details Called once at elaboration time (simulation time = 0) to
-  --!          populate the local mem signal. Each line of the file must
-  --!          contain exactly one 32-bit binary word. Bytes are stored
-  --!          in little-endian order: bits 7:0 of the word go to byte i*4,
-  --!          bits 15:8 to i*4+1, bits 23:16 to i*4+2, bits 31:24 to i*4+3.
-  --!          This function is simulation-only - Quartus ignores it and
-  --!          uses the ram_init_file attribute instead.
-  --! @param file_name Path to the instruction memory text file.
-  --! @return Populated t_bytes array with instruction data.
-  impure function initialize_memory(file_name : in string) return t_bytes
-  is
-    file     f_ptr            : text;
-    variable l                : line;
-    variable result           : t_bytes := (others => (others => '0'));
-    variable temp             : std_logic_vector(31 downto 0);
-    variable v_max_word_index : integer := (c_TOTAL_BYTES / 4) - 1;
-  begin
-    file_open(f_ptr, file_name, read_mode);
-    for i in 0 to v_max_word_index loop
-      if not endfile(f_ptr) then
-        readline(f_ptr, l);
-        read(l, temp);
-        result(i*4)     := temp(7  downto 0);
-        result(i*4 + 1) := temp(15 downto 8);
-        result(i*4 + 2) := temp(23 downto 16);
-        result(i*4 + 3) := temp(31 downto 24);
-      else
-        exit;
-      end if;
-    end loop;
-    file_close(f_ptr);
-    return result;
-  end function initialize_memory;
-
-  --! @brief Instruction memory array.
-  --! @details Initialised from g_INIT_FILE at elaboration time in simulation.
-  --!          Declared as a signal inside this architecture so Quartus can
-  --!          infer MLAB storage. For synthesis initialisation use the
-  --!          ram_init_file attribute pointing to a .mif file.
-  signal mem : t_bytes := initialize_memory(g_INIT_FILE);
 
   signal full_instruction : std_logic_vector(31 downto 0);
 
 begin
 
-  --! @brief Asynchronous read from local mem signal.
-  --! @description Behaviour identical to original c_IMEM read in mem_pkg.
-  full_instruction <= mem(to_integer(unsigned(instruction_count_i)) + 3) &
-                      mem(to_integer(unsigned(instruction_count_i)) + 2) &
-                      mem(to_integer(unsigned(instruction_count_i)) + 1) &
-                      mem(to_integer(unsigned(instruction_count_i)));
+  --! @brief IMEM instantiation - delegates all memory storage and read logic.
+  u_imem : entity design_lib.imem
+    generic map (
+      g_INIT_FILE => g_INIT_FILE
+    )
+    port map (
+      addr_i => instruction_count_i,
+      data_o => full_instruction
+    );
 
   instruction_bits_o.opcode                 <= full_instruction(6 downto 0);
   instruction_bits_o.other_instruction_bits <= full_instruction(31 downto 7);
