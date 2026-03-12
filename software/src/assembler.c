@@ -366,17 +366,19 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 
 		if(strcmp(instr->name, "jalr") == 0) {
 			registers[regd] = pc + 4;
-			alu_out = pc;
+			alu_out = registers[reg1] + imm;
+			wb_out = pc + 4;
 		}
 		else if(instr->signess == 0) {
 			alu_out = instr->signed_operation(registers[reg1], imm);
 			registers[regd] = alu_out;
+			wb_out = alu_out;
 		}
 		else {
 			alu_out = instr->unsigned_operation(registers[reg1], imm);
 			registers[regd] = alu_out;
+			wb_out = alu_out;
 		}
-		wb_out = alu_out;
 	}
 	// If it's Load or Store instruction
 	else if(instr->format == S_TYPE || strcmp(instr->name, "lb") == 0 
@@ -461,7 +463,7 @@ void output_expected(Instruction *instr, uint8_t regd, uint8_t reg1, uint8_t reg
 		uint32_t return_addr = pc + 4;
 		registers[regd] = return_addr;
 		alu_out = pc+imm;
-		wb_out = pc+imm;
+		wb_out = return_addr;
 		we = '1';
 	}
 	else if(instr->format == B_TYPE) {
