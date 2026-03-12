@@ -61,6 +61,7 @@ architecture arch of pc_tb is
   signal sim_stop_s  : std_logic := '0';
   signal pc_sel_s    : std_logic := '0';
   signal pc_target_s : std_logic_vector(31 downto 0) := (others => '0');
+  signal pc4_sig     : std_logic_vector(31 downto 0) := (others => '0');
 
   constant c_CLK_PERIOD : time := 10 ns;
 
@@ -88,6 +89,7 @@ begin
       pc_target_i => pc_target_s,
       pc_sel_i    => pc_sel_s,
       pc_i        => pc_out,
+      pc4_o       => pc4_sig,
       pc_next_o   => pc_next
     );
 
