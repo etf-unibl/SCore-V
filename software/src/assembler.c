@@ -522,11 +522,10 @@ void bits_to_str(unsigned int value, int bits, char *out)
  * Writes instruction machine code to output file
  */
 void output_result(uint32_t result, FILE* output) {
-	char instruction[35];
-	bits_to_str(result, 32, instruction);
-	instruction[32] = '\n';
-	instruction[33] = '\0';
-	fputs(instruction, output);
+	fprintf(output, "%02X\n%02X\n%02X\n%02X\n", result & 0xFF,
+										(result & 0xFF00)     >> 8,
+										(result & 0xFF0000)   >> 16,
+										(result & 0xFF000000) >> 24);
 }
 
 void store_instruction(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm) {
