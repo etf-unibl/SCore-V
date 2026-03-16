@@ -65,7 +65,6 @@ void process_file(FILE* fptr) {
 			pom[2] = '\0';
 			dmem[i] = (uint8_t)strtol(pom, NULL, 16);
 
-			printf("%02X\n%02X\n%02X\n%02X\n", dmem[i], dmem[i+1], dmem[i+2], dmem[i+3]);
 			i+=4;
 		}
 
