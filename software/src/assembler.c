@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
 void process_file(FILE* fptr) {
 	char line[256];
-	char line_dmem[5];
+	char line_dmem[10];
 	FILE* fout;
 	fout = fopen("../hardware/init_files/instruction_memory.txt", "w");
 	if(fout == NULL) {
@@ -44,7 +44,29 @@ void process_file(FILE* fptr) {
 	else {
 		int i=0;
 		while(fgets(line_dmem, sizeof(line_dmem), fdmem)) {
-			dmem[i++] = (uint8_t)strtol(line_dmem, NULL, 16);
+			char pom[3];
+			pom[0] = line_dmem[0];
+			pom[1] = line_dmem[1];
+			pom[2] = '\0';
+			dmem[i+3] = (uint8_t)strtol(pom, NULL, 16);
+
+			pom[0] = line_dmem[2];
+			pom[1] = line_dmem[3];
+			pom[2] = '\0';
+			dmem[i+2] = (uint8_t)strtol(pom, NULL, 16);
+
+			pom[0] = line_dmem[4];
+			pom[1] = line_dmem[5];
+			pom[2] = '\0';
+			dmem[i+1] = (uint8_t)strtol(pom, NULL, 16);
+
+			pom[0] = line_dmem[6];
+			pom[1] = line_dmem[7];
+			pom[2] = '\0';
+			dmem[i] = (uint8_t)strtol(pom, NULL, 16);
+
+			printf("%02X\n%02X\n%02X\n%02X\n", dmem[i], dmem[i+1], dmem[i+2], dmem[i+3]);
+			i+=4;
 		}
 
 		fclose(fdmem);
