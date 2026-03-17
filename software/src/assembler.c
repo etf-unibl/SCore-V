@@ -71,10 +71,28 @@ void process_file(FILE* fptr) {
 		fclose(fdmem);
 	}
 
-	while(fgets(line, sizeof(line), fptr)) {
-		if(strcmp(line, "\n") == 0)
-			continue;
-		process_line(line, fout);
+	while (fgets(line, sizeof(line), fptr)) {
+    	// Remove comment
+    	char *comment = strchr(line, '#');
+    	if (comment != NULL)
+        	*comment = '\0';
+
+    	// Trim leading whitespace
+    	char *start = line;
+    	while (*start == ' ' || *start == '\t')
+        	start++;
+
+    	// Trim trailing whitespace
+    	char *end = start + strlen(start) - 1;
+    	while (end >= start && (*end == ' ' || *end == '\t' || *end == '\n'))
+        	*end-- = '\0';
+
+    	// Skip empty lines
+    	if (*start == '\0')
+        	continue;
+
+    	printf("%s\n", start);
+    	process_line(start, fout);
 	}
 
 	generate_expected(expected_out);
