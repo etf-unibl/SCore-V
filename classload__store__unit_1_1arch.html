@@ -74,126 +74,55 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#Functions">Functions</a> &#124;
+<a href="#Instantiations">Instantiations</a> &#124;
 <a href="#Processes">Processes</a> &#124;
 <a href="#Signals">Signals</a>  </div>
   <div class="headertitle"><div class="title">arch Architecture Reference</div></div>
 </div><!--header-->
 <div class="contents">
-
-<p>Architecture implementing the LSU logic.  
- <a href="classload__store__unit_1_1arch.html#details">More...</a></p>
 <b>Architecture &gt;&gt; </b><a class="el" href="classload__store__unit_1_1arch.html">arch</a><br />
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Functions" name="Functions"></a>
-Functions</h2></td></tr>
- <tr class="memitem:a8f47229818850495f1f79b87c92da413"><td class="memItemLeft" align="right" valign="top"><b><b><b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> <span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <a class="el" href="classload__store__unit_1_1arch.html#a8f47229818850495f1f79b87c92da413">initialize_dmem</a><b> ( </b><b><span class="vhdlchar">file_name: </span><span class="stringliteral">in </span><span class="vhdlchar">in  string</span></b><b> )&#160;</td><td class="memItemRight" valign="bottom"><b>[ impure ]</b></b></td></tr>
-<tr class="memdesc:a8f47229818850495f1f79b87c92da413"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads DMEM from a hex byte file at elaboration time.  <a href="#a8f47229818850495f1f79b87c92da413"></a><br /></td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Processes" name="Processes"></a>
 Processes</h2></td></tr>
- <tr class="memitem:a2e7550a0c8818d7bdb6a8b537c323ecf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a2e7550a0c8818d7bdb6a8b537c323ecf">PROCESS_2</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classload__store__unit_1_1arch.html#a4d21ba8f48848d93d373dced3c3f72d9">address</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit.html#aa69c0014783e759c7e1316923565c0f9">sign_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit.html#a3b7c3ebf55e91939ebd79c0bb691599b">width_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit.html#ab3aeae00a6a62bbd6e23d91bc37746d1">mem_RW_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit_1_1arch.html#a8c2143f4208773a7e967dd64e2100c7d">DMEM</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
-<tr class="memdesc:a2e7550a0c8818d7bdb6a8b537c323ecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concurrent address conversion.  <a href="#a2e7550a0c8818d7bdb6a8b537c323ecf"></a><br /></td></tr>
-<tr class="memitem:a7ee7794fecc26322b72c359b74b5feb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a7ee7794fecc26322b72c359b74b5feb6">PROCESS_3</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classload__store__unit.html#ab86c7a8eec3a8327e506892977f85708">rst_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit.html#ae8d3e5458b0e3cd523d6461463e36fe8">clk_i</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
-<tr class="memdesc:a7ee7794fecc26322b72c359b74b5feb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data Read and Sign Extension Logic.  <a href="#a7ee7794fecc26322b72c359b74b5feb6"></a><br /></td></tr>
+ <tr class="memitem:a4f141200ad7ad2a861e0c91475d020b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a4f141200ad7ad2a861e0c91475d020b4">PROCESS_4</a>&#160;</td><td class="memItemRight" valign="bottom"><b> ( <b><b><a class="el" href="classload__store__unit_1_1arch.html#a0cf4f22584387a577afa739850fca7b4">raw_data</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit.html#aa69c0014783e759c7e1316923565c0f9">sign_i</a></b> <span class="vhdlchar"> </span></b> , <b><b><a class="el" href="classload__store__unit.html#a3b7c3ebf55e91939ebd79c0bb691599b">width_i</a></b> <span class="vhdlchar"> </span></b> )</b></td></tr>
+<tr class="memdesc:a4f141200ad7ad2a861e0c91475d020b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign / zero extension on the raw byte or halfword read from DMEM.  <a href="#a4f141200ad7ad2a861e0c91475d020b4"></a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Signals" name="Signals"></a>
 Signals</h2></td></tr>
- <tr class="memitem:a0bb2f49b566bca88f682e41793a98002"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a0bb2f49b566bca88f682e41793a98002">word_to_read</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a0bb2f49b566bca88f682e41793a98002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal signal to hold the 32-bit word assembled from byte-addressable DMEM.  <a href="#a0bb2f49b566bca88f682e41793a98002"></a><br /></td></tr>
-<tr class="memitem:a4d21ba8f48848d93d373dced3c3f72d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a4d21ba8f48848d93d373dced3c3f72d9">address</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">integer</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memitem:a8c2143f4208773a7e967dd64e2100c7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a8c2143f4208773a7e967dd64e2100c7d">DMEM</a> &#160;</td><td class="memItemRight" valign="bottom"><b><b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar">initialize_dmem</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><b><a class="el" href="classload__store__unit.html#ac0a3b5610607c1f4e7bc0f304115c2bc">g_INIT_FILE</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a8c2143f4208773a7e967dd64e2100c7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data memory array initialised from file at elaboration time.  <a href="#a8c2143f4208773a7e967dd64e2100c7d"></a><br /></td></tr>
-<tr class="memitem:a7ab0519865f1a6f661c73eb8fc1345b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a7ab0519865f1a6f661c73eb8fc1345b2">memory_bound</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">integer</span><span class="vhdlchar"> </span></b></td></tr>
+ <tr class="memitem:a0cf4f22584387a577afa739850fca7b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a0cf4f22584387a577afa739850fca7b4">raw_data</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a0cf4f22584387a577afa739850fca7b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw word read back from DMEM (no sign extension yet).  <a href="#a0cf4f22584387a577afa739850fca7b4"></a><br /></td></tr>
+<tr class="memitem:a0bb2f49b566bca88f682e41793a98002"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a0bb2f49b566bca88f682e41793a98002">word_to_read</a> &#160;</td><td class="memItemRight" valign="bottom"><b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
+<tr class="memdesc:a0bb2f49b566bca88f682e41793a98002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign/zero-extended word ready for the pipeline.  <a href="#a0bb2f49b566bca88f682e41793a98002"></a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="Instantiations" name="Instantiations"></a>
+Instantiations</h2></td></tr>
+ <tr class="memitem:a1436ac1a2a5cf15bac6ea2e2d246872a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classload__store__unit_1_1arch.html#a1436ac1a2a5cf15bac6ea2e2d246872a">u_dmem</a>&#160;</td><td class="memItemRight" valign="bottom">  <b>dmem</b>  <em><a class="el" href="classdmem.html">&lt;Entity dmem&gt;</a></em></td></tr>
+<tr class="memdesc:a1436ac1a2a5cf15bac6ea2e2d246872a"><td class="mdescLeft">&#160;</td><td class="mdescRight">DMEM instantiation.  <a href="#a1436ac1a2a5cf15bac6ea2e2d246872a"></a><br /></td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >Architecture implementing the LSU logic. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8f47229818850495f1f79b87c92da413" name="a8f47229818850495f1f79b87c92da413"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f47229818850495f1f79b87c92da413">&#9670;&#160;</a></span>initialize_dmem()</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a4f141200ad7ad2a861e0c91475d020b4" name="a4f141200ad7ad2a861e0c91475d020b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f141200ad7ad2a861e0c91475d020b4">&#9670;&#160;</a></span>PROCESS_4()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"> <b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> initialize_dmem</td>
+          <td class="memname">PROCESS_4 </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><span class="vhdlchar">file_name</span><span class="vhdlchar"> </span></b><span class="stringliteral">in</span> <em><b><span class="keywordflow">in</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span></b></em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> impure</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Function</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Loads DMEM from a hex byte file at elaboration time. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">file_name</td><td>Absolute path to data_memory.txt. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Populated t_bytes array.</dd></dl>
-<p>Loads DMEM from a hex byte file at elaboration time.</p>
-<p >Each line must contain one byte as a 2-digit hex value (e.g. FF). SIMULATION ONLY - Quartus ignores this function. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">file_name</td><td>Absolute path to data_memory.txt. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Populated t_bytes array. </dd></dl>
-
-</div>
-</div>
-<a id="a2e7550a0c8818d7bdb6a8b537c323ecf" name="a2e7550a0c8818d7bdb6a8b537c323ecf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e7550a0c8818d7bdb6a8b537c323ecf">&#9670;&#160;</a></span>PROCESS_2()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"> <b><span class="vhdlchar"> </span></b> PROCESS_2</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit_1_1arch.html#a4d21ba8f48848d93d373dced3c3f72d9">address</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+          <td class="paramname"><em>raw_data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit.html#aa69c0014783e759c7e1316923565c0f9">sign_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
+          <td class="paramname"><em>sign_i</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit.html#a3b7c3ebf55e91939ebd79c0bb691599b">width_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit.html#ab3aeae00a6a62bbd6e23d91bc37746d1">mem_RW_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit_1_1arch.html#a8c2143f4208773a7e967dd64e2100c7d">DMEM</a></b> <span class="vhdlchar"> </span></b> <em></em>&#160;</td>
+          <td class="paramname"><em>width_i</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -201,65 +130,16 @@ Signals</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Process</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Concurrent address conversion. </p>
-
-</div>
-</div>
-<a id="a7ee7794fecc26322b72c359b74b5feb6" name="a7ee7794fecc26322b72c359b74b5feb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ee7794fecc26322b72c359b74b5feb6">&#9670;&#160;</a></span>PROCESS_3()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"> <b><span class="vhdlchar"> </span></b> PROCESS_3</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit.html#ab86c7a8eec3a8327e506892977f85708">rst_i</a></b> <span class="vhdlchar"> </span></b> <em></em> , </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><b><b><a class="el" href="classload__store__unit.html#ae8d3e5458b0e3cd523d6461463e36fe8">clk_i</a></b> <span class="vhdlchar"> </span></b> <em></em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Process</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Data Read and Sign Extension Logic. </p>
-<p >Performs an asynchronous read from the byte-addressable DMEM. The process formats the output based on the requested data width and sign:</p><ul>
-<li><b>Byte (00)</b>: Loads 8 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.</li>
-<li><b>Halfword (01)</b>: Loads 16 bits. Sign-extends if sign_i = '0', zero-extends if sign_i = '1'.</li>
-<li><b>Word (10)</b>: Loads 32 bits directly from four consecutive memory locations. width_i = 11 is interpreted the same way as the width_i = 10. <dl class="section note"><dt>Note</dt><dd>This process is combinatorial and updates whenever address, control signals, or memory content changes. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Validates that the address is within [0, memory_bound] to prevent out-of-bounds array access during simulation. </dd></dl>
-</li>
-</ul>
+<p>Sign / zero extension on the raw byte or halfword read from DMEM. </p>
+<p >DMEM always returns zero-extended values; LSU applies sign extension here when sign_i = '0'. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a4d21ba8f48848d93d373dced3c3f72d9" name="a4d21ba8f48848d93d373dced3c3f72d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d21ba8f48848d93d373dced3c3f72d9">&#9670;&#160;</a></span>address</h2>
+<a id="a0cf4f22584387a577afa739850fca7b4" name="a0cf4f22584387a577afa739850fca7b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cf4f22584387a577afa739850fca7b4">&#9670;&#160;</a></span>raw_data</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -268,7 +148,7 @@ Signals</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classload__store__unit_1_1arch.html#a4d21ba8f48848d93d373dced3c3f72d9">address</a> <b><span class="keywordtype">integer</span><span class="vhdlchar"> </span></b> </td>
+          <td class="memname"><a class="el" href="classload__store__unit_1_1arch.html#a0cf4f22584387a577afa739850fca7b4">raw_data</a> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
         </tr>
       </table>
   </td>
@@ -278,10 +158,12 @@ Signals</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Raw word read back from DMEM (no sign extension yet). </p>
+
 </div>
 </div>
-<a id="a8c2143f4208773a7e967dd64e2100c7d" name="a8c2143f4208773a7e967dd64e2100c7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c2143f4208773a7e967dd64e2100c7d">&#9670;&#160;</a></span>DMEM</h2>
+<a id="a1436ac1a2a5cf15bac6ea2e2d246872a" name="a1436ac1a2a5cf15bac6ea2e2d246872a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1436ac1a2a5cf15bac6ea2e2d246872a">&#9670;&#160;</a></span>u_dmem</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -290,39 +172,17 @@ Signals</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classload__store__unit_1_1arch.html#a8c2143f4208773a7e967dd64e2100c7d">DMEM</a> <b><b><a class="el" href="classmem__pkg.html#a60cd968c2ea19a766de1182d38c9a985">t_bytes</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar">initialize_dmem</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><b><a class="el" href="classload__store__unit.html#ac0a3b5610607c1f4e7bc0f304115c2bc">g_INIT_FILE</a></b> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
+          <td class="memname"><a class="el" href="classload__store__unit_1_1arch.html#a1436ac1a2a5cf15bac6ea2e2d246872a">u_dmem</a> <b><span class="vhdlchar">dmem</span><span class="vhdlchar"> </span></b> </td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
+<span class="mlabels"><span class="mlabel">Instantiation</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Data memory array initialised from file at elaboration time. </p>
-
-</div>
-</div>
-<a id="a7ab0519865f1a6f661c73eb8fc1345b2" name="a7ab0519865f1a6f661c73eb8fc1345b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ab0519865f1a6f661c73eb8fc1345b2">&#9670;&#160;</a></span>memory_bound</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classload__store__unit_1_1arch.html#a7ab0519865f1a6f661c73eb8fc1345b2">memory_bound</a> <b><span class="keywordtype">integer</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Signal</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>DMEM instantiation. </p>
 
 </div>
 </div>
@@ -346,7 +206,7 @@ Signals</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Internal signal to hold the 32-bit word assembled from byte-addressable DMEM. </p>
+<p>Sign/zero-extended word ready for the pipeline. </p>
 
 </div>
 </div>
