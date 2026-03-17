@@ -51,23 +51,28 @@ entity load_store_unit is
     g_INIT_FILE : string := "data_memory.txt"
   );
   port (
-    clk_i        : in  std_logic;                     --! Global clock signal
-    rst_i        : in  std_logic;                     --! Asynchronous reset, active high
-    sign_i       : in  std_logic;                     --! '1' = unsigned (zero-extend), '0' = signed (sign-extend)
-    width_i      : in  std_logic_vector(1 downto 0);  --! byte=00, halfword=01, word=1x
-    addr_i       : in  std_logic_vector(31 downto 0); --! Memory address for access
-    mem_RW_i     : in  std_logic;                     --! '1' = Write, '0' = Read
-    data_write_i : in  std_logic_vector(31 downto 0); --! Data to store
-    data_read_o  : out std_logic_vector(31 downto 0)  --! Data loaded from memory
+    clk_i               : in  std_logic;                     --! Global clock signal
+    rst_i               : in  std_logic;                     --! Asynchronous reset, active high
+    sign_i              : in  std_logic;                     --! '1' = unsigned (zero-extend), '0' = signed (sign-extend)
+    width_i             : in  std_logic_vector(1 downto 0);  --! byte=00, halfword=01, word=1x
+    addr_i              : in  std_logic_vector(31 downto 0); --! Memory address for access
+    mem_RW_i            : in  std_logic;                     --! '1' = Write, '0' = Read
+    data_write_i        : in  std_logic_vector(31 downto 0); --! Data to store
+    data_read_o         : out std_logic_vector(31 downto 0)  --! Data loaded from memory
+    invalid_addr_o      : out std_logic;                     --! Trying to access out of bounds address 
+    misaligned_access_o : out std_logic;                     --! Trying to access misaligned address
   );
 end load_store_unit;
 
 architecture arch of load_store_unit is
 
   --! @brief Raw word read back from DMEM (no sign extension yet).
-  signal raw_data     : std_logic_vector(31 downto 0);
+  signal raw_data            : std_logic_vector(31 downto 0);
   --! @brief Sign/zero-extended word ready for the pipeline.
-  signal word_to_read : std_logic_vector(31 downto 0);
+  signal word_to_read        : std_logic_vector(31 downto 0);
+  --! @brief Exception handling flags
+  signal invalid_addr_s      : std_logic;
+  signal misaligned_access_s : std_logic;
 
 begin
 
@@ -77,12 +82,14 @@ begin
       g_INIT_FILE => g_INIT_FILE
     )
     port map (
-      clk_i        => clk_i,
-      addr_i       => addr_i,
-      we_i         => mem_RW_i,
-      width_i      => width_i,
-      data_write_i => data_write_i,
-      data_read_o  => raw_data
+      clk_i               => clk_i,
+      addr_i              => addr_i,
+      we_i                => mem_RW_i,
+      width_i             => width_i,
+      data_write_i        => data_write_i,
+      data_read_o         => raw_data,
+      invalid_addr_o      => invalid_addr_s,
+      misaligned_access_o => misaligned_access_s
     );
 
   --! @brief Sign / zero extension on the raw byte or halfword read from DMEM.
@@ -109,6 +116,9 @@ begin
   end process;
 
   --! @brief Output mux: zero during reset or when writing.
-  data_read_o <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
+  data_read_o         <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
+  
+  invalid_addr_o      <= invalid_addr_s;
+  misaligned_access_o <= misaligned_access_s;
 
 end arch;
