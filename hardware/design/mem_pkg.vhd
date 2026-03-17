@@ -123,12 +123,10 @@ package mem_pkg is
   signal regs : t_regs := (
     others => (others => '0')
   );
-  --! @brief Maximums of DMEM memory and IMEM memory
-  constant c_TOTAL_BYTES : integer := 1024;
 
   --! @brief Array type representing the instruction memory storage.
   subtype t_byte  is std_logic_vector(7 downto 0);
-  type t_bytes    is array (0 to c_TOTAL_BYTES - 1) of t_byte;
+  type t_bytes    is array (natural range <>) of t_byte;
 
   --! @brief Array representing the data memory storage.
 end mem_pkg;

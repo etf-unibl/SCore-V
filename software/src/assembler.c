@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
 void process_file(FILE* fptr) {
 	char line[256];
-	char line_dmem[5];
+	char line_dmem[10];
 	FILE* fout;
 	fout = fopen("../hardware/init_files/instruction_memory.txt", "w");
 	if(fout == NULL) {
@@ -44,7 +44,28 @@ void process_file(FILE* fptr) {
 	else {
 		int i=0;
 		while(fgets(line_dmem, sizeof(line_dmem), fdmem)) {
-			dmem[i++] = (uint8_t)strtol(line_dmem, NULL, 16);
+			char pom[3];
+			pom[0] = line_dmem[0];
+			pom[1] = line_dmem[1];
+			pom[2] = '\0';
+			dmem[i+3] = (uint8_t)strtol(pom, NULL, 16);
+
+			pom[0] = line_dmem[2];
+			pom[1] = line_dmem[3];
+			pom[2] = '\0';
+			dmem[i+2] = (uint8_t)strtol(pom, NULL, 16);
+
+			pom[0] = line_dmem[4];
+			pom[1] = line_dmem[5];
+			pom[2] = '\0';
+			dmem[i+1] = (uint8_t)strtol(pom, NULL, 16);
+
+			pom[0] = line_dmem[6];
+			pom[1] = line_dmem[7];
+			pom[2] = '\0';
+			dmem[i] = (uint8_t)strtol(pom, NULL, 16);
+
+			i+=4;
 		}
 
 		fclose(fdmem);
@@ -522,11 +543,10 @@ void bits_to_str(unsigned int value, int bits, char *out)
  * Writes instruction machine code to output file
  */
 void output_result(uint32_t result, FILE* output) {
-	char instruction[35];
-	bits_to_str(result, 32, instruction);
-	instruction[32] = '\n';
-	instruction[33] = '\0';
-	fputs(instruction, output);
+	fprintf(output, "%02X\n%02X\n%02X\n%02X\n", result & 0xFF,
+										(result & 0xFF00)     >> 8,
+										(result & 0xFF0000)   >> 16,
+										(result & 0xFF000000) >> 24);
 }
 
 void store_instruction(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2, int imm) {

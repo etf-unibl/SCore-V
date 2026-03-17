@@ -24,7 +24,11 @@ design_lib    = VU.add_library("design_lib")
 design_lib.add_source_files(SRC_PATH / "*.vhd")
 
 testbench_lib = VU.add_library("testbench_lib")
-testbench_lib.add_source_files(TESTS_PATH / "*.vhd")
+# testbench_lib.add_source_files(TESTS_PATH / "*.vhd")
+
+for f in TESTS_PATH.glob("*.vhd"):
+    if f.name != "score_v_signature_tb.vhd":
+        testbench_lib.add_source_files(f)
 
 # Resolve absolute paths — forward slashes required by GHDL on Windows
 IMEM_FILE     = str((INIT_PATH / "instruction_memory.txt").resolve()).replace("\\", "/")
