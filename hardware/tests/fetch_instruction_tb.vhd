@@ -42,7 +42,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use std.textio.all;
-use ieee.std_logic_textio.all;
 use design_lib.mem_pkg.all;
 
 --! @brief Top-level entity for the fetch instruction testbench.
@@ -58,37 +57,50 @@ end fetch_instruction_tb;
 --! @brief Architecture implementing the stimulus and verification logic.
 architecture arch of fetch_instruction_tb is
 
-  -- ----------------------------------------------------------------
-  --  Local initialize_memory - provides the golden reference c_IMEM.
-  --  Identical to the function inside fetch_instruction.vhd so both
-  --  always read the same data from the same file.
-  -- ----------------------------------------------------------------
-  impure function initialize_memory(file_name : in string) return t_bytes is
-    file     f_ptr            : text;
-    variable l                : line;
-    variable result           : t_bytes := (others => (others => '0'));
-    variable temp             : std_logic_vector(31 downto 0);
-    variable v_max_word_index : integer := (c_TOTAL_BYTES / 4) - 1;
+  --! @brief Counts non-blank lines in the init file to determine memory size.
+  impure function count_bytes(file_name : in string) return integer
+  is
+    file     f_ptr : text;
+    variable l     : line;
+    variable n     : integer := 0;
   begin
     file_open(f_ptr, file_name, read_mode);
-    for i in 0 to v_max_word_index loop
-      if not endfile(f_ptr) then
-        readline(f_ptr, l);
-        read(l, temp);
-        result(i*4)     := temp(7  downto 0);
-        result(i*4 + 1) := temp(15 downto 8);
-        result(i*4 + 2) := temp(23 downto 16);
-        result(i*4 + 3) := temp(31 downto 24);
-      else
-        exit;
+    while not endfile(f_ptr) loop
+      readline(f_ptr, l);
+      if l'length > 0 then
+        n := n + 1;
       end if;
+    end loop;
+    file_close(f_ptr);
+    return n;
+  end function count_bytes;
+
+  --! @brief Loads golden IMEM reference (one hex byte per line).
+  impure function initialize_memory(file_name : in string; mem_size : in integer) return t_bytes
+  is
+    file     f_ptr  : text;
+    variable l      : line;
+    variable result : t_bytes(0 to mem_size - 1) := (others => (others => '0'));
+    variable temp   : std_logic_vector(7 downto 0);
+    variable i      : integer := 0;
+  begin
+    file_open(f_ptr, file_name, read_mode);
+    while not endfile(f_ptr) and i < mem_size loop
+      readline(f_ptr, l);
+      next when l'length = 0;
+      hread(l, temp);
+      result(i) := temp;
+      i := i + 1;
     end loop;
     file_close(f_ptr);
     return result;
   end function initialize_memory;
 
-  --! Golden reference - loaded from the same file as the UUT.
-  signal c_IMEM : t_bytes := initialize_memory(g_init_file);
+  --! @brief Memory size derived from the init file at elaboration time.
+  constant c_MEM_SIZE : integer := count_bytes(g_init_file);
+
+  --! @brief Golden reference IMEM, sized from the file.
+  constant c_IMEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_init_file, c_MEM_SIZE);
 
   signal test_in                 : std_logic_vector(31 downto 0);
   signal test_out                : t_instruction_rec;
@@ -99,7 +111,6 @@ architecture arch of fetch_instruction_tb is
 begin
 
   --! @brief UUT instantiation and port mapping.
-  --! @details g_init_file forwarded so UUT reads from the same file.
   uut_fetch_instruction : entity design_lib.fetch_instruction
     generic map (
       g_INIT_FILE => g_init_file
@@ -133,7 +144,7 @@ begin
           check_equal(test_out.opcode, full_instruction(6 downto 0),
                     "Opcode mismatch at index " & integer'image(addr_int));
           check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
-                    "Data bits mismatch at index " & integer'image(addr_int));                 
+                    "Data bits mismatch at index " & integer'image(addr_int));
         end loop;
 
       elsif run("test_exceptions_in_fetch_instr") then
