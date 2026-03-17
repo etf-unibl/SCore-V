@@ -64,9 +64,15 @@ entity imem is
   port
   (
     --! @brief Byte address of the instruction to read.
-    addr_i : in  std_logic_vector(31 downto 0);
+    addr_i                  : in  std_logic_vector(31 downto 0);
+    --! @brief HALT state detected input
+    halt_i                  : in  std_logic;
     --! @brief 32-bit instruction word at addr_i (asynchronous).
-    data_o : out std_logic_vector(31 downto 0)
+    data_o                  : out std_logic_vector(31 downto 0);
+    --! @brief Instruction fetch address is outside valid instruction memory range
+    invalid_instr_addr_o    : out std_logic;
+    --! @brief Instruction fetch address is not 4-byte aligned (PC(1 downto 0) /= "00")
+    misaligned_instr_addr_o : out std_logic 
   );
 end imem;
 
@@ -115,14 +121,29 @@ architecture arch of imem is
   constant c_MEM_SIZE : integer := count_bytes(g_INIT_FILE);
 
   --! @brief Instruction memory contents, initialised at elaboration time.
-  constant c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
+  signal c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
+
+  signal invalid_instr_addr_s    : std_logic;
+  signal misaligned_instr_addr_s : std_logic;
 
 begin
+  
+  misaligned_instr_addr_s <= '1' when addr_i(1 downto 0) /= "00" else '0';
+  invalid_instr_addr_s    <= '1' when to_integer(unsigned(addr_i)) > c_MEM_SIZE - 4 else '0';
 
-  --! @brief Asynchronous little-endian 32-bit read.
-  data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
-            c_MEM(to_integer(unsigned(addr_i)) + 2) &
-            c_MEM(to_integer(unsigned(addr_i)) + 1) &
-            c_MEM(to_integer(unsigned(addr_i))) when (to_integer(unsigned(addr_i)) < c_MEM_SIZE - 3) else (others => '0');
+  comb_proc : process(misaligned_instr_addr_s, invalid_instr_addr_s, halt_i, addr_i, c_MEM)
+  begin
+    if halt_i = '1' then 
+      data_o <= (others => '0');
+    elsif invalid_instr_addr_s = '0' and misaligned_instr_addr_s <= '0' then
+      --! @brief Asynchronous little-endian 32-bit read.
+      data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
+                c_MEM(to_integer(unsigned(addr_i)) + 2) &
+                c_MEM(to_integer(unsigned(addr_i)) + 1) &
+                c_MEM(to_integer(unsigned(addr_i))) when (to_integer(unsigned(addr_i)) < c_MEM_SIZE - 3) else (others => '0');
+    else 
+      data_o <= (others => '0');
+    end if;
+  end process;
 
 end arch;

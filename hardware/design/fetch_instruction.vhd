@@ -63,17 +63,16 @@ entity fetch_instruction is
     halt_i                  : in  std_logic;
     --! @brief Fetched instruction output split into opcode and remaining bits.
     instruction_bits_o      : out t_instruction_rec;
-    --! Instruction fetch address is outside valid instruction memory range
+    --! @brief Instruction fetch address is outside valid instruction memory range
     invalid_instr_addr_o    : out std_logic;
-    --! Instruction fetch address is not 4-byte aligned (PC(1 downto 0) /= "00")
+    --! @brief Instruction fetch address is not 4-byte aligned (PC(1 downto 0) /= "00")
     misaligned_instr_addr_o : out std_logic
   );
 end fetch_instruction;
 
 architecture arch of fetch_instruction is
 
-  signal full_instruction : std_logic_vector(31 downto 0);
-
+  signal full_instruction  : std_logic_vector(31 downto 0);
   signal addr_s            : integer;
   signal invalid_addr_s    : std_logic;
   signal misaligned_addr_s : std_logic;
@@ -86,14 +85,17 @@ begin
       g_INIT_FILE => g_INIT_FILE
     )
     port map (
-      addr_i => instruction_count_i,
-      data_o => full_instruction
+      addr_i                  => instruction_count_i,
+      halt_i                  => halt_i,
+      data_o                  => full_instruction,
+      invalid_instr_addr_o    => invalid_addr_s,
+      misaligned_instr_addr_o => misaligned_addr_s
     );
 
   instruction_bits_o.opcode                 <= full_instruction(6 downto 0);
   instruction_bits_o.other_instruction_bits <= full_instruction(31 downto 7);
 
-  invalid_instr_addr_o    <= invalid_addr_s;
-  misaligned_instr_addr_o <= misaligned_addr_s;
+  invalid_instr_addr_o                      <= invalid_addr_s;
+  misaligned_instr_addr_o                   <= misaligned_addr_s;
 
 end arch;
