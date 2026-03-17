@@ -97,7 +97,7 @@ architecture arch of fetch_instruction_tb is
   end function initialize_memory;
 
   --! @brief Memory size derived from the init file at elaboration time.
-  constant c_MEM_SIZE : integer := count_bytes(g_init_file);
+  signal c_MEM_SIZE : integer := count_bytes(g_init_file);
 
   --! @brief Golden reference IMEM, sized from the file.
   constant c_IMEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_init_file, c_MEM_SIZE);
@@ -190,7 +190,7 @@ begin
                    "Misaligned instruction address flag should be '1' when misaligned access is detected");
 
         --! Invalid instruction address access test
-        test_in  <= std_logic_vector(to_unsigned(c_TOTAL_BYTES + 1, 32));
+        test_in  <= std_logic_vector(to_unsigned(c_MEM_SIZE + 1, 32));
         addr_int := to_integer(unsigned(test_in));
         full_instruction := (others => '0');
         wait for 10 ns;

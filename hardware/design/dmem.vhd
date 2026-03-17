@@ -145,13 +145,13 @@ begin
     variable v_is_invalid_addr    : std_logic;
     variable v_is_misaligned_addr : std_logic;
   begin
-    result               := (others => '0');
+    v_result               := (others => '0');
     v_is_invalid_addr    := '0';
     v_is_misaligned_addr := '0';
   case width_i is
     when "00" =>  -- byte
       if address >= 0 and address <= c_MEM_SIZE - 1 then
-        result := x"000000" & mem(address);
+        v_result := x"000000" & mem(address);
       else
         v_is_invalid_addr := '1';
       end if;
@@ -161,7 +161,7 @@ begin
       elsif addr_i(0) /= '0' then
         v_is_misaligned_addr := '1';
       else
-        result := x"0000" & mem(address + 1) & mem(address);
+        v_result := x"0000" & mem(address + 1) & mem(address);
       end if;
     when others =>  -- word
       if address < 0 or address > c_MEM_SIZE - 4 then
@@ -169,12 +169,12 @@ begin
       elsif addr_i(1 downto 0) /= "00" then
         v_is_misaligned_addr := '1';
       else
-        result := mem(address + 3) & mem(address + 2) &
+        v_result := mem(address + 3) & mem(address + 2) &
                   mem(address + 1) & mem(address);
       end if;
   end case;
 
-  data_read_o              <= result;
+  data_read_o              <= v_result;
   is_invalid_addr_read     <= v_is_invalid_addr;
   is_misaligned_addr_read  <= v_is_misaligned_addr;
 end process;

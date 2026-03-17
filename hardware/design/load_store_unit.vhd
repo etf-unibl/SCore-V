@@ -58,9 +58,9 @@ entity load_store_unit is
     addr_i              : in  std_logic_vector(31 downto 0); --! Memory address for access
     mem_RW_i            : in  std_logic;                     --! '1' = Write, '0' = Read
     data_write_i        : in  std_logic_vector(31 downto 0); --! Data to store
-    data_read_o         : out std_logic_vector(31 downto 0)  --! Data loaded from memory
+    data_read_o         : out std_logic_vector(31 downto 0); --! Data loaded from memory
     invalid_addr_o      : out std_logic;                     --! Trying to access out of bounds address 
-    misaligned_access_o : out std_logic;                     --! Trying to access misaligned address
+    misaligned_access_o : out std_logic                      --! Trying to access misaligned address
   );
 end load_store_unit;
 
@@ -117,7 +117,7 @@ begin
 
   --! @brief Output mux: zero during reset or when writing.
   data_read_o         <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
-  
+
   invalid_addr_o      <= invalid_addr_s;
   misaligned_access_o <= misaligned_access_s;
 
