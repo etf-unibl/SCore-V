@@ -283,7 +283,11 @@ begin
         for i in 0 to c_VALID_COUNT - 1 loop
           wait until rising_edge(clk_s);
 
-          full_instr := dbg_instr.other_instruction_bits & dbg_instr.opcode;
+          if dbg_opcode'length = 7 then
+			  full_instr := dbg_instr.other_instruction_bits & dbg_instr.opcode;
+		  else
+			  next;
+		  end if;
 
           if step <= c_VALID_COUNT - 1 then
             check_equal(to_integer(unsigned(dbg_pc)), res(step).pc, "PC Error at step " & integer'image(step));
