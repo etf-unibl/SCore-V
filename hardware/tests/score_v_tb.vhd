@@ -237,7 +237,8 @@ begin
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
-      instr_addr_o => instr_addr_s
+      instr_addr_o => instr_addr_s,
+      instr_data_i => instr_mem_s
     );
 
   instr_mem_s <= fetch_instr_s;
@@ -263,8 +264,8 @@ begin
     alias dbg_alu_result is << signal .score_v_tb.uut.alu_result_sig : std_logic_vector(31 downto 0) >>;
     alias dbg_reg_we     is << signal .score_v_tb.uut.reg_we_sig : std_logic >>;
     alias dbg_wb_data    is << signal .score_v_tb.uut.final_wb_sig : std_logic_vector(31 downto 0) >>;
-    alias dbg_instr      is << signal .score_v_tb.uut.instr_sig : t_instruction_rec >>;
-    
+    alias dbg_instr is << signal .score_v_tb.uut.instr_sig : t_instruction_rec >>;
+
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
   begin
@@ -283,11 +284,7 @@ begin
         for i in 0 to c_VALID_COUNT - 1 loop
           wait until rising_edge(clk_s);
 
-          if dbg_opcode'length = 7 then
-			  full_instr := dbg_instr.other_instruction_bits & dbg_instr.opcode;
-		  else
-			  next;
-		  end if;
+          full_instr := dbg_instr.other_instruction_bits & dbg_instr.opcode;
 
           if step <= c_VALID_COUNT - 1 then
             check_equal(to_integer(unsigned(dbg_pc)), res(step).pc, "PC Error at step " & integer'image(step));
