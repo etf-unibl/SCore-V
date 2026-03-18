@@ -90,7 +90,7 @@ architecture arch of score_v is
 
   --! @brief Internal PC signals
   signal pc_sig       : std_logic_vector(31 downto 0); --! Current PC
-  signal pc_next_sig  : std_logic_vector(31 downto 0); --! Next PC 
+  signal pc_next_sig  : std_logic_vector(31 downto 0); --! Next PC
   signal pc4_sig      : std_logic_vector(31 downto 0); --! Next sequential PC
 
   --! @brief Control and Branching signals

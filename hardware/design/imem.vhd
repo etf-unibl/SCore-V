@@ -123,6 +123,6 @@ begin
   data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
             c_MEM(to_integer(unsigned(addr_i)) + 2) &
             c_MEM(to_integer(unsigned(addr_i)) + 1) &
-            c_MEM(to_integer(unsigned(addr_i))) when (to_integer(unsigned(addr_i)) < c_MEM_SIZE - 3) else (others => '0');
+            c_MEM(to_integer(unsigned(addr_i))) when to_integer(unsigned(addr_i)) < c_MEM_SIZE - 3 else (others => '0');
 
 end arch;
