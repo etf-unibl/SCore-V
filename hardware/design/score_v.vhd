@@ -59,26 +59,14 @@ use work.alu_pkg.all;
 entity score_v is
   generic (
     --! @brief Absolute path to data_memory.txt, forwarded to load_store_unit.
-    g_DMEM_INIT_FILE : string := "data_memory.txt"
+    g_DMEM_INIT_FILE : string := "data_memory.txt";
+	g_IMEM_INIT_FILE : string := "instruction_memory.txt"
   );
   port (
     clk_i        : in  std_logic;                     --! Clock input
     rst_i        : in  std_logic;                     --! Reset input
 
-    instr_addr_o : out std_logic_vector(31 downto 0); --! PC output to memory
-    instr_data_i : in  t_instruction_rec;             --! Instruction input from fetch_instruction
-
-    pc_o         : out std_logic_vector(31 downto 0); --! Program counter value output
-    opcode_o     : out std_logic_vector(6 downto 0);  --! Instruction opcode output
-    rd_o         : out std_logic_vector(4 downto 0);  --! Destination register address output
-    rs1_o        : out std_logic_vector(4 downto 0);  --! Source register 1 address output
-    rs2_o        : out std_logic_vector(4 downto 0);  --! Source register 2 address output
-    rs1_data_o   : out std_logic_vector(31 downto 0); --! Source register 1 data output
-    rs2_data_o   : out std_logic_vector(31 downto 0); --! Source register 2 data output
-    alu_result_o : out std_logic_vector(31 downto 0); --! ALU result output
-    reg_we_o     : out std_logic;                     --! Register write enable output
-    mem_data_o   : out std_logic_vector(31 downto 0); --! Data read from memory output
-    wb_data_o    : out std_logic_vector(31 downto 0)  --! Final write-back data output
+    instr_addr_o : out std_logic_vector(31 downto 0) --! PC output to memory
   );
 end score_v;
 
@@ -111,7 +99,8 @@ architecture arch of score_v is
   signal imm_s_type_h_sig   : std_logic_vector(6 downto 0); --! instr[31:25]
   signal imm_s_type_l_sig   : std_logic_vector(4 downto 0); --! instr[11:7]
   signal imm_b_type_sig     : std_logic_vector(11 downto 0);  --! instr[11:7]
-  signal imm_j_u_type_sig : std_logic_vector(19 downto 0);  --! J-type and U-type immediate (instr[31:12])
+  signal imm_j_u_type_sig   : std_logic_vector(19 downto 0);  --! J-type and U-type immediate (instr[31:12])
+  signal instr_sig          : t_instruction_rec;
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -303,6 +292,16 @@ architecture arch of score_v is
     );
   end component;
 
+  component fetch_instruction is
+    generic (
+      g_INIT_FILE : string := "instruction_memory.txt"
+    );
+    port (
+      instruction_count_i : in  std_logic_vector(31 downto 0);
+      instruction_bits_o  : out t_instruction_rec
+    );
+  end component;
+
 begin
 
   --! @brief Program Counter instance
@@ -327,7 +326,7 @@ begin
   --! @brief Instruction decoder
   u_decoder : instruction_decoder
     port map (
-      instr_i         => instr_data_i,
+      instr_i         => instr_sig,
       opcode_o        => opcode_sig,
       rs1_o           => rs1_sig,
       rs2_o           => rs2_sig,
@@ -451,17 +450,15 @@ begin
       wb_data_o    => final_wb_sig
     );
 
+  u_fetch : fetch_instruction
+    generic map (
+      g_INIT_FILE => g_IMEM_INIT_FILE
+    )
+    port map (
+      instruction_count_i => pc_sig,
+      instruction_bits_o  => instr_sig
+    );
+  
   --! @brief Output assignments
   instr_addr_o <= pc_sig;
-  pc_o         <= pc_sig;
-  opcode_o     <= opcode_sig;
-  rd_o         <= rd_sig;
-  rs1_o        <= rs1_sig;
-  rs2_o        <= rs2_sig;
-  rs1_data_o   <= rs1_data_sig;
-  rs2_data_o   <= rs2_data_sig;
-  alu_result_o <= alu_result_sig;
-  reg_we_o     <= reg_we_sig;
-  wb_data_o    <= final_wb_sig;
-  mem_data_o   <= mem_data_sig;
 end arch;
