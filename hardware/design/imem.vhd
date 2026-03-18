@@ -123,8 +123,8 @@ architecture arch of imem is
   --! @brief Instruction memory contents, initialised at elaboration time.
   signal c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
 
-  signal invalid_instr_addr_s    : std_logic;
-  signal misaligned_instr_addr_s : std_logic;
+  signal invalid_instr_addr_s    : std_logic := '0';
+  signal misaligned_instr_addr_s : std_logic := '0';
 
 begin
   

@@ -71,8 +71,8 @@ architecture arch of load_store_unit is
   --! @brief Sign/zero-extended word ready for the pipeline.
   signal word_to_read        : std_logic_vector(31 downto 0);
   --! @brief Exception handling flags
-  signal invalid_addr_s      : std_logic;
-  signal misaligned_access_s : std_logic;
+  signal invalid_addr_s      : std_logic := '0';
+  signal misaligned_access_s : std_logic := '0';
 
 begin
 
