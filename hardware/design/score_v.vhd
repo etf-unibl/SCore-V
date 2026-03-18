@@ -415,8 +415,8 @@ begin
       pc_sel_o           => pc_sel_sig,
       br_un_o            => br_un_sig,
       invalid_instr_o    => invalid_instruction_sig,
-      out_of_bound_i     => invalid_address_fetch_sig,
-      misaligned_i       => misaligned_fetch_sig
+      out_of_bound_i     => invalid_address_lsu_sig,
+      misaligned_i       => misaligned_lsu_sig
     );
 
   --! @brief Immediate Generator unit instance

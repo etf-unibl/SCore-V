@@ -162,7 +162,7 @@ begin
 --! This signal indicates that the instruction encoding is not supported
 --! by the implemented subset of the RISC-V ISA.
 
-  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i, br_eq_i, br_lt_i, halt_i, out_of_bound_i, misaligned_i)
+  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i, br_eq_i, br_lt_i, halt_i)
     variable valid_instruction_v : std_logic; --! Internal flag indicating successful instruction decode
   begin
     reg_write_enable_o <= '0';
