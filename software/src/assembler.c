@@ -82,16 +82,18 @@ void process_file(FILE* fptr) {
     	while (*start == ' ' || *start == '\t')
         	start++;
 
-    	// Trim trailing whitespace
-    	char *end = start + strlen(start) - 1;
-    	while (end >= start && (*end == ' ' || *end == '\t' || *end == '\n'))
-        	*end-- = '\0';
+    	// Trim trailing whitespace (keep newline!)
+    	size_t len = strlen(start);
+    	if (len > 0) {
+        	char *end = start + len - 1;
+        	while (end >= start && (*end == ' ' || *end == '\t'))
+            	*end-- = '\0';
+    	}
 
     	// Skip empty lines
-    	if (*start == '\0')
+    	if (*start == '\0' || *start == '\n')
         	continue;
 
-    	printf("%s\n", start);
     	process_line(start, fout);
 	}
 
@@ -290,6 +292,9 @@ void handle_r_type(Instruction* instr, uint8_t regd, uint8_t reg1, uint8_t reg2,
  */
 void handle_i_type(Instruction* instr, uint8_t regd, uint8_t reg1, int imm, FILE* output) {
 	uint32_t result;
+
+	if(strcmp(instr->name, "srai") == 0)
+		imm |= 0x400;
 
 	result = ((imm           & 0xFFF) << 20) |
              ((reg1          & 0x1F)  << 15) |

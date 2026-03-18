@@ -107,7 +107,7 @@ architecture sim of score_v_tb is
   type expected_array is array (natural range <>) of expected_rec;
 
   --! @brief Maximum number of expected entries the file can contain.
-  constant c_MAX_EXPECTED : integer := 256;
+  constant c_MAX_EXPECTED : integer := 2048;
 
   --! @brief Empty record used to pad unused slots in the result array.
   constant c_EMPTY_REC : expected_rec := (
