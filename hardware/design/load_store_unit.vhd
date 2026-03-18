@@ -83,6 +83,7 @@ begin
     )
     port map (
       clk_i               => clk_i,
+      rst_i               => rst_i,
       addr_i              => addr_i,
       we_i                => mem_RW_i,
       width_i             => width_i,

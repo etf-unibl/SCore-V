@@ -65,6 +65,7 @@ entity dmem is
   port
   (
     clk_i               : in  std_logic;                     --! Global clock signal
+    rst_i               : in  std_logic;                     --! Synchronous reset, active high
     addr_i              : in  std_logic_vector(31 downto 0); --! Byte address for read/write access
     we_i                : in  std_logic;                     --! Write enable: '1' = write, '0' = read
     width_i             : in  std_logic_vector(1 downto 0);  --! Access width: byte=00, halfword=01, word=1x
@@ -178,20 +179,20 @@ end process;
 
   --! @brief Synchronous write.
   process(clk_i) is
-    variable v_is_invalid_addr     : std_logic;
-    variable v_is_misaligned_addr  : std_logic; 
   begin
-    v_is_invalid_addr    := '0';
-    v_is_misaligned_addr := '0';
-
     if rising_edge(clk_i) then
-      if we_i = '1' then
+      if rst_i = '1' then
+        is_invalid_addr_write    <= '0';
+        is_misaligned_addr_write <= '0';
+      elsif we_i = '1' then
+        is_invalid_addr_write    <= '0';
+        is_misaligned_addr_write <= '0';
         case width_i is
           when "00" => -- byte
             if address >= 0 and address <= c_MEM_SIZE - 1 then
               mem(address) <= data_write_i(7 downto 0);
             else
-              v_is_invalid_addr    := '1';
+              is_invalid_addr_write <= '1';
             end if;
           when "01" => -- half
             if address >= 0 and address <= c_MEM_SIZE - 2 then
@@ -199,10 +200,10 @@ end process;
                 mem(address)     <= data_write_i(7 downto 0);
                 mem(address + 1) <= data_write_i(15 downto 8);
               else
-                v_is_misaligned_addr := '1';
+                is_misaligned_addr_write <= '1';
               end if;
             else
-              v_is_invalid_addr    := '1';
+              is_invalid_addr_write <= '1';
             end if;
           when others => -- word
             if address >= 0 and address <= c_MEM_SIZE - 4 then
@@ -212,17 +213,17 @@ end process;
                 mem(address + 2) <= data_write_i(23 downto 16);
                 mem(address + 3) <= data_write_i(31 downto 24);
               else
-                v_is_misaligned_addr := '1';
+                is_misaligned_addr_write <= '1';
               end if;
             else
-              v_is_invalid_addr    := '1';
+              is_invalid_addr_write <= '1';
             end if;
         end case;
+      else
+        is_invalid_addr_write    <= '0';
+        is_misaligned_addr_write <= '0';
       end if;
     end if;
-
-    is_invalid_addr_write     <= v_is_invalid_addr;
-    is_misaligned_addr_write  <= v_is_misaligned_addr;
   end process;
 
   invalid_addr_o      <= is_invalid_addr_read or is_invalid_addr_write;
