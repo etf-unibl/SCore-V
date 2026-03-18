@@ -127,7 +127,7 @@ architecture arch of imem is
   signal misaligned_instr_addr_s : std_logic := '0';
 
 begin
-  
+
   misaligned_instr_addr_s <= '1' when addr_i(1 downto 0) /= "00" else '0';
   invalid_instr_addr_s    <= '1' when to_integer(unsigned(addr_i)) > c_MEM_SIZE - 4 else '0';
 
@@ -135,7 +135,7 @@ begin
   begin
     if halt_i = '1' then 
       data_o <= (others => '0');
-    elsif invalid_instr_addr_s = '0' and misaligned_instr_addr_s <= '0' then
+    elsif invalid_instr_addr_s = '0' and misaligned_instr_addr_s = '0' then
       --! @brief Asynchronous little-endian 32-bit read.
       data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
                 c_MEM(to_integer(unsigned(addr_i)) + 2) &
