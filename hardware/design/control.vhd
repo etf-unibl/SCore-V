@@ -443,6 +443,7 @@ begin
       end if;
       invalid_instr_o <= not valid_instruction_v;
     end if;
+
   end process comb_proc;
 
 end architecture arch;

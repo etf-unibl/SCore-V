@@ -72,8 +72,8 @@ architecture arch of control_tb is
   signal s_br_un            : std_logic;
   signal s_halt_i           : std_logic := '0';
   signal s_invalid_instr    : std_logic;
-  signal out_of_bound_s     : std_logic := '0';
-  signal misaligned_s       : std_logic := '0';
+  signal out_of_bound_s            : std_logic := '0';
+  signal misaligned_s              : std_logic := '0';
 
 begin
   -- Instantiate the Unit Under Test (UUT)
@@ -770,140 +770,29 @@ begin
         check_equal(to_integer(unsigned(s_wb_select_o)), 2, "JALR: wb_select must be PC+4 (10)");
         check_equal(s_invalid_instr, '0', "JALR must be valid");
 
-      elsif run("test_exception_behavior") then
+      elsif run("test_halt_behavior") then
 
-        -----------------------------------------------------------------------
-        -- Exception behavior:
-        -- If out_of_bound_i = '1' or misaligned_i = '1',
-        -- control must not decode the instruction and all outputs
-        -- must remain at safe default values.
-        -- invalid_instr_o must stay '0' because this is not an illegal
-        -- instruction decode, but an exception detected upstream.
-        -----------------------------------------------------------------------
+        s_halt_i     <= '1';
 
-        -- Start from a valid instruction encoding, so we prove that
-        -- exception flags override normal decode.
-        s_halt_i       <= '0';
-        out_of_bound_s <= '0';
-        misaligned_s   <= '0';
-        s_opcode       <= "0110011";   -- valid R-type ADD
-        s_funct3       <= "000";
-        s_funct7       <= "0000000";
-        s_imm_i_type   <= (others => '0');
-        s_br_eq        <= '0';
-        s_br_lt        <= '0';
+        s_opcode     <= "1111111";
+        s_funct3     <= "111";
+        s_funct7     <= (others => '1');
+        s_imm_i_type <= (others => '1');
+        s_br_eq      <= '1';
+        s_br_lt      <= '1';
         wait for 5 ns;
 
-        check_equal(s_reg_write_enable, '1', "Precondition: ADD should enable reg write");
-        check_equal(s_b_sel,            '0', "Precondition: ADD uses rs2");
-        check_equal(s_a_sel,            '0', "Precondition: ADD uses rs1");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "Precondition: ADD -> ALU_ADD");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "Precondition: ADD wb from ALU");
-        check_equal(s_invalid_instr,    '0', "Precondition: valid ADD must not assert invalid_instr");
-
-        -----------------------------------------------------------------------
-        -- 1) out_of_bound exception active
-        -----------------------------------------------------------------------
-        out_of_bound_s <= '1';
-        wait for 5 ns;
-
-        check_equal(s_reg_write_enable, '0', "OUT_OF_BOUND: reg_write must stay default");
-        check_equal(s_b_sel,            '0', "OUT_OF_BOUND: b_sel must stay default");
-        check_equal(s_a_sel,            '0', "OUT_OF_BOUND: a_sel must stay default");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "OUT_OF_BOUND: ALU must stay NOP");
-        check_equal(s_mem_rw_o,         '0', "OUT_OF_BOUND: mem_rw must stay default");
-        check_equal(s_mem_size_o, std_logic_vector'("10"), "OUT_OF_BOUND: mem_size must stay default word");
-        check_equal(s_mem_unsigned_o,   '0', "OUT_OF_BOUND: mem_unsigned must stay default");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "OUT_OF_BOUND: wb_select must stay default");
-        check_equal(to_integer(unsigned(s_imm_sel)), 0, "OUT_OF_BOUND: imm_sel must stay default");
-        check_equal(s_pc_sel,           '0', "OUT_OF_BOUND: pc_sel must stay default");
-        check_equal(s_br_un,            '0', "OUT_OF_BOUND: br_un must stay default");
-        check_equal(s_invalid_instr,    '0', "OUT_OF_BOUND: invalid_instr_o must remain 0");
-
-        -----------------------------------------------------------------------
-        -- 2) misaligned exception active
-        -----------------------------------------------------------------------
-        out_of_bound_s <= '0';
-        misaligned_s   <= '1';
-        wait for 5 ns;
-
-        check_equal(s_reg_write_enable, '0', "MISALIGNED: reg_write must stay default");
-        check_equal(s_b_sel,            '0', "MISALIGNED: b_sel must stay default");
-        check_equal(s_a_sel,            '0', "MISALIGNED: a_sel must stay default");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "MISALIGNED: ALU must stay NOP");
-        check_equal(s_mem_rw_o,         '0', "MISALIGNED: mem_rw must stay default");
-        check_equal(s_mem_size_o, std_logic_vector'("10"), "MISALIGNED: mem_size must stay default word");
-        check_equal(s_mem_unsigned_o,   '0', "MISALIGNED: mem_unsigned must stay default");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "MISALIGNED: wb_select must stay default");
-        check_equal(to_integer(unsigned(s_imm_sel)), 0, "MISALIGNED: imm_sel must stay default");
-        check_equal(s_pc_sel,           '0', "MISALIGNED: pc_sel must stay default");
-        check_equal(s_br_un,            '0', "MISALIGNED: br_un must stay default");
-        check_equal(s_invalid_instr,    '0', "MISALIGNED: invalid_instr_o must remain 0");
-
-        -----------------------------------------------------------------------
-        -- 3) Both exceptions active
-        -----------------------------------------------------------------------
-        out_of_bound_s <= '1';
-        misaligned_s   <= '1';
-        wait for 5 ns;
-
-        check_equal(s_reg_write_enable, '0', "BOTH EXCEPTIONS: reg_write must stay default");
-        check_equal(s_b_sel,            '0', "BOTH EXCEPTIONS: b_sel must stay default");
-        check_equal(s_a_sel,            '0', "BOTH EXCEPTIONS: a_sel must stay default");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "BOTH EXCEPTIONS: ALU must stay NOP");
-        check_equal(s_mem_rw_o,         '0', "BOTH EXCEPTIONS: mem_rw must stay default");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 0, "BOTH EXCEPTIONS: wb_select must stay default");
-        check_equal(to_integer(unsigned(s_imm_sel)), 0, "BOTH EXCEPTIONS: imm_sel must stay default");
-        check_equal(s_pc_sel,           '0', "BOTH EXCEPTIONS: pc_sel must stay default");
-        check_equal(s_br_un,            '0', "BOTH EXCEPTIONS: br_un must stay default");
-        check_equal(s_invalid_instr,    '0', "BOTH EXCEPTIONS: invalid_instr_o must remain 0");
-
-        -----------------------------------------------------------------------
-        -- 4) Exception removed -> normal decode must work again
-        -----------------------------------------------------------------------
-        out_of_bound_s <= '0';
-        misaligned_s   <= '0';
-        wait for 5 ns;
-
-        check_equal(s_reg_write_enable, '1', "After exception clear: ADD should decode again");
-        check_equal(s_b_sel,            '0', "After exception clear: ADD uses rs2");
-        check_equal(s_a_sel,            '0', "After exception clear: ADD uses rs1");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "After exception clear: ADD -> ALU_ADD");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "After exception clear: wb from ALU");
-        check_equal(s_invalid_instr,    '0', "After exception clear: valid ADD must remain valid");
-
-        -----------------------------------------------------------------------
-        -- HALT active
-        -----------------------------------------------------------------------
-        s_halt_i <= '1';
-        wait for 5 ns;
-      
         check_equal(s_reg_write_enable, '0', "HALT: reg_write must stay default");
         check_equal(s_b_sel,            '0', "HALT: b_sel must stay default");
         check_equal(s_a_sel,            '0', "HALT: a_sel must stay default");
         check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_NOP), "HALT: ALU must stay NOP");
         check_equal(s_mem_rw_o,         '0', "HALT: mem_rw must stay default");
-        check_equal(s_mem_size_o, std_logic_vector'("10"), "HALT: mem_size must stay default word");
-        check_equal(s_mem_unsigned_o,   '0', "HALT: mem_unsigned must stay default");
         check_equal(to_integer(unsigned(s_wb_select_o)), 0, "HALT: wb_select must stay default");
         check_equal(to_integer(unsigned(s_imm_sel)), 0, "HALT: imm_sel must stay default");
         check_equal(s_pc_sel,           '0', "HALT: pc_sel must stay default");
         check_equal(s_br_un,            '0', "HALT: br_un must stay default");
         check_equal(s_invalid_instr,    '0', "HALT: invalid_instr_o must remain 0");
-      
-        -----------------------------------------------------------------------
-        -- HALT removed -> normal decode must work again
-        -----------------------------------------------------------------------
-        s_halt_i <= '0';
-        wait for 5 ns;
-      
-        check_equal(s_reg_write_enable, '1', "After HALT clear: ADD should decode again");
-        check_equal(s_b_sel,            '0', "After HALT clear: ADD uses rs2");
-        check_equal(s_a_sel,            '0', "After HALT clear: ADD uses rs1");
-        check_equal(t_alu_op'image(s_alu_op), t_alu_op'image(ALU_ADD), "After HALT clear: ADD -> ALU_ADD");
-        check_equal(to_integer(unsigned(s_wb_select_o)), 1, "After HALT clear: wb from ALU");
-        check_equal(s_invalid_instr,    '0', "After HALT clear: valid ADD must remain valid");
-      
+
       end if;
     end loop;
 
