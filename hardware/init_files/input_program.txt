@@ -1,174 +1,123 @@
-auipc x1, 333
-lui x2, 444
-addi x2, x0, 30
-sub x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 1
-sub x3, x1, x2
-addi x1, x0, 5
-sub x3, x1, x1
-addi x1, x0, 255
-addi x2, x0, 15
-and x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 0
-and x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, -1
-and x3, x1, x2
-addi x1, x0, 240
-addi x2, x0, 15
-or x3, x1, x2
+# Example input program for SCore-V.
+# Character '#' represents a comment and everything after it is ignored.
+
+# Showcasing I_TYPE instructions:
+addi x1, x0, 5 		    # Value in register x0 is always zero, so x1 = 0 + 5 = 5
+addi x2, x1, 15
+addi x7, x0, -452
+xori x3, x2, 4
+ori x4, x2, 7
+andi x5, x4, 100
+slli x6, x4, 3          # Shift left logical: x6 = x4 << 3
+srli x6, x6, 3          # Shift right logical: x6 = x6 >> 3
+srai x7, x7, 2          # Shift right arithmetci: x7 stays negative number
+slti x8, x7, 10         # Set less then: x8 = 1 if x7 < 10, else x8 = 0. x8 should be 1
+sltiu x8, x7, 10        # Set less then unsigned: x8 should be 0
+
+# Shocasing R_TYPE instructions:
+add x9, x1, x0          # x0 is 0 so x9 = x1
+sub x9, x9, x1
+xor x10, x2, x1
+or x11, x10, x3
+and x12, x11, x5
+sll x10, x10, x1        # x10 <<= x1: x10 shifted left by 10
+srl x10, x10, x1        # x10 >== x1
+sra x7, x7, x20          # x7 >== x1 arithmetic
+slt x10, x7, x10
+sltu x10, x7, x10
+
+# Showcasing U_TYPE instructions:
+lui x15, 1000
+auipc x15, 1000
+
+# Showcasing S_TYPE instructions:
+sb x1, 0(x0)            # Store lowest byte of x1 into address 0 of dmem
+sh x2, 5(x0) 			# Store lower half word of x2 into address 4 of dmem
+sw x7, 10(x0)           # Store word x7 into to address 10 of dmem
+
+# Showcasing Load instructions:
+lb x3, 0(x0)            # Load lowest byte of dmem into register x3
+lh x3, 5(x0)            # Load half word from address 5 into x3
+lw x3, 10(x0)           # Load word from address 10 into register x3
+lbu x3, 10(x0)          # Load byte from address 10 into register x3 unsigned
+lhu x3, 10(x0)          # Load word from address 10 into register x3 unsigned
+
+# Reset values of registers
 addi x1, x0, 0
 addi x2, x0, 0
-or x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 0
-or x3, x1, x2
-addi x1, x0, 255
-addi x2, x0, 255
-xor x3, x1, x2
-addi x1, x0, 170
-addi x2, x0, 85
-xor x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 0
-xor x3, x1, x2
-addi x1, x0, 1
-addi x2, x0, 4
-addi x1, x0, 1
-addi x1, x0, 0
-addi x2, x0, 10
-sll x3, x1, x2
-addi x1, x0, 16
-addi x2, x0, 4
-srl x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 1
-addi x1, x0, 0
-addi x2, x0, 5
-srl x3, x1, x2
-addi x1, x0, -16
-addi x2, x0, 2
-sra x3, x1, x2
-addi x1, x0, 16
-addi x2, x0, 2
-sra x3, x1, x2
-addi x1, x0, -1
-sra x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 0
-slt x3, x1, x2
-addi x1, x0, 1
-addi x2, x0, 0
-slt x3, x1, x2
-addi x1, x0, 0
-addi x2, x0, 0
-slt x3, x1, x2
-addi x1, x0, -1
-addi x2, x0, 0
-sltu x3, x1, x2
-addi x1, x0, 0
-addi x2, x0, -1
-sltu x3, x1, x2
-addi x1, x0, 5
-addi x2, x0, 5
-sltu x3, x1, x2
-addi x1, x0, 0
-addi x1, x0, 2047
-addi x1, x0, -2048
-addi x1, x0, -1
-addi x1, x1, 1
-addi x1, x0, 255
-andi x2, x1, 15
-andi x2, x1, 0
-andi x2, x1, -1
-addi x1, x0, 0
-ori x2, x1, 255
-ori x2, x1, 0
-addi x1, x0, 240
-ori x2, x1, 15
-addi x1, x0, 255
-xori x2, x1, 255
-xori x2, x1, 0
-xori x2, x1, -1
-addi x1, x0, 1
-slli x2, x1, 0
-slli x2, x1, 1
-slli x2, x1, 15
-srli x2, x1, 0
-srli x2, x1, 1
-addi x1, x0, -1
-srai x2, x1, 0
-addi x1, x0, 16
-srai x2, x1, 2
-addi x1, x0, -1
-slti x2, x1, 0
-slti x2, x1, -1
-slti x2, x1, -2
-addi x1, x0, 0
-sltiu x2, x1, 1
-sltiu x2, x1, 0
-addi x1, x0, -1
-sltiu x2, x1, -1
-addi x1, x0, 1
-addi x2, x0, 2
-addi x3, x0, -1
+addi x3, x0, 0
 addi x4, x0, 0
-beq x1, x1, 8
-addi x10, x0, 111
-addi x10, x0, 1
-beq x1, x2, 8
-addi x10, x0, 2
-addi x10, x0, 111
-bne x1, x2, 8
-addi x10, x0, 111
-addi x10, x0, 3
-bne x1, x1, 8
-addi x10, x0, 4
-addi x10, x0, 111
-blt x3, x1, 8
-addi x10, x0, 111
-addi x10, x0, 5
-blt x1, x3, 8
-addi x10, x0, 6
-addi x10, x0, 111
-blt x1, x1, 8
-addi x10, x0, 111
-addi x10, x0, 7
-bge x1, x3, 8
-addi x10, x0, 111
-addi x10, x0, 8
-bge x3, x1, 8
-addi x10, x0, 9
-addi x10, x0, 111
-bge x1, x1, 8
-addi x10, x0, 111
-addi x10, x0, 10
-bltu x4, x1, 8
-addi x10, x0, 111
-addi x10, x0, 11
-bltu x3, x1, 8
-addi x10, x0, 12
-addi x10, x0, 111
-bgeu x1, x4, 8
-addi x10, x0, 111
-addi x10, x0, 13
-bgeu x4, x1, 8
-addi x10, x0, 14
-addi x10, x0, 111
-addi x1, x0, 50
-jal x1, 12
-addi x30, x0, 111
-addi x30, x0, 111
-addi x30, x0, 41
-jal x2, 8
-addi x30, x0, 111
-addi x30, x0, 42
-jal x0, 8
-addi x30, x0, 111
-addi x30, x0, 43
-addi x1, x0, 0
-addi x2, x0, 5
+addi x5, x0, 0
+addi x6, x0, 0
+addi x7, x0, 0
+addi x8, x0, 0
+addi x9, x0, 0
+addi x10, x0, 0
+addi x11, x0, 0
+addi x12, x0, 0
+addi x13, x0, 0
+
+# Add initial values to some registers
+addi x1, x0, 10
+addi x6, x0, 1
+addi x2, x0, 20
+addi x3, x0, 30
+addi x4, x0, 40
+addi x5, x0, 50
+
+# Showcasing B_TYPE instructions:
+
+# loop: while x5 is greather then or equal to x1 increment x1 by 1
 addi x1, x1, 1
-bne x1, x2, -4
+bge x5, x1, -4
+
+# loop: while x2 is lower then x1 decrement x1 by 1
+sub x1, x1, x6
+blt x2, x1, -4
+
+# loop: while x5 is greather then or equal to x1 increment x1 by 1 using beq
+addi x1, x0, 10      # Reset x1 to 10
+addi x1, x1, 1
+beq x5, x1, -4
+
+# Reset values of registers
+addi x1, x0, 0
+addi x2, x0, 0
+addi x3, x0, 0
+addi x4, x0, 0
+addi x5, x0, 0
+addi x6, x0, 0
+addi x7, x0, 0
+addi x8, x0, 0
+addi x9, x0, 0
+addi x10, x0, 0
+addi x11, x0, 0
+addi x12, x0, 0
+addi x13, x0, 0
+
+# Showcasing jal and jalr instructions:
+
+# Store values to be multiplied:
+addi x2, x0, 10
+addi x3, x0, 20
+jal x1, 8
+
+# Jump to end of program:
+jal x1, 32
+
+# A simple function that multiplies x2 and x3 registers and stores value in x4 (x2 and x3 must be positive values):
+
+# Function setup:
+addi x4, x0, 0      # Reset output to 0
+addi x5, x0, 1      # temp value for decrementing
+addi x6, x3, 0      # x3 temp
+
+# for loop for calculating multiplication
+add x4, x4, x2
+sub x6, x6, x5
+bne x6, x0, -8     # if x6 is not equal to zero jump to start of the loop
+
+# Once the loop is done, jump back to main program
+jalr x0, x1, 0
+
+addi x1, x1, 10
