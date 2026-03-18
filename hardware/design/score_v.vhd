@@ -136,10 +136,18 @@ architecture arch of score_v is
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
   --! @brief Exepction handler signals
-  signal misaligned_access_sig   : std_logic;
-  signal invalid_address_sig     : std_logic;
-  signal invalid_instruction_sig : std_logic;
-  signal halt_sig                : std_logic;
+  signal invalid_address_sig       : std_logic; --! exception handler out of bound
+  signal misaligned_access_sig     : std_logic; --! exception handler misaligned
+  signal invalid_instruction_sig   : std_logic; --! exception handler and control
+
+  signal invalid_address_fetch_sig : std_logic; --! fetch out of bound
+  signal misaligned_fetch_sig      : std_logic; --! fetch misaligned
+  signal invalid_address_lsu_sig   : std_logic; --! out of bound lsu
+  signal misaligned_lsu_sig        : std_logic; --! misaligned lsu
+
+  signal halt_sig                      : std_logic;
+
+  -- signal fetched_instr_sig : t_instruction_rec;
 
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
@@ -198,6 +206,8 @@ architecture arch of score_v is
       br_eq_i            : in  std_logic;
       br_lt_i            : in  std_logic;
       halt_i             : in  std_logic;
+      out_of_bound_i     : in  std_logic;
+      misaligned_i       : in  std_logic;
       reg_write_enable_o : out std_logic;
       imm_sel_o          : out std_logic_vector(2 downto 0);
       a_sel_o            : out std_logic;
@@ -209,7 +219,7 @@ architecture arch of score_v is
       wb_select_o        : out std_logic_vector(1 downto 0);
       pc_sel_o           : out std_logic;
       br_un_o            : out std_logic;
-      invalid_instr_o    : out std_logic
+      invalid_instr_o    : out std_logic    
     );
   end component;
 
@@ -325,7 +335,26 @@ architecture arch of score_v is
     );
   end component;
 
+  component fetch_instruction is
+  generic
+  (
+    g_ADDR_WIDTH : integer := 32;
+    g_INIT_FILE  : string  := "instruction_memory.txt"
+  );
+  port
+  (
+    instruction_count_i     : in  std_logic_vector(g_ADDR_WIDTH-1 downto 0);
+    halt_i                  : in  std_logic;
+    instruction_bits_o      : out t_instruction_rec;
+    invalid_instr_addr_o    : out std_logic;
+    misaligned_instr_addr_o : out std_logic
+  );
+end component;
+
 begin
+
+  invalid_address_sig   <= invalid_address_fetch_sig or invalid_address_lsu_sig;
+  misaligned_access_sig <= misaligned_fetch_sig or misaligned_lsu_sig;
 
   --! @brief Program Counter instance
   u_pc : pc
@@ -385,7 +414,9 @@ begin
       wb_select_o        => wb_select_sig,
       pc_sel_o           => pc_sel_sig,
       br_un_o            => br_un_sig,
-      invalid_instr_o    => invalid_instruction_sig
+      invalid_instr_o    => invalid_instruction_sig,
+      out_of_bound_i     => invalid_address_fetch_sig,
+      misaligned_i       => misaligned_fetch_sig
     );
 
   --! @brief Immediate Generator unit instance
@@ -463,8 +494,8 @@ begin
       data_read_o         => mem_data_sig,
       sign_i              => sign_s,
       width_i             => width_s,
-      invalid_addr_o      => invalid_address_sig,
-      misaligned_access_o => misaligned_access_sig
+      invalid_addr_o      => invalid_address_lsu_sig,
+      misaligned_access_o => misaligned_lsu_sig
     );
 
   --! @brief Write-Back Multiplexer
@@ -487,6 +518,18 @@ begin
       invalid_instruction_i => invalid_instruction_sig,
       halt_processor_o      => halt_sig
     );
+
+--  u_fetch : fetch_instruction
+--    generic map (
+--      g_INIT_FILE => g_init_file
+--    )
+--    port map (
+--      instruction_count_i     => pc_sig,
+--      instruction_bits_o      => fetched_instr_sig,
+--      halt_i                  => halt_sig,
+--      invalid_instr_addr_o    => invalid_address_fetch_sig,
+--      misaligned_instr_addr_o => misaligned_access_fetch_sig
+--    );
 
   --! @brief Output assignments
   instr_addr_o <= pc_sig;

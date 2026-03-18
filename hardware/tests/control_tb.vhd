@@ -72,6 +72,8 @@ architecture arch of control_tb is
   signal s_br_un            : std_logic;
   signal s_halt_i           : std_logic := '0';
   signal s_invalid_instr    : std_logic;
+  signal out_of_bound_s            : std_logic := '0';
+  signal misaligned_s              : std_logic := '0';
 
 begin
   -- Instantiate the Unit Under Test (UUT)
@@ -94,8 +96,10 @@ begin
       wb_select_o        => s_wb_select_o,
       pc_sel_o           => s_pc_sel,
       br_un_o            => s_br_un,
-      halt_i          => s_halt_i,
-      invalid_instr_o => s_invalid_instr
+      halt_i             => s_halt_i,
+      invalid_instr_o    => s_invalid_instr,
+      out_of_bound_i     => out_of_bound_s,
+      misaligned_i       => misaligned_s
     );
 
   -- Stimulus process
@@ -769,6 +773,7 @@ begin
       elsif run("test_halt_behavior") then
 
         s_halt_i     <= '1';
+
         s_opcode     <= "1111111";
         s_funct3     <= "111";
         s_funct7     <= (others => '1');

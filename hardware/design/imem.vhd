@@ -146,4 +146,7 @@ begin
     end if;
   end process;
 
+  invalid_instr_addr_o     <= invalid_instr_addr_s;
+  misaligned_instr_addr_o  <= misaligned_instr_addr_s;
+
 end arch;

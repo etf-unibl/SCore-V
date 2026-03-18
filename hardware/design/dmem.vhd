@@ -135,9 +135,6 @@ architecture arch of dmem is
 begin
 
   address      <= to_integer(signed(addr_i));
-  --memory_bound <= c_MEM_SIZE - 2 when width_i = "00" else
-  --                c_MEM_SIZE - 3 when width_i = "01" else
-  --                c_MEM_SIZE - 4;
 
   --! @brief Asynchronous zero-extended read.
   process(address, width_i, mem, addr_i) is
@@ -145,7 +142,7 @@ begin
     variable v_is_invalid_addr    : std_logic;
     variable v_is_misaligned_addr : std_logic;
   begin
-    v_result               := (others => '0');
+    v_result             := (others => '0');
     v_is_invalid_addr    := '0';
     v_is_misaligned_addr := '0';
   case width_i is

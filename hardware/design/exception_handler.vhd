@@ -67,7 +67,7 @@ end exception_handler;
 architecture arch of exception_handler is
   signal int_halt : std_logic := '0';
 begin
-  comb_proc : process(clk_i, rst_i)
+  comb_proc : process(clk_i, rst_i, misaligned_access_i, invalid_address_i, invalid_instruction_i)
   begin
     if rst_i = '1' then
       int_halt <= '0';

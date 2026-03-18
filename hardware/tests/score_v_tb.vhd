@@ -86,6 +86,9 @@ architecture sim of score_v_tb is
   signal reg_we_s     : std_logic;
   signal mem_data_s   : std_logic_vector(31 downto 0);
   signal wb_data_s    : std_logic_vector(31 downto 0);
+  signal misaligned_access_sig   : std_logic;
+  signal invalid_address_sig     : std_logic;
+  signal halt_sig                : std_logic;
 
   constant CLK_PERIOD : time := 10 ns;
 
@@ -268,7 +271,10 @@ begin
     )
     port map (
       instruction_count_i => instr_addr_s,
-      instruction_bits_o  => fetch_instr_s
+      instruction_bits_o  => fetch_instr_s,
+      halt_i                  => halt_sig,
+      invalid_instr_addr_o    => invalid_address_sig,
+      misaligned_instr_addr_o => misaligned_access_sig
     );
 
   instr_mem_s <= fetch_instr_s;

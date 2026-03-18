@@ -118,6 +118,8 @@ entity control is
     br_eq_i            : in  std_logic;                     --! Equality indicator from Branch Comparator
     br_lt_i            : in  std_logic;                     --! Less-than indicator from Branch Comparator
     halt_i             : in  std_logic;                     --! HALT state indicator (disables instruction decoding when the CPU enters HALT state)
+    out_of_bound_i     : in  std_logic;                     --! Exception flag from imem module
+    misaligned_i       : in  std_logic;                     --! Exception flag from imem module
     reg_write_enable_o : out std_logic;                     --! Register write enable signal
     imm_sel_o          : out std_logic_vector(2 downto 0);  --! Immediate select/qualifier
     b_sel_o            : out std_logic;                     --! ALU operand B select (0=rs2_data, 1=immediate)
@@ -160,7 +162,7 @@ begin
 --! This signal indicates that the instruction encoding is not supported
 --! by the implemented subset of the RISC-V ISA.
 
-  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i, br_eq_i, br_lt_i, halt_i)
+  comb_proc : process (opcode_i, funct3_i, funct7_i, imm_i_type_i, br_eq_i, br_lt_i, halt_i, out_of_bound_i, misaligned_i)
     variable valid_instruction_v : std_logic; --! Internal flag indicating successful instruction decode
   begin
     reg_write_enable_o <= '0';
@@ -178,7 +180,7 @@ begin
 
     valid_instruction_v := '0';
 
-    if halt_i = '0' then
+    if halt_i = '0' and out_of_bound_i = '0' and misaligned_i = '0' then
 -- =========================================================
 --                 R-type ALU instructions
 -- =========================================================
