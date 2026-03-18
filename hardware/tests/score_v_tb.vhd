@@ -254,8 +254,7 @@ begin
     wait;
   end process;
 
-  monitor_proc : process
-  
+monitor_proc : process
     alias dbg_pc         is << signal .score_v_tb.uut.pc_sig : std_logic_vector(31 downto 0) >>;
     alias dbg_opcode     is << signal .score_v_tb.uut.opcode_sig : std_logic_vector(6 downto 0) >>;
     alias dbg_rd_addr    is << signal .score_v_tb.uut.rd_sig : std_logic_vector(4 downto 0) >>;
@@ -264,7 +263,7 @@ begin
     alias dbg_alu_result is << signal .score_v_tb.uut.alu_result_sig : std_logic_vector(31 downto 0) >>;
     alias dbg_reg_we     is << signal .score_v_tb.uut.reg_we_sig : std_logic >>;
     alias dbg_wb_data    is << signal .score_v_tb.uut.final_wb_sig : std_logic_vector(31 downto 0) >>;
-    alias dbg_instr is << signal .score_v_tb.uut.instr_sig : t_instruction_rec >>;
+    alias dbg_instr      is << signal .score_v_tb.uut.instr_sig : t_instruction_rec >>;
 
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
@@ -284,41 +283,24 @@ begin
         for i in 0 to c_VALID_COUNT - 1 loop
           wait until rising_edge(clk_s);
 
-          --full_instr := dbg_instr.other_instruction_bits & dbg_instr.opcode;
+          check_equal(to_integer(unsigned(dbg_pc)), res(step).pc, "PC Error at step " & integer'image(step));
+          check_equal(to_integer(unsigned(dbg_rd_addr)), res(step).rd, "RD Error at step " & integer'image(step));
+          check_equal(to_integer(unsigned(dbg_rs1_addr)), res(step).rs1, "RS1 Error at step " & integer'image(step));
+          check_equal(to_integer(unsigned(dbg_rs2_addr)), res(step).rs2, "RS2 Error at step " & integer'image(step));
+          check_equal(to_integer(signed(dbg_alu_result)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
-          if step <= c_VALID_COUNT - 1 then
-            check_equal(to_integer(unsigned(dbg_pc)), res(step).pc, "PC Error at step " & integer'image(step));
-
-/*             if dbg_opcode = "0110111" or dbg_opcode = "0010111" then
-              check_equal(0, res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
-            else
-              check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
-            end if;
-
-            if dbg_opcode = "0110011" then
-              check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
-            end if; */
-
-            check_equal(to_integer(unsigned(dbg_rd_addr)), res(step).rd, "RD Error at step " & integer'image(step));
-            check_equal(to_integer(unsigned(dbg_rs1_addr)), res(step).rs1, "RS1 Error at step " & integer'image(step));
-            check_equal(to_integer(unsigned(dbg_rs2_addr)), res(step).rs2,
-              "RS2 Error at step " & integer'image(step) &
-              " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(dbg_rs2_addr))) &
-              " | expected = " & integer'image(res(step).rs2));
-            check_equal(to_integer(signed(dbg_alu_result)), res(step).alu_out, "ALU Error at step " & integer'image(step));
-
-            if dbg_reg_we = '1' then
-              check_equal(to_integer(signed(dbg_wb_data)), res(step).wb_out, "WB Error at step " & integer'image(step));
-            end if;
-
-            check_equal(dbg_reg_we, res(step).we, "WE Error at step " & integer'image(step));
-			
-			step := step + 1;
-          else
-            test_runner_cleanup(runner);
-            sim_done_s <= '1';
+          if dbg_reg_we = '1' then
+            check_equal(to_integer(signed(dbg_wb_data)), res(step).wb_out, "WB Error at step " & integer'image(step));
           end if;
+
+          check_equal(dbg_reg_we, res(step).we, "WE Error at step " & integer'image(step));
+          
+          step := step + 1;
         end loop;
+
+        test_runner_cleanup(runner);
+        sim_done_s <= '1';
+        wait;
       end if;
     end loop;
 
