@@ -257,7 +257,7 @@ begin
         info("Testing load word (lw) function of load_store unit");
 
         -- First store values that will be loaded
-        width_s <= "01";
+        width_s <= "00";
         mem_RW_s <= '1';
         addr_s <= std_logic_vector(to_unsigned(0, 32));
         data_write_s(7 downto 0) <= "11111111";
@@ -345,7 +345,7 @@ begin
         info("Testing load half word (lh) function of load_store_unit");
 
         -- First store values that will be loaded
-        width_s <= "01";
+        width_s <= "00";
         mem_RW_s <= '1';
         addr_s <= std_logic_vector(to_unsigned(0, 32));
         data_write_s(7 downto 0) <= "11111111";
@@ -466,7 +466,7 @@ begin
         info("Testing load byte(lb) function of load_store_unit");
 
         -- First store values that will be loaded
-        width_s <= "01";
+        width_s <= "00";
         mem_RW_s <= '1';
         addr_s <= std_logic_vector(to_unsigned(0, 32));
         data_write_s(7 downto 0) <= "11111111";
