@@ -69,8 +69,6 @@ architecture sim of score_v_signature_tb is
   signal sim_done_s   : std_logic := '0';
 
   signal instr_addr_s : std_logic_vector(31 downto 0);
-  signal instr_mem_s  : t_instruction_rec;
-  signal fetch_instr_s: t_instruction_rec;
   signal pc_s         : std_logic_vector(31 downto 0);
   signal opcode_s     : std_logic_vector(6 downto 0);
   signal rd_addr_s    : std_logic_vector(4 downto 0);
@@ -109,36 +107,14 @@ begin
 
   uut : entity design_lib.score_v
     generic map (
-      g_dmem_init_file => g_dmem_init_file
+      g_dmem_init_file => g_dmem_init_file,
+      g_IMEM_INIT_FILE => g_init_file
     )
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
-      instr_addr_o => instr_addr_s,
-      instr_data_i => instr_mem_s,
-      pc_o         => pc_s,
-      opcode_o     => opcode_s,
-      rd_o         => rd_addr_s,
-      rs1_o        => rs1_addr_s,
-      rs2_o        => rs2_addr_s,
-      rs1_data_o   => rs1_data_s,
-      rs2_data_o   => rs2_data_s,
-      alu_result_o => alu_result_s,
-      reg_we_o     => reg_we_s,
-      mem_data_o   => mem_data_s,
-      wb_data_o    => wb_data_s
+      instr_addr_o => instr_addr_s
     );
-
-  u_fetch : entity design_lib.fetch_instruction
-    generic map (
-      g_INIT_FILE => g_init_file
-    )
-    port map (
-      instruction_count_i => instr_addr_s,
-      instruction_bits_o  => fetch_instr_s
-    );
-
-  instr_mem_s <= fetch_instr_s;
 
   clk_process : process
   begin

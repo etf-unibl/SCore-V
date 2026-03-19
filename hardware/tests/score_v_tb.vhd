@@ -74,11 +74,9 @@ architecture sim of score_v_tb is
   signal sim_done_s   : std_logic := '0';
 
   signal instr_addr_s : std_logic_vector(31 downto 0);
-  signal instr_mem_s  : t_instruction_rec := (others => (others => '0'));
 
   constant CLK_PERIOD : time := 10 ns;
 
-  signal fetch_instr_s : t_instruction_rec;
 
   type expected_rec is record
     pc      : integer;
@@ -232,16 +230,13 @@ begin
   uut : entity design_lib.score_v
     generic map (
       g_dmem_init_file => g_dmem_init_file,
-	  g_IMEM_INIT_FILE => g_init_file
+      g_IMEM_INIT_FILE => g_init_file
     )
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
-      instr_addr_o => instr_addr_s,
-      instr_data_i => instr_mem_s
+      instr_addr_o => instr_addr_s
     );
-
-  instr_mem_s <= fetch_instr_s;
 
   clk_process : process
   begin
@@ -281,6 +276,7 @@ monitor_proc : process
 
         for i in 0 to c_VALID_COUNT - 1 loop
           wait until rising_edge(clk_s);
+          wait for 1 ns;  -- settle past delta cycles
 
           check_equal(to_integer(unsigned(dbg_pc)), res(step).pc, "PC Error at step " & integer'image(step));
           check_equal(to_integer(unsigned(dbg_rd_addr)), res(step).rd, "RD Error at step " & integer'image(step));

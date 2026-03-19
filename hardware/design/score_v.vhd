@@ -66,8 +66,7 @@ entity score_v is
     clk_i        : in  std_logic;                     --! Clock input
     rst_i        : in  std_logic;                     --! Reset input
 
-    instr_addr_o : out std_logic_vector(31 downto 0); --! PC output to memory
-	instr_data_i : in t_instruction_rec
+    instr_addr_o : out std_logic_vector(31 downto 0) --! PC output to memory
   );
 end score_v;
 
