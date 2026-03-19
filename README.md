@@ -212,3 +212,19 @@ More details about these tools can be found at the following links:
 - [Assembler](https://github.com/etf-unibl/SCore-V/wiki/Assembler)  
 - [Conformance Tests](https://github.com/etf-unibl/SCore-V/wiki/Conformance-tests)  
 - [VUnit Guide](https://github.com/etf-unibl/SCore-V/wiki/VUnit-uputstvo)
+
+## Generating Documentation
+
+The project uses Doxygen to generate documentation from source code comments.
+
+Navigate to the directory containing the Doxyfile:
+
+>`cd SCore-V\hardware\design`
+
+Run Doxygen:
+
+>`doxygen Doxyfile`
+
+The documentation will be generated in the html/ directory.
+
+Open the generated documentation: html/index.html
