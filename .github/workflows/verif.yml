@@ -24,7 +24,7 @@ jobs:
       - name: Run VUnit tests
         uses: VUnit/vunit_action@master
         with:
-          image: ghdl/vunit:gcc
+          image: ghdl/vunit:llvm
           cmd: scripts/run.py --gtkwave-fmt vcd
 
       - name: Archive results
