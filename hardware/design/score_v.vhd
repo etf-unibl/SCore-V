@@ -79,6 +79,7 @@ entity score_v is
     alu_result_o : out std_logic_vector(31 downto 0); --! ALU result output
     reg_we_o     : out std_logic;                     --! Register write enable output
     mem_data_o   : out std_logic_vector(31 downto 0); --! Data read from memory output
+    halt_o       : out std_logic;
     wb_data_o    : out std_logic_vector(31 downto 0)  --! Final write-back data output
   );
 end score_v;
@@ -547,5 +548,6 @@ begin
   reg_we_o     <= reg_we_sig;
   wb_data_o    <= final_wb_sig;
   mem_data_o   <= mem_data_sig;
+  halt_o       <= halt_sig;
   
 end arch;

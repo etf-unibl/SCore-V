@@ -263,6 +263,7 @@ begin
       alu_result_o => alu_result_s,
       reg_we_o     => reg_we_s,
       mem_data_o   => mem_data_s,
+      halt_o       => halt_sig,
       wb_data_o    => wb_data_s
     );
 
@@ -299,12 +300,15 @@ begin
   wait for 1 ns;
 
   for i in 0 to c_VALID_COUNT - 1 loop
+   check_equal(halt_sig, '0', "Halt should be zero for every step");
+
     full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
     report "STEP=" & integer'image(step) &
        " PC=" & integer'image(to_integer(unsigned(pc_s))) &
        " instr_rec_opcode=" & to_string(instr_mem_s.opcode) &
        " opcode_s=" & to_string(opcode_s) &
+       " opcode_s=" & to_string(opcode_s)  &
        " full_instr=" & to_hstring(full_instr);
 
     if step <= c_VALID_COUNT - 1 then
