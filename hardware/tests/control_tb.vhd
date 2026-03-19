@@ -74,11 +74,15 @@ architecture arch of control_tb is
   signal s_invalid_instr    : std_logic;
   signal out_of_bound_s            : std_logic := '0';
   signal misaligned_s              : std_logic := '0';
+  signal rst_s              : std_logic;
+  signal mem_en_s           : std_logic;
 
 begin
   -- Instantiate the Unit Under Test (UUT)
   uut : entity design_lib.control
     port map (
+	  mem_en_o           => mem_en_s,
+	  rst_i              => rst_s,
       opcode_i           => s_opcode,
       funct3_i           => s_funct3,
       funct7_i           => s_funct7,

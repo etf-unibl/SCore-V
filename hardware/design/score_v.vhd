@@ -147,6 +147,7 @@ architecture arch of score_v is
   signal misaligned_lsu_sig        : std_logic; --! misaligned lsu
 
   signal halt_sig                      : std_logic;
+  signal mem_en_s                  : std_logic;
 
   signal fetched_instr_sig : t_instruction_rec;
 
@@ -200,6 +201,8 @@ architecture arch of score_v is
   --!   based on opcode and funct fields from the decoded instruction.
   component control is
     port (
+	  mem_en_o           : out std_logic;
+	  rst_i              : in  std_logic;
       opcode_i           : in  std_logic_vector(6 downto 0);
       funct3_i           : in  std_logic_vector(2 downto 0);
       funct7_i           : in  std_logic_vector(6 downto 0);
@@ -258,6 +261,7 @@ architecture arch of score_v is
       g_INIT_FILE : string := "data_memory.txt"
     );
     port (
+	  mem_en_i       : in std_logic;
       clk_i          : in  std_logic;
       rst_i          : in  std_logic;
       addr_i         : in  std_logic_vector(31 downto 0);
@@ -397,6 +401,8 @@ begin
   --! @brief Control unit instance
   u_control : control
     port map (
+	  mem_en_o           => mem_en_s,
+	  rst_i              => rst_i,
       opcode_i           => opcode_sig,
       funct3_i           => funct3_sig,
       funct7_i           => funct7_sig,
@@ -487,6 +493,7 @@ begin
       g_init_file => g_DMEM_INIT_FILE
     )
     port map (
+	  mem_en_i            => mem_en_s,
       clk_i               => clk_i,
       rst_i               => rst_i,
       addr_i              => alu_result_sig,

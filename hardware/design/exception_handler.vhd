@@ -65,18 +65,21 @@ entity exception_handler is
 end exception_handler;
 
 architecture arch of exception_handler is
-  signal int_halt : std_logic := '0';
-begin
-  comb_proc : process(clk_i, rst_i, misaligned_access_i, invalid_address_i, invalid_instruction_i)
+    signal int_halt : std_logic := '0';
   begin
-    if rst_i = '1' then
-      int_halt <= '0';
-    elsif rising_edge (clk_i) then
-      if misaligned_access_i = '1' or invalid_address_i = '1' or invalid_instruction_i = '1' then
-        int_halt <= '1';
+    process(clk_i, rst_i)
+    begin
+      if rst_i = '1' then
+        int_halt <= '0';
+      elsif rising_edge(clk_i) then
+        if (misaligned_access_i = '1' or invalid_address_i = '1' or invalid_instruction_i = '1') then
+		  int_halt <= '1';
+		  if invalid_instruction_i = '1' then report "DEBUG: Invalid Instruction detected!"; end if;
+		  if invalid_address_i = '1' then report "DEBUG: Out of Bounds detected!"; end if;
+		  if misaligned_access_i = '1' then report "DEBUG: Misalignment detected!"; end if;
+		end if;
       end if;
-    end if;
-  end process comb_proc;
+    end process;
 
-  halt_processor_o <= int_halt;
+    halt_processor_o <= int_halt;
 end arch;

@@ -111,6 +111,8 @@ use work.alu_pkg.all;
 --! @brief Entity definition of control unit
 entity control is
   port (
+    mem_en_o           : out std_logic; --Novi signal koji je spasio score_v_tb
+    rst_i              : in  std_logic;
     opcode_i           : in  std_logic_vector(6 downto 0);  --! Instruction opcode
     funct3_i           : in  std_logic_vector(2 downto 0);  --! Instruction funct3 field
     funct7_i           : in  std_logic_vector(6 downto 0);  --! Instruction funct7 field
@@ -177,7 +179,7 @@ begin
     pc_sel_o           <= '0';
     br_un_o            <= '0';
     invalid_instr_o    <= '0';
-
+    mem_en_o           <= '0';
     valid_instruction_v := '0';
 
     if halt_i = '0' and out_of_bound_i = '0' and misaligned_i = '0' then
@@ -344,6 +346,7 @@ begin
           mem_size_o         <= funct3_i(1 downto 0);
           mem_unsigned_o     <= funct3_i(2);
           valid_instruction_v := '1';
+		  mem_en_o <= '1';
 
         end if;
 
@@ -356,6 +359,7 @@ begin
           mem_rw_o   <= '1';
           mem_size_o <= funct3_i(1 downto 0);
           valid_instruction_v := '1';
+		  mem_en_o <= '1';
 
         end if;
 
@@ -441,9 +445,14 @@ begin
         valid_instruction_v := '1';
 
       end if;
-      invalid_instr_o <= not valid_instruction_v;
     end if;
-
+	
+	if halt_i = '1' or rst_i = '1' then 
+        invalid_instr_o <= '0';
+    else
+        invalid_instr_o <= not valid_instruction_v;
+    end if;
+    report "Control Unit: Sta je sad ovo: " & to_string(opcode_i);
   end process comb_proc;
 
 end architecture arch;

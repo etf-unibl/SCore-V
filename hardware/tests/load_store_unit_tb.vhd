@@ -67,6 +67,7 @@ architecture arch of load_store_unit_tb is
   signal width_s      : std_logic_vector(1 downto 0);
   signal invalid_addr_s      : std_logic;
   signal misaligned_access_s : std_logic;
+  signal mem_en_s     : std_logic;
 
   signal word_to_write : std_logic_vector(31 downto 0) := (others => '0');
   constant c_CLK_PERIOD : time := 10 ns;
@@ -78,6 +79,7 @@ begin
       g_init_file => g_init_file
     )
     port map (
+	  mem_en_i     => mem_en_s,
       clk_i        => clk_s,
       rst_i        => rst_s,
       addr_i       => addr_s,

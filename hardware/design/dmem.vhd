@@ -110,6 +110,9 @@ architecture arch of dmem is
       readline(f_ptr, l);
       next when l'length = 0;
       hread(l, word);
+	  if i < 16 then -- Ispiši samo prvih par bajtova
+		report "INIT DEBUG: mem(" & integer'image(i) & ")=" & to_hstring(word);
+	  end if;
       result(i)     := word(7  downto 0);
       result(i + 1) := word(15 downto 8);
       result(i + 2) := word(23 downto 16);
@@ -171,7 +174,11 @@ begin
                   mem(address + 1) & mem(address);
       end if;
   end case;
-
+  	if v_is_invalid_addr = '0' and v_is_misaligned_addr = '0' then
+       report "DMEM READ DEBUG: Addr=" & integer'image(address) & 
+              " Width=" & to_string(width_i) &
+              " Result=" & to_hstring(v_result);
+    end if;
   data_read_o              <= v_result;
   is_invalid_addr_read     <= v_is_invalid_addr;
   is_misaligned_addr_read  <= v_is_misaligned_addr;

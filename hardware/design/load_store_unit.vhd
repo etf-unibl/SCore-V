@@ -51,6 +51,7 @@ entity load_store_unit is
     g_INIT_FILE : string := "data_memory.txt"
   );
   port (
+    mem_en_i            : in std_logic;
     clk_i               : in  std_logic;                     --! Global clock signal
     rst_i               : in  std_logic;                     --! Asynchronous reset, active high
     sign_i              : in  std_logic;                     --! '1' = unsigned (zero-extend), '0' = signed (sign-extend)
@@ -119,7 +120,7 @@ begin
   --! @brief Output mux: zero during reset or when writing.
   data_read_o         <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
 
-  invalid_addr_o      <= invalid_addr_s;
-  misaligned_access_o <= misaligned_access_s;
+  invalid_addr_o      <= invalid_addr_s      when mem_en_i = '1' else '0';
+  misaligned_access_o <= misaligned_access_s when mem_en_i = '1' else '0';
 
 end arch;
