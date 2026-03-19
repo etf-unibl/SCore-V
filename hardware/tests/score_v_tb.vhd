@@ -268,6 +268,7 @@ monitor_proc : process
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
   begin
+  wait for 0 ns;
     test_runner_setup(runner, runner_cfg);
 
     while test_suite loop
