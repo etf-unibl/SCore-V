@@ -115,18 +115,7 @@ begin
       clk_i        => clk_s,
       rst_i        => rst_s,
       instr_addr_o => instr_addr_s,
-      instr_data_i => instr_mem_s,
-      pc_o         => pc_s,
-      opcode_o     => opcode_s,
-      rd_o         => rd_addr_s,
-      rs1_o        => rs1_addr_s,
-      rs2_o        => rs2_addr_s,
-      rs1_data_o   => rs1_data_s,
-      rs2_data_o   => rs2_data_s,
-      alu_result_o => alu_result_s,
-      reg_we_o     => reg_we_s,
-      mem_data_o   => mem_data_s,
-      wb_data_o    => wb_data_s
+      instr_data_i => instr_mem_s
     );
 
   u_fetch : entity design_lib.fetch_instruction
