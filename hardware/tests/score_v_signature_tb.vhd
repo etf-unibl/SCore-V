@@ -48,9 +48,9 @@ use design_lib.mem_pkg.all;
 
 entity score_v_signature_tb is
   generic (
-    runner_cfg        : string;
-    g_init_file       : string := "instruction_memory.txt";
-    g_dmem_init_file  : string := "data_memory.txt";
+    runner_cfg         : string;
+    g_init_file        : string := "instruction_memory.txt";
+    g_dmem_init_file   : string := "data_memory.txt";
     --! Path to the file containing the two hex signature-region addresses.
     --! Format: line 1 = start byte address (hex), line 2 = end byte address (hex),
     --! both inclusive and word-aligned.
@@ -109,22 +109,14 @@ begin
 
   uut : entity design_lib.score_v
     generic map (
-      g_dmem_init_file => g_dmem_init_file
+      g_DMEM_INIT_FILE => g_dmem_init_file,
+      g_IMEM_INIT_FILE => g_init_file
     )
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
       instr_addr_o => instr_addr_s,
       instr_data_i => instr_mem_s
-    );
-
-  u_fetch : entity design_lib.fetch_instruction
-    generic map (
-      g_INIT_FILE => g_init_file
-    )
-    port map (
-      instruction_count_i => instr_addr_s,
-      instruction_bits_o  => fetch_instr_s
     );
 
   instr_mem_s <= fetch_instr_s;

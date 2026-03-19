@@ -60,7 +60,7 @@ entity score_v is
   generic (
     --! @brief Absolute path to data_memory.txt, forwarded to load_store_unit.
     g_DMEM_INIT_FILE : string := "data_memory.txt";
-	g_IMEM_INIT_FILE : string := "instruction_memory.txt"
+	  g_IMEM_INIT_FILE : string := "instruction_memory.txt"
   );
   port (
     clk_i        : in  std_logic;                     --! Clock input
@@ -97,11 +97,11 @@ architecture arch of score_v is
   signal funct3_sig         : std_logic_vector(2 downto 0);   --! Decoded funct3 field
   signal funct7_sig         : std_logic_vector(6 downto 0);   --! Decoded funct7 field
   signal imm_i_type_sig     : std_logic_vector(11 downto 0);  --! Decoded imm_i_type field
-  signal imm_s_type_h_sig   : std_logic_vector(6 downto 0); --! instr[31:25]
-  signal imm_s_type_l_sig   : std_logic_vector(4 downto 0); --! instr[11:7]
+  signal imm_s_type_h_sig   : std_logic_vector(6 downto 0);   --! instr[31:25]
+  signal imm_s_type_l_sig   : std_logic_vector(4 downto 0);   --! instr[11:7]
   signal imm_b_type_sig     : std_logic_vector(11 downto 0);  --! instr[11:7]
   signal imm_j_u_type_sig   : std_logic_vector(19 downto 0);  --! J-type and U-type immediate (instr[31:12])
-  signal instr_sig          : t_instruction_rec;
+  signal fetched_instr_sig  : t_instruction_rec;              --! Fetched instruction
 
   --! @brief Register file signals
   signal rs1_data_sig : std_logic_vector(31 downto 0);   --! Data from source register 1
@@ -327,7 +327,7 @@ begin
   --! @brief Instruction decoder
   u_decoder : instruction_decoder
     port map (
-      instr_i         => instr_sig,
+      instr_i         => fetched_instr_sig,
       opcode_o        => opcode_sig,
       rs1_o           => rs1_sig,
       rs2_o           => rs2_sig,
@@ -452,13 +452,14 @@ begin
     );
 
   u_fetch : fetch_instruction
-    generic map (
-      g_INIT_FILE => g_IMEM_INIT_FILE
-    )
-    port map (
-      instruction_count_i => pc_sig,
-      instruction_bits_o  => instr_sig
-    );
+  generic map (
+    g_INIT_FILE => g_IMEM_INIT_FILE
+  )
+  port map (
+    instruction_count_i     => pc_sig,
+    instruction_bits_o      => fetched_instr_sig
+  );
+
   
   --! @brief Output assignments
   instr_addr_o <= pc_sig;
