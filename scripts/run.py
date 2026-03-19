@@ -14,6 +14,8 @@ VU.add_vhdl_builtins()
 VU.add_osvvm()
 VU.add_verification_components()
 
+VU.add_compile_option("ghdl.a_flags", ["--std=08"])
+
 HARDWARE_PATH = Path(__file__).parent / ".." / "hardware"
 SRC_PATH      = HARDWARE_PATH / "design"
 TESTS_PATH    = HARDWARE_PATH / "tests"
