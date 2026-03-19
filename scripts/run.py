@@ -47,6 +47,4 @@ score_v_tb.set_generic("g_init_file",      IMEM_FILE)
 score_v_tb.set_generic("g_dmem_init_file", DMEM_FILE)
 score_v_tb.set_generic("g_expected_file",  EXPECTED_FILE)
 
-VU.add_compile_option("ghdl.a_flags", ["--std=08"])
-
 VU.main()
