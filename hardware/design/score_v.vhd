@@ -60,14 +60,14 @@ entity score_v is
   generic (
     --! @brief Absolute path to data_memory.txt, forwarded to load_store_unit.
     g_DMEM_INIT_FILE : string := "data_memory.txt";
-	  g_IMEM_INIT_FILE : string := "instruction_memory.txt"
+    g_IMEM_INIT_FILE : string := "instruction_memory.txt"
   );
   port (
     clk_i        : in  std_logic;                     --! Clock input
     rst_i        : in  std_logic;                     --! Reset input
 
     instr_addr_o : out std_logic_vector(31 downto 0); --! PC output to memory
-	instr_data_i : in t_instruction_rec
+    instr_data_i : in t_instruction_rec
   );
 end score_v;
 
