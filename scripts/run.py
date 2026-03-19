@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from vunit import VUnit
 
+os.system("ghdl --version")
 script_dir = Path(__file__).parent.resolve()
 
 command = str(script_dir / "compile.sh")
