@@ -67,7 +67,7 @@ entity score_v is
     rst_i        : in  std_logic;                     --! Reset input
 
     instr_addr_o : out std_logic_vector(31 downto 0); --! PC output to memory
-    instr_data_i : in t_instruction_rec
+    instr_data_i : in  t_instruction_rec
   );
 end score_v;
 
@@ -460,7 +460,6 @@ begin
     instruction_bits_o      => fetched_instr_sig
   );
 
-  
   --! @brief Output assignments
   instr_addr_o <= pc_sig;
 end arch;
