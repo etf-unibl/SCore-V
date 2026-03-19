@@ -21,9 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
     
-      - name: Patch VUnit for GHDL 5.0 mcode string change
-          run: sed -i 's/mcode code generator/mcode JIT code generator/g' /opt/venv/lib/python3.11/site-packages/vunit/sim_if/ghdl.py
-
       - name: Run VUnit tests
         uses: VUnit/vunit_action@master
         with:
