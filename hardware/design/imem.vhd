@@ -4,11 +4,15 @@
 -- https://github.com/etf-unibl/SCore-V/
 -----------------------------------------------------------------------------
 --
--- unit name: instruction fetch testbench unit
+-- unit name: instruction memory (IMEM)
 --
 -- description:
 --
---   This file implements a simple testbench file for the instruction fetch logic.
+--   This file implements the instruction memory as a separate entity.
+--   It is initialised from a hex byte file at simulation elaboration time
+--   and provides asynchronous (combinational) read access.
+--   Memory size is derived automatically from the number of lines in the
+--   initialisation file.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -35,27 +39,38 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
-library vunit_lib;
-context vunit_lib.vunit_context;
-library design_lib;
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use std.textio.all;
+
+library design_lib;
+
 use design_lib.mem_pkg.all;
 
---! @brief Top-level entity for the fetch instruction testbench.
---! @details As a testbench, this entity has no ports.
-entity fetch_instruction_tb is
-  generic (
-    runner_cfg  : string;
-    --! @brief Absolute path to instruction_memory.txt, set by run.py.
-    g_init_file : string := "instruction_memory.txt"
-  );
-end fetch_instruction_tb;
 
---! @brief Architecture implementing the stimulus and verification logic.
-architecture arch of fetch_instruction_tb is
+--! @brief Instruction Memory (IMEM) entity for the SCore-V processor.
+--! @details Initialised from a hex byte file (one byte per line) at
+--!          elaboration time. Memory size is derived automatically from
+--!          the file. Provides asynchronous 32-bit word read access via
+--!          a byte address input.
+entity imem is
+  generic
+  (
+    --! @brief Path to the instruction memory initialisation file.
+    --! @details Each line must contain one byte as a 2-digit hex value (e.g. 37).
+    g_INIT_FILE : string := "instruction_memory.txt"
+  );
+  port
+  (
+    --! @brief Byte address of the instruction to read.
+    addr_i : in  std_logic_vector(31 downto 0);
+    --! @brief 32-bit instruction word at addr_i (asynchronous).
+    data_o : out std_logic_vector(31 downto 0)
+  );
+end imem;
+
+architecture arch of imem is
 
   --! @brief Counts non-blank lines in the init file to determine memory size.
   impure function count_bytes(file_name : in string) return integer
@@ -75,7 +90,7 @@ architecture arch of fetch_instruction_tb is
     return n;
   end function count_bytes;
 
-  --! @brief Loads golden IMEM reference (one hex byte per line).
+  --! @brief Loads IMEM from a hex byte file (one byte per line) at elaboration.
   impure function initialize_memory(file_name : in string; mem_size : in integer) return t_bytes
   is
     file     f_ptr  : text;
@@ -97,53 +112,17 @@ architecture arch of fetch_instruction_tb is
   end function initialize_memory;
 
   --! @brief Memory size derived from the init file at elaboration time.
-  constant c_MEM_SIZE : integer := count_bytes(g_init_file);
+  constant c_MEM_SIZE : integer := count_bytes(g_INIT_FILE);
 
-  --! @brief Golden reference IMEM, sized from the file.
-  constant c_IMEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_init_file, c_MEM_SIZE);
-
-  signal test_in  : std_logic_vector(31 downto 0);
-  signal test_out : t_instruction_rec;
+  --! @brief Instruction memory contents, initialised at elaboration time.
+  constant c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
 
 begin
 
-  --! @brief UUT instantiation and port mapping.
-  uut_fetch_instruction : entity design_lib.fetch_instruction
-    generic map (
-      g_INIT_FILE => g_init_file
-    )
-    port map (
-      instruction_count_i => test_in,
-      instruction_bits_o  => test_out
-    );
-
-  main : process
-    variable full_instruction : std_logic_vector(31 downto 0);
-    variable addr_int         : integer;
-  begin
-    test_runner_setup(runner, runner_cfg);
-
-    while test_suite loop
-      if run("test_fetch_instruction") then
-        for i in 0 to 16 loop
-          if i mod 4 = 0 then
-            test_in <= std_logic_vector(to_unsigned(i, 32));
-            wait for 100 ns;
-          end if;
-          addr_int := to_integer(unsigned(test_in));
-          full_instruction := c_IMEM(addr_int + 3) &
-                              c_IMEM(addr_int + 2) &
-                              c_IMEM(addr_int + 1) &
-                              c_IMEM(addr_int);
-          check_equal(test_out.opcode, full_instruction(6 downto 0),
-                    "Opcode mismatch at index " & integer'image(addr_int));
-          check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
-                    "Data bits mismatch at index " & integer'image(addr_int));
-        end loop;
-      end if;
-    end loop;
-
-    test_runner_cleanup(runner);
-  end process;
+  --! @brief Asynchronous little-endian 32-bit read.
+  data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
+            c_MEM(to_integer(unsigned(addr_i)) + 2) &
+            c_MEM(to_integer(unsigned(addr_i)) + 1) &
+            c_MEM(to_integer(unsigned(addr_i))) when (to_integer(unsigned(addr_i)) < c_MEM_SIZE - 3) else (others => '0');
 
 end arch;

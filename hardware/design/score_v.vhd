@@ -90,7 +90,8 @@ architecture arch of score_v is
 
   --! @brief Internal PC signals
   signal pc_sig       : std_logic_vector(31 downto 0); --! Current PC
-  signal pc_next_sig  : std_logic_vector(31 downto 0); --! Next sequential PC
+  signal pc_next_sig  : std_logic_vector(31 downto 0); --! Next PC 
+  signal pc4_sig      : std_logic_vector(31 downto 0); --! Next sequential PC
 
   --! @brief Control and Branching signals
   signal br_eq_sig        : std_logic;                     --! Comparator equal flag
@@ -153,6 +154,7 @@ architecture arch of score_v is
       pc_target_i : in  std_logic_vector(31 downto 0);
       pc_sel_i    : in  std_logic;
       pc_i        : in  std_logic_vector(31 downto 0);
+      pc4_o       : out std_logic_vector(31 downto 0);
       pc_next_o   : out std_logic_vector(31 downto 0)
     );
   end component;
@@ -318,6 +320,7 @@ begin
       pc_target_i => alu_result_sig,
       pc_sel_i    => pc_sel_sig,
       pc_i        => pc_sig,
+      pc4_o       => pc4_sig,
       pc_next_o   => pc_next_sig
     );
 
@@ -443,7 +446,7 @@ begin
       alu_result_i => alu_result_sig,
       mem_data_i   => mem_data_sig,
       wb_select_i  => wb_select_sig,
-      pc4_i        => pc_next_sig,
+      pc4_i        => pc4_sig,
       imm_lui_i    => imm_sig,
       wb_data_o    => final_wb_sig
     );
