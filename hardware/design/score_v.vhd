@@ -503,8 +503,8 @@ begin
       data_read_o         => mem_data_sig,
       sign_i              => sign_s,
       width_i             => width_s,
-      invalid_addr_o      => invalid_address_lsu_sig,
-      misaligned_access_o => misaligned_lsu_sig
+      invalid_addr_o      => invalid_address_sig,
+      misaligned_access_o => misaligned_access_sig
     );
 
   --! @brief Write-Back Multiplexer

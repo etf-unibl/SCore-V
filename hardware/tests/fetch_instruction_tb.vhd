@@ -97,7 +97,7 @@ architecture arch of fetch_instruction_tb is
   end function initialize_memory;
 
   --! @brief Memory size derived from the init file at elaboration time.
-  signal c_MEM_SIZE : integer := count_bytes(g_init_file);
+  constant c_MEM_SIZE : integer := count_bytes(g_init_file);
 
   --! @brief Golden reference IMEM, sized from the file.
   constant c_IMEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_init_file, c_MEM_SIZE);
@@ -166,6 +166,7 @@ begin
         halt_s   <= '0';
         if c_MEM_SIZE >= 4 then
           test_in  <= std_logic_vector(to_unsigned(0, 32));
+          wait for 0 ns;  -- let signal assignments propagate before reading test_in
           addr_int := to_integer(unsigned(test_in));
           full_instruction := c_IMEM(addr_int + 3) &
                               c_IMEM(addr_int + 2) &

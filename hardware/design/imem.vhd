@@ -135,7 +135,7 @@ begin
   invalid_instr_addr_s    <= '1' when to_integer(unsigned(addr_i)) > c_MEM_SIZE - 4 else '0';
   
 
-comb_proc : process(addr_i, c_MEM)
+comb_proc : process(addr_i, c_MEM, halt_i)
     variable v_addr : integer;
     variable v_invalid : std_logic;
     variable v_misaligned : std_logic;

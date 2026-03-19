@@ -120,7 +120,12 @@ begin
   --! @brief Output mux: zero during reset or when writing.
   data_read_o         <= word_to_read when mem_RW_i = '0' and rst_i = '0' else (others => '0');
 
-  invalid_addr_o      <= invalid_addr_s      when mem_en_i = '1' else '0';
-  misaligned_access_o <= misaligned_access_s when mem_en_i = '1' else '0';
+  -- Read exceptions are combinatorial and must always propagate so the
+  -- processor can halt on an invalid/misaligned load. Write exceptions are
+  -- already gated inside DMEM (only latched on rising_edge when we_i='1').
+  -- Gating both on mem_en_i caused read exception checks to see '0' whenever
+  -- mem_en_i was not explicitly driven '1' by the testbench.
+  invalid_addr_o      <= invalid_addr_s;
+  misaligned_access_o <= misaligned_access_s;
 
 end arch;

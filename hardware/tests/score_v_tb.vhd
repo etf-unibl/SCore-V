@@ -90,12 +90,6 @@ architecture sim of score_v_tb is
   signal invalid_address_sig     : std_logic;
   signal halt_sig                : std_logic;
 
-  signal uut_halt         : std_logic;
-  signal uut_inv_instr    : std_logic;
-  signal uut_fetch_err    : std_logic;
-  signal uut_lsu_err      : std_logic;
-  signal uut_pc_sel       : std_logic;
-
   constant CLK_PERIOD : time := 10 ns;
 
   signal fetch_instr_s : t_instruction_rec;
@@ -249,12 +243,6 @@ architecture sim of score_v_tb is
 
 begin
 
-  -- Debug signali
-  uut_halt      <= <<signal .score_v_tb.uut.halt_sig : std_logic>>;
-  uut_inv_instr <= <<signal .score_v_tb.uut.invalid_instruction_sig : std_logic>>;
-  uut_fetch_err <= <<signal .score_v_tb.uut.invalid_address_fetch_sig : std_logic>>;
-  uut_lsu_err   <= <<signal .score_v_tb.uut.invalid_address_lsu_sig : std_logic>>;
-
   uut : entity design_lib.score_v
     generic map (
       g_dmem_init_file => g_dmem_init_file,
@@ -320,15 +308,9 @@ begin
        " PC=" & integer'image(to_integer(unsigned(pc_s))) &
        " instr_rec_opcode=" & to_string(instr_mem_s.opcode) &
        " opcode_s=" & to_string(opcode_s) &
-       " opcode_s=" & to_string(opcode_s)  &
+       " valid_count=" & to_string(c_VALID_COUNT)  &
        " full_instr=" & to_hstring(full_instr);
-	report "STEP=" & integer'image(step) & " ---" &
-                 " PC=" & integer'image(to_integer(unsigned(pc_s))) &
-                 " INSTR=" & to_hstring(full_instr) &
-                 " HALT=" & std_logic'image(uut_halt) &
-                 " ERR_INSTR=" & std_logic'image(uut_inv_instr) &
-                 " ERR_FETCH=" & std_logic'image(uut_fetch_err);
-
+    
     if step <= c_VALID_COUNT - 1 then
       check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
       check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
