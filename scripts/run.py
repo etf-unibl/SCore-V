@@ -14,8 +14,6 @@ VU.add_vhdl_builtins()
 VU.add_osvvm()
 VU.add_verification_components()
 
-VU.add_compile_option("ghdl.a_flags", ["--std=08"])
-
 HARDWARE_PATH = Path(__file__).parent / ".." / "hardware"
 SRC_PATH      = HARDWARE_PATH / "design"
 TESTS_PATH    = HARDWARE_PATH / "tests"
@@ -48,5 +46,8 @@ score_v_tb = testbench_lib.test_bench("score_v_tb")
 score_v_tb.set_generic("g_init_file",      IMEM_FILE)
 score_v_tb.set_generic("g_dmem_init_file", DMEM_FILE)
 score_v_tb.set_generic("g_expected_file",  EXPECTED_FILE)
+
+VU.add_compile_option("ghdl.a_flags", ["--std=08"])
+testbench_lib.set_sim_option("ghdl.sim_flags", ["-r"])
 
 VU.main()
