@@ -48,7 +48,6 @@ score_v_tb.set_generic("g_dmem_init_file", DMEM_FILE)
 score_v_tb.set_generic("g_expected_file",  EXPECTED_FILE)
 
 VU.add_compile_option("ghdl.a_flags", ["--std=08", "-frelaxed-rules"])
-VU.set_sim_option("ghdl.elab_flags", ["--std=08", "-frelaxed-rules"])
-VU.set_sim_option("ghdl.sim_flags", ["--std=08"])
+VU.set_sim_option("ghdl.elab_e", True)
 
 VU.main()
