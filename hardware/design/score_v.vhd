@@ -59,14 +59,15 @@ use work.alu_pkg.all;
 entity score_v is
   generic (
     --! @brief Absolute path to data_memory.txt, forwarded to load_store_unit.
-    g_DMEM_INIT_FILE : string := "data_memory.txt"
+    g_DMEM_INIT_FILE  : string := "data_memory.txt";
+    g_IMEM_INIT_FILE  : string := "instruction_memory.txt"
   );
   port (
     clk_i        : in  std_logic;                     --! Clock input
     rst_i        : in  std_logic;                     --! Reset input
 
     instr_addr_o : out std_logic_vector(31 downto 0); --! PC output to memory
-    instr_data_i : in  t_instruction_rec;             --! Instruction input from fetch_instruction
+    instr_data_o : out t_instruction_rec;             --! Instruction output from fetch_instruction
 
     pc_o         : out std_logic_vector(31 downto 0); --! Program counter value output
     opcode_o     : out std_logic_vector(6 downto 0);  --! Instruction opcode output
@@ -147,7 +148,7 @@ architecture arch of score_v is
 
   signal halt_sig                      : std_logic;
 
-  -- signal fetched_instr_sig : t_instruction_rec;
+  signal fetched_instr_sig : t_instruction_rec;
 
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
@@ -379,7 +380,7 @@ begin
   --! @brief Instruction decoder
   u_decoder : instruction_decoder
     port map (
-      instr_i         => instr_data_i,
+      instr_i         => fetched_instr_sig,
       opcode_o        => opcode_sig,
       rs1_o           => rs1_sig,
       rs2_o           => rs2_sig,
@@ -415,8 +416,8 @@ begin
       pc_sel_o           => pc_sel_sig,
       br_un_o            => br_un_sig,
       invalid_instr_o    => invalid_instruction_sig,
-      out_of_bound_i     => invalid_address_lsu_sig,
-      misaligned_i       => misaligned_lsu_sig
+      out_of_bound_i     => invalid_address_fetch_sig,
+      misaligned_i       => misaligned_fetch_sig
     );
 
   --! @brief Immediate Generator unit instance
@@ -519,22 +520,24 @@ begin
       halt_processor_o      => halt_sig
     );
 
---  u_fetch : fetch_instruction
---    generic map (
---      g_INIT_FILE => g_init_file
---    )
---    port map (
---      instruction_count_i     => pc_sig,
---      instruction_bits_o      => fetched_instr_sig,
---      halt_i                  => halt_sig,
---      invalid_instr_addr_o    => invalid_address_fetch_sig,
---      misaligned_instr_addr_o => misaligned_access_fetch_sig
---    );
-
+  u_fetch : fetch_instruction
+    generic map (
+      g_INIT_FILE => g_IMEM_INIT_FILE
+    )
+    port map (
+      instruction_count_i     => pc_sig,
+      instruction_bits_o      => fetched_instr_sig,
+      halt_i                  => halt_sig,
+      invalid_instr_addr_o    => invalid_address_fetch_sig,
+      misaligned_instr_addr_o => misaligned_fetch_sig
+    );
+    
   --! @brief Output assignments
   instr_addr_o <= pc_sig;
+  
   pc_o         <= pc_sig;
   opcode_o     <= opcode_sig;
+  instr_data_o <= fetched_instr_sig;
   rd_o         <= rd_sig;
   rs1_o        <= rs1_sig;
   rs2_o        <= rs2_sig;
@@ -544,4 +547,5 @@ begin
   reg_we_o     <= reg_we_sig;
   wb_data_o    <= final_wb_sig;
   mem_data_o   <= mem_data_sig;
+  
 end arch;

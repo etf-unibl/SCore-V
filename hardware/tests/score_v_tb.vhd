@@ -245,13 +245,14 @@ begin
 
   uut : entity design_lib.score_v
     generic map (
-      g_dmem_init_file => g_dmem_init_file
+      g_dmem_init_file => g_dmem_init_file,
+      g_IMEM_INIT_FILE => g_init_file
     )
     port map (
       clk_i        => clk_s,
       rst_i        => rst_s,
       instr_addr_o => instr_addr_s,
-      instr_data_i => instr_mem_s,
+      instr_data_o => fetch_instr_s,
       pc_o         => pc_s,
       opcode_o     => opcode_s,
       rd_o         => rd_addr_s,
@@ -263,18 +264,6 @@ begin
       reg_we_o     => reg_we_s,
       mem_data_o   => mem_data_s,
       wb_data_o    => wb_data_s
-    );
-
-  u_fetch : entity design_lib.fetch_instruction
-    generic map (
-      g_INIT_FILE => g_init_file
-    )
-    port map (
-      instruction_count_i => instr_addr_s,
-      instruction_bits_o  => fetch_instr_s,
-      halt_i                  => halt_sig,
-      invalid_instr_addr_o    => invalid_address_sig,
-      misaligned_instr_addr_o => misaligned_access_sig
     );
 
   instr_mem_s <= fetch_instr_s;
@@ -303,47 +292,55 @@ begin
 
       elsif run("test_score_v") then
         rst_s <= '1';
-        wait until rising_edge(clk_s);
-        rst_s <= '0';
+  wait until rising_edge(clk_s);
+  rst_s <= '0';
+  wait for 1 ns;
 
-        for i in 0 to c_VALID_COUNT - 1 loop
-          wait until rising_edge(clk_s);
+  for i in 0 to c_VALID_COUNT - 1 loop
+    full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
 
-          full_instr := instr_mem_s.other_instruction_bits & instr_mem_s.opcode;
+    report "STEP=" & integer'image(step) &
+       " PC=" & integer'image(to_integer(unsigned(pc_s))) &
+       " instr_rec_opcode=" & to_string(instr_mem_s.opcode) &
+       " opcode_s=" & to_string(opcode_s) &
+       " full_instr=" & to_hstring(full_instr);
 
-          if step <= c_VALID_COUNT - 1 then
-            check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
-            check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
+    if step <= c_VALID_COUNT - 1 then
+      check_equal(to_integer(unsigned(pc_s)), res(step).pc, "PC Error at step " & integer'image(step));
+      check_equal(opcode_s, res(step).opcode, "OPCODE Error at step " & integer'image(step));
 
-            if opcode_s = "0110111" or opcode_s = "0010111" then
-              check_equal(0, res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
-            else
-              check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
-            end if;
+      if opcode_s = "0110111" or opcode_s = "0010111" then
+        check_equal(0, res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
+      else
+        check_equal(full_instr(14 downto 12), res(step).funct3, "FUNCT3 Error at step " & integer'image(step));
+      end if;
 
-            if opcode_s = "0110011" then
-              check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
-            end if;
+      if opcode_s = "0110011" then
+        check_equal(full_instr(31 downto 25), res(step).funct7, "FUNCT7 Error at step " & integer'image(step));
+      end if;
 
-            check_equal(to_integer(unsigned(rd_addr_s)), res(step).rd, "RD Error at step " & integer'image(step));
-            check_equal(to_integer(unsigned(rs1_addr_s)), res(step).rs1, "RS1 Error at step " & integer'image(step));
-            check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2,
-              "RS2 Error at step " & integer'image(step) &
-              " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
-              " | expected = " & integer'image(res(step).rs2));
-            check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
+      check_equal(to_integer(unsigned(rd_addr_s)), res(step).rd, "RD Error at step " & integer'image(step));
+      check_equal(to_integer(unsigned(rs1_addr_s)), res(step).rs1, "RS1 Error at step " & integer'image(step));
+      check_equal(to_integer(unsigned(rs2_addr_s)), res(step).rs2,
+        "RS2 Error at step " & integer'image(step) &
+        " | RS2_ADDR_s = " & integer'image(to_integer(unsigned(rs2_addr_s))) &
+        " | expected = " & integer'image(res(step).rs2));
+      check_equal(to_integer(signed(alu_result_s)), res(step).alu_out, "ALU Error at step " & integer'image(step));
 
-            if reg_we_s = '1' then
-              check_equal(to_integer(signed(wb_data_s)), res(step).wb_out, "WB Error at step " & integer'image(step));
-            end if;
+      if reg_we_s = '1' then
+        check_equal(to_integer(signed(wb_data_s)), res(step).wb_out, "WB Error at step " & integer'image(step));
+      end if;
 
-            check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
+      check_equal(reg_we_s, res(step).we, "WE Error at step " & integer'image(step));
 
-            step := step + 1;
-          else
-            test_runner_cleanup(runner);
-            sim_done_s <= '1';
-          end if;
+      step := step + 1;
+    else
+      test_runner_cleanup(runner);
+      sim_done_s <= '1';
+    end if;
+
+    wait until rising_edge(clk_s);
+    wait for 1 ns;
         end loop;
       end if;
     end loop;
