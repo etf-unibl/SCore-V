@@ -25,7 +25,7 @@ jobs:
         uses: VUnit/vunit_action@master
         with:
           image: ghdl/vunit:mcode
-          cmd: scripts/run.py --gtkwave-fmt vcd
+          cmd: sh -c "sed -i 's/mcode code generator/mcode JIT code generator/g' /opt/venv/lib/python3.*/site-packages/vunit/sim_if/ghdl.py && scripts/run.py --gtkwave-fmt vcd"
 
       - name: Archive results
         if: always()
