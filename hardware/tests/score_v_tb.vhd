@@ -295,6 +295,8 @@ begin
     variable step       : integer := 0;
   begin
     test_runner_setup(runner, runner_cfg);
+    wait for 3 ns;  -- let signals settle past delta cycles
+
 
     while test_suite loop
       if run("test_reset") then
