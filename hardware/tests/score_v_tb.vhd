@@ -254,21 +254,23 @@ begin
     wait;
   end process;
 
-monitor_proc : process
-    alias dbg_pc         is << signal uut.pc_sig : std_logic_vector(31 downto 0) >>;
-    alias dbg_opcode     is << signal uut.opcode_sig : std_logic_vector(6 downto 0) >>;
-    alias dbg_rd_addr    is << signal uut.rd_sig : std_logic_vector(4 downto 0) >>;
-    alias dbg_rs1_addr   is << signal uut.rs1_sig : std_logic_vector(4 downto 0) >>;
-    alias dbg_rs2_addr   is << signal uut.rs2_sig : std_logic_vector(4 downto 0) >>;
-    alias dbg_alu_result is << signal uut.alu_result_sig : std_logic_vector(31 downto 0) >>;
-    alias dbg_reg_we     is << signal uut.reg_we_sig : std_logic >>;
-    alias dbg_wb_data    is << signal uut.final_wb_sig : std_logic_vector(31 downto 0) >>;
+  monitor_proc : process
+    -- Use absolute paths with the leading dot for the GCC backend
+    alias dbg_pc         is << signal .score_v_tb.uut.pc_sig : std_logic_vector(31 downto 0) >>;
+    alias dbg_opcode     is << signal .score_v_tb.uut.opcode_sig : std_logic_vector(6 downto 0) >>;
+    alias dbg_rd_addr    is << signal .score_v_tb.uut.rd_sig : std_logic_vector(4 downto 0) >>;
+    alias dbg_rs1_addr   is << signal .score_v_tb.uut.rs1_sig : std_logic_vector(4 downto 0) >>;
+    alias dbg_rs2_addr   is << signal .score_v_tb.uut.rs2_sig : std_logic_vector(4 downto 0) >>;
+    alias dbg_alu_result is << signal .score_v_tb.uut.alu_result_sig : std_logic_vector(31 downto 0) >>;
+    alias dbg_reg_we     is << signal .score_v_tb.uut.reg_we_sig : std_logic >>;
+    alias dbg_wb_data    is << signal .score_v_tb.uut.final_wb_sig : std_logic_vector(31 downto 0) >>;
 
     variable full_instr : std_logic_vector(31 downto 0);
     variable step       : integer := 0;
   begin
-    test_runner_setup(runner, runner_cfg);
+    wait for 0 ns;
 
+    test_runner_setup(runner, runner_cfg);
     while test_suite loop
       if run("test_reset") then
         rst_s <= '1';
