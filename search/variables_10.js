@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['wb_5fdata_5fo_0',['wb_data_o',['../classscore__v.html#a7d43c92a865fb38d542c38613760be82',1,'score_v.wb_data_o()'],['../classwb__mux.html#a7d43c92a865fb38d542c38613760be82',1,'wb_mux.wb_data_o()']]],
+  ['wb_5fdata_5fo_0',['wb_data_o',['../classwb__mux.html#a7d43c92a865fb38d542c38613760be82',1,'wb_mux']]],
   ['wb_5fmux_1',['wb_mux',['../classscore__v_1_1arch.html#ac9b4345234cb343d186be42d8c2d55d9',1,'score_v::arch']]],
   ['wb_5fselect_5fi_2',['wb_select_i',['../classwb__mux.html#af75a24bd2ecb1b819199b98c9d00596b',1,'wb_mux']]],
   ['wb_5fselect_5fo_3',['wb_select_o',['../classcontrol.html#a7054bc5ad30cbd8ece571d5c48ae64ea',1,'control']]],

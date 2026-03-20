@@ -84,6 +84,7 @@ Inheritance diagram for score_v:</div>
  <div class="center">
   <img src="classscore__v.png" usemap="#score_5Fv_map" alt=""/>
   <map id="score_5Fv_map" name="score_5Fv_map">
+<area href="classfetch__instruction.html" title="Instruction fetch unit for the SCore-V processor." alt="fetch_instruction" shape="rect" coords="134,616,258,640"/>
 <area href="classwb__mux.html" alt="wb_mux" shape="rect" coords="134,560,258,584"/>
 <area href="classload__store__unit.html" title="Entity for the Load Store Unit (LSU)." alt="load_store_unit" shape="rect" coords="134,504,258,528"/>
 <area href="classbranch__comparator.html" alt="branch_comparator" shape="rect" coords="134,448,258,472"/>
@@ -119,6 +120,7 @@ Use Clauses</h2></td></tr>
 Generics</h2></td></tr>
  <tr class="memitem:aef37e586cf607c3da0a4a73539892ffd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#aef37e586cf607c3da0a4a73539892ffd">g_DMEM_INIT_FILE</a> &#160;</td><td class="memItemRight" valign="bottom"><b><b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; data_memory.txt &quot;</span><span class="vhdlchar"> </span></b></b></td></tr>
 <tr class="memdesc:aef37e586cf607c3da0a4a73539892ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute path to data_memory.txt, forwarded to <a class="el" href="classload__store__unit.html" title="Entity for the Load Store Unit (LSU).">load_store_unit</a>.  <a href="#aef37e586cf607c3da0a4a73539892ffd"></a><br /></td></tr>
+<tr class="memitem:aa9e07f4d33ed8fe4dfe90e8b6284cd95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#aa9e07f4d33ed8fe4dfe90e8b6284cd95">g_IMEM_INIT_FILE</a> &#160;</td><td class="memItemRight" valign="bottom"><b><b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; instruction_memory.txt &quot;</span><span class="vhdlchar"> </span></b></b></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="3"><h2 class="groupheader"><a id="Ports" name="Ports"></a>
 Ports</h2></td></tr>
@@ -129,29 +131,6 @@ Ports</h2></td></tr>
 <tr class="memitem:ad655edd095eba6b4c45159f3c5cfef63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#ad655edd095eba6b4c45159f3c5cfef63">instr_addr_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
 <tr class="memdesc:ad655edd095eba6b4c45159f3c5cfef63"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">PC output to memory.  <a href="#ad655edd095eba6b4c45159f3c5cfef63"></a><br /></td></tr>
 <tr class="memitem:a4560f5fc7c432d16115166623cbcd5d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a4560f5fc7c432d16115166623cbcd5d9">instr_data_i</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">in</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="vhdlchar">t_instruction_rec</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a4560f5fc7c432d16115166623cbcd5d9"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction input from <a class="el" href="classfetch__instruction.html" title="Instruction fetch unit for the SCore-V processor.">fetch_instruction</a>.  <a href="#a4560f5fc7c432d16115166623cbcd5d9"></a><br /></td></tr>
-<tr class="memitem:a3b1dd06064836b982a39318569cd4bad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a3b1dd06064836b982a39318569cd4bad">pc_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a3b1dd06064836b982a39318569cd4bad"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Program counter value output.  <a href="#a3b1dd06064836b982a39318569cd4bad"></a><br /></td></tr>
-<tr class="memitem:a1a3d0af0ddeea5341f418100570092ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a1a3d0af0ddeea5341f418100570092ee">opcode_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">6</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a1a3d0af0ddeea5341f418100570092ee"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruction opcode output.  <a href="#a1a3d0af0ddeea5341f418100570092ee"></a><br /></td></tr>
-<tr class="memitem:aa7c99d73898bf89bf201ff204e3a567d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#aa7c99d73898bf89bf201ff204e3a567d">rd_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:aa7c99d73898bf89bf201ff204e3a567d"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination register address output.  <a href="#aa7c99d73898bf89bf201ff204e3a567d"></a><br /></td></tr>
-<tr class="memitem:ae07aba5b1bec511c0c5488f7a3dd43fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#ae07aba5b1bec511c0c5488f7a3dd43fa">rs1_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:ae07aba5b1bec511c0c5488f7a3dd43fa"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Source register 1 address output.  <a href="#ae07aba5b1bec511c0c5488f7a3dd43fa"></a><br /></td></tr>
-<tr class="memitem:a2c0ca28c959e96b26f2eeb65ac70b4e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a2c0ca28c959e96b26f2eeb65ac70b4e0">rs2_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a2c0ca28c959e96b26f2eeb65ac70b4e0"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Source register 2 address output.  <a href="#a2c0ca28c959e96b26f2eeb65ac70b4e0"></a><br /></td></tr>
-<tr class="memitem:a08f2b01bb7e45773bb3a61c3d6a2c81d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a08f2b01bb7e45773bb3a61c3d6a2c81d">rs1_data_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a08f2b01bb7e45773bb3a61c3d6a2c81d"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Source register 1 data output.  <a href="#a08f2b01bb7e45773bb3a61c3d6a2c81d"></a><br /></td></tr>
-<tr class="memitem:a69539a218d2ec8d3ee9c2c2324bc6913"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a69539a218d2ec8d3ee9c2c2324bc6913">rs2_data_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a69539a218d2ec8d3ee9c2c2324bc6913"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Source register 2 data output.  <a href="#a69539a218d2ec8d3ee9c2c2324bc6913"></a><br /></td></tr>
-<tr class="memitem:a006be26d73d93e955b7bcba2d6bf8c78"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a006be26d73d93e955b7bcba2d6bf8c78">alu_result_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a006be26d73d93e955b7bcba2d6bf8c78"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">ALU result output.  <a href="#a006be26d73d93e955b7bcba2d6bf8c78"></a><br /></td></tr>
-<tr class="memitem:a023ef4f05e555c83ff1efe287ccf2d7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a023ef4f05e555c83ff1efe287ccf2d7d">reg_we_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a023ef4f05e555c83ff1efe287ccf2d7d"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Register write enable output.  <a href="#a023ef4f05e555c83ff1efe287ccf2d7d"></a><br /></td></tr>
-<tr class="memitem:a26ffcd314425dc313259632198142905"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a26ffcd314425dc313259632198142905">mem_data_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a26ffcd314425dc313259632198142905"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Data read from memory output.  <a href="#a26ffcd314425dc313259632198142905"></a><br /></td></tr>
-<tr class="memitem:a7d43c92a865fb38d542c38613760be82"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classscore__v.html#a7d43c92a865fb38d542c38613760be82">wb_data_o</a> &#160;</td><td class="memItemLeft" align="right" valign="top"> <b><b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b></b>&#160;</td><td class="memItemRight" valign="bottom"> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b></td></tr>
-<tr class="memdesc:a7d43c92a865fb38d542c38613760be82"><td class="mdescLeft">&#160;</td><td class="mdescLeft">&#160;</td><td class="mdescRight">Final write-back data output.  <a href="#a7d43c92a865fb38d542c38613760be82"></a><br /></td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a9021b1cfffc858cd17368b24b6418fd3" name="a9021b1cfffc858cd17368b24b6418fd3"></a>
@@ -173,30 +152,6 @@ Ports</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="a006be26d73d93e955b7bcba2d6bf8c78" name="a006be26d73d93e955b7bcba2d6bf8c78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a006be26d73d93e955b7bcba2d6bf8c78">&#9670;&#160;</a></span>alu_result_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a006be26d73d93e955b7bcba2d6bf8c78">alu_result_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>ALU result output. </p>
 
 </div>
 </div>
@@ -245,6 +200,28 @@ Ports</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Absolute path to data_memory.txt, forwarded to <a class="el" href="classload__store__unit.html" title="Entity for the Load Store Unit (LSU).">load_store_unit</a>. </p>
+
+</div>
+</div>
+<a id="aa9e07f4d33ed8fe4dfe90e8b6284cd95" name="aa9e07f4d33ed8fe4dfe90e8b6284cd95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9e07f4d33ed8fe4dfe90e8b6284cd95">&#9670;&#160;</a></span>g_IMEM_INIT_FILE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classscore__v.html#aa9e07f4d33ed8fe4dfe90e8b6284cd95">g_IMEM_INIT_FILE</a> <b><span class="vhdlchar"> </span></b> <b><span class="keywordtype">string</span><span class="vhdlchar"> </span><span class="vhdlchar">:</span><span class="vhdlchar">=</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="vhdlchar"> </span><span class="keyword">&quot; instruction_memory.txt &quot;</span><span class="vhdlchar"> </span></b> </td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">Generic</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -314,32 +291,6 @@ Ports</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Instruction input from <a class="el" href="classfetch__instruction.html" title="Instruction fetch unit for the SCore-V processor.">fetch_instruction</a>. </p>
-
-</div>
-</div>
-<a id="a26ffcd314425dc313259632198142905" name="a26ffcd314425dc313259632198142905"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26ffcd314425dc313259632198142905">&#9670;&#160;</a></span>mem_data_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a26ffcd314425dc313259632198142905">mem_data_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Data read from memory output. </p>
-
 </div>
 </div>
 <a id="abafacda428d973c04eff9cb53862d2c8" name="abafacda428d973c04eff9cb53862d2c8"></a>
@@ -386,198 +337,6 @@ Ports</h2></td></tr>
 
 </div>
 </div>
-<a id="a1a3d0af0ddeea5341f418100570092ee" name="a1a3d0af0ddeea5341f418100570092ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a3d0af0ddeea5341f418100570092ee">&#9670;&#160;</a></span>opcode_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a1a3d0af0ddeea5341f418100570092ee">opcode_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">6</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Instruction opcode output. </p>
-
-</div>
-</div>
-<a id="a3b1dd06064836b982a39318569cd4bad" name="a3b1dd06064836b982a39318569cd4bad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b1dd06064836b982a39318569cd4bad">&#9670;&#160;</a></span>pc_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a3b1dd06064836b982a39318569cd4bad">pc_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Program counter value output. </p>
-
-</div>
-</div>
-<a id="aa7c99d73898bf89bf201ff204e3a567d" name="aa7c99d73898bf89bf201ff204e3a567d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7c99d73898bf89bf201ff204e3a567d">&#9670;&#160;</a></span>rd_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#aa7c99d73898bf89bf201ff204e3a567d">rd_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Destination register address output. </p>
-
-</div>
-</div>
-<a id="a023ef4f05e555c83ff1efe287ccf2d7d" name="a023ef4f05e555c83ff1efe287ccf2d7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a023ef4f05e555c83ff1efe287ccf2d7d">&#9670;&#160;</a></span>reg_we_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a023ef4f05e555c83ff1efe287ccf2d7d">reg_we_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Register write enable output. </p>
-
-</div>
-</div>
-<a id="a08f2b01bb7e45773bb3a61c3d6a2c81d" name="a08f2b01bb7e45773bb3a61c3d6a2c81d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08f2b01bb7e45773bb3a61c3d6a2c81d">&#9670;&#160;</a></span>rs1_data_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a08f2b01bb7e45773bb3a61c3d6a2c81d">rs1_data_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Source register 1 data output. </p>
-
-</div>
-</div>
-<a id="ae07aba5b1bec511c0c5488f7a3dd43fa" name="ae07aba5b1bec511c0c5488f7a3dd43fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae07aba5b1bec511c0c5488f7a3dd43fa">&#9670;&#160;</a></span>rs1_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#ae07aba5b1bec511c0c5488f7a3dd43fa">rs1_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Source register 1 address output. </p>
-
-</div>
-</div>
-<a id="a69539a218d2ec8d3ee9c2c2324bc6913" name="a69539a218d2ec8d3ee9c2c2324bc6913"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69539a218d2ec8d3ee9c2c2324bc6913">&#9670;&#160;</a></span>rs2_data_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a69539a218d2ec8d3ee9c2c2324bc6913">rs2_data_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Source register 2 data output. </p>
-
-</div>
-</div>
-<a id="a2c0ca28c959e96b26f2eeb65ac70b4e0" name="a2c0ca28c959e96b26f2eeb65ac70b4e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c0ca28c959e96b26f2eeb65ac70b4e0">&#9670;&#160;</a></span>rs2_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a2c0ca28c959e96b26f2eeb65ac70b4e0">rs2_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">4</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Source register 2 address output. </p>
-
-</div>
-</div>
 <a id="ab86c7a8eec3a8327e506892977f85708" name="ab86c7a8eec3a8327e506892977f85708"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab86c7a8eec3a8327e506892977f85708">&#9670;&#160;</a></span>rst_i</h2>
 
@@ -621,30 +380,6 @@ Ports</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7d43c92a865fb38d542c38613760be82" name="a7d43c92a865fb38d542c38613760be82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7d43c92a865fb38d542c38613760be82">&#9670;&#160;</a></span>wb_data_o</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classscore__v.html#a7d43c92a865fb38d542c38613760be82">wb_data_o</a> <b><span class="keywordflow">out</span><span class="vhdlchar"> </span></b> <b><span class="keywordtype">std_logic_vector</span><span class="vhdlchar"> </span><span class="vhdlchar">(</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">31</span> <span class="vhdlchar"> </span><span class="keywordflow">downto</span><span class="vhdlchar"> </span><span class="vhdlchar"> </span> <span class="vhdldigit">0</span> <span class="vhdlchar"> </span><span class="vhdlchar">)</span><span class="vhdlchar"> </span></b> </td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">Port</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Final write-back data output. </p>
 
 </div>
 </div>

@@ -13,6 +13,5 @@ var searchData=
   ['alu_5fop_5fsig_10',['alu_op_sig',['../classscore__v_1_1arch.html#a51eafa9e06501a48108433f9d683c52d',1,'score_v::arch']]],
   ['alu_5fpkg_11',['alu_pkg',['../classalu.html#a9021b1cfffc858cd17368b24b6418fd3',1,'alu.alu_pkg()'],['../classcontrol.html#a9021b1cfffc858cd17368b24b6418fd3',1,'control.alu_pkg()'],['../classscore__v.html#a9021b1cfffc858cd17368b24b6418fd3',1,'score_v.alu_pkg()']]],
   ['alu_5fresult_5fi_12',['alu_result_i',['../classwb__mux.html#a20c4096ebcde223fa59040dca8e98e23',1,'wb_mux']]],
-  ['alu_5fresult_5fo_13',['alu_result_o',['../classscore__v.html#a006be26d73d93e955b7bcba2d6bf8c78',1,'score_v']]],
-  ['alu_5fresult_5fsig_14',['alu_result_sig',['../classscore__v_1_1arch.html#a8011ff90ba4fa7d3cab62e6915c576fa',1,'score_v::arch']]]
+  ['alu_5fresult_5fsig_13',['alu_result_sig',['../classscore__v_1_1arch.html#a8011ff90ba4fa7d3cab62e6915c576fa',1,'score_v::arch']]]
 ];
