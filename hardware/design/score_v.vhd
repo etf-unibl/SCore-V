@@ -59,14 +59,15 @@ use work.alu_pkg.all;
 entity score_v is
   generic (
     --! @brief Absolute path to data_memory.txt, forwarded to load_store_unit.
-    g_DMEM_INIT_FILE : string := "data_memory.txt"
+    g_DMEM_INIT_FILE  : string := "data_memory.txt";
+    g_IMEM_INIT_FILE  : string := "instruction_memory.txt"
   );
   port (
     clk_i        : in  std_logic;                     --! Clock input
     rst_i        : in  std_logic;                     --! Reset input
 
     instr_addr_o : out std_logic_vector(31 downto 0); --! PC output to memory
-    instr_data_i : in  t_instruction_rec;             --! Instruction input from fetch_instruction
+    instr_data_o : out t_instruction_rec;             --! Instruction output from fetch_instruction
 
     pc_o         : out std_logic_vector(31 downto 0); --! Program counter value output
     opcode_o     : out std_logic_vector(6 downto 0);  --! Instruction opcode output
@@ -78,6 +79,7 @@ entity score_v is
     alu_result_o : out std_logic_vector(31 downto 0); --! ALU result output
     reg_we_o     : out std_logic;                     --! Register write enable output
     mem_data_o   : out std_logic_vector(31 downto 0); --! Data read from memory output
+    halt_o       : out std_logic;
     wb_data_o    : out std_logic_vector(31 downto 0)  --! Final write-back data output
   );
 end score_v;
@@ -135,6 +137,21 @@ architecture arch of score_v is
   signal sign_s         : std_logic;                     --! Sign of data to be loaded or stored
   signal width_s        : std_logic_vector(1 downto 0);  --! load/store byte(00), half(01), word(11)
 
+  --! @brief Exepction handler signals
+  signal invalid_address_sig       : std_logic; --! exception handler out of bound
+  signal misaligned_access_sig     : std_logic; --! exception handler misaligned
+  signal invalid_instruction_sig   : std_logic; --! exception handler and control
+
+  signal invalid_address_fetch_sig : std_logic; --! fetch out of bound
+  signal misaligned_fetch_sig      : std_logic; --! fetch misaligned
+  signal invalid_address_lsu_sig   : std_logic; --! out of bound lsu
+  signal misaligned_lsu_sig        : std_logic; --! misaligned lsu
+
+  signal halt_sig                      : std_logic;
+  signal mem_en_s                  : std_logic;
+
+  signal fetched_instr_sig : t_instruction_rec;
+
   --! @brief Program Counter (PC) module
   --! @details Holds and updates the current program counter value based on
   --!   the next PC input and clock/reset signals.
@@ -143,6 +160,7 @@ architecture arch of score_v is
       clk_i     : in  std_logic;
       rst_i     : in  std_logic;
       pc_next_i : in  std_logic_vector(31 downto 0);
+      halt_i    : in  std_logic;
       pc_o      : out std_logic_vector(31 downto 0)
     );
   end component;
@@ -184,12 +202,17 @@ architecture arch of score_v is
   --!   based on opcode and funct fields from the decoded instruction.
   component control is
     port (
+	  mem_en_o           : out std_logic;
+	  rst_i              : in  std_logic;
       opcode_i           : in  std_logic_vector(6 downto 0);
       funct3_i           : in  std_logic_vector(2 downto 0);
       funct7_i           : in  std_logic_vector(6 downto 0);
       imm_i_type_i       : in  std_logic_vector(11 downto 0);
       br_eq_i            : in  std_logic;
       br_lt_i            : in  std_logic;
+      halt_i             : in  std_logic;
+      out_of_bound_i     : in  std_logic;
+      misaligned_i       : in  std_logic;
       reg_write_enable_o : out std_logic;
       imm_sel_o          : out std_logic_vector(2 downto 0);
       a_sel_o            : out std_logic;
@@ -200,7 +223,8 @@ architecture arch of score_v is
       mem_unsigned_o     : out std_logic;
       wb_select_o        : out std_logic_vector(1 downto 0);
       pc_sel_o           : out std_logic;
-      br_un_o            : out std_logic
+      br_un_o            : out std_logic;
+      invalid_instr_o    : out std_logic    
     );
   end component;
 
@@ -238,14 +262,17 @@ architecture arch of score_v is
       g_INIT_FILE : string := "data_memory.txt"
     );
     port (
-      clk_i        : in  std_logic;
-      rst_i        : in  std_logic;
-      addr_i       : in  std_logic_vector(31 downto 0);
-      mem_RW_i     : in  std_logic;
-      data_write_i : in  std_logic_vector(31 downto 0);
-      width_i      : in  std_logic_vector(1 downto 0);
-      sign_i       : in std_logic;
-      data_read_o  : out std_logic_vector(31 downto 0)
+	  mem_en_i       : in std_logic;
+      clk_i          : in  std_logic;
+      rst_i          : in  std_logic;
+      addr_i         : in  std_logic_vector(31 downto 0);
+      mem_RW_i       : in  std_logic;
+      data_write_i   : in  std_logic_vector(31 downto 0);
+      width_i        : in  std_logic_vector(1 downto 0);
+      sign_i         : in std_logic;
+      data_read_o    : out std_logic_vector(31 downto 0);
+      invalid_addr_o : out std_logic;
+      misaligned_access_o : out std_logic
     );
   end component;
 
@@ -303,7 +330,37 @@ architecture arch of score_v is
     );
   end component;
 
+  component exception_handler is
+    port (
+      clk_i                  : in  std_logic;
+      rst_i                  : in  std_logic;
+      misaligned_access_i    : in  std_logic;
+      invalid_address_i      : in  std_logic;
+      invalid_instruction_i  : in  std_logic;
+      halt_processor_o       : out std_logic
+    );
+  end component;
+
+  component fetch_instruction is
+  generic
+  (
+    g_ADDR_WIDTH : integer := 32;
+    g_INIT_FILE  : string  := "instruction_memory.txt"
+  );
+  port
+  (
+    instruction_count_i     : in  std_logic_vector(g_ADDR_WIDTH-1 downto 0);
+    halt_i                  : in  std_logic;
+    instruction_bits_o      : out t_instruction_rec;
+    invalid_instr_addr_o    : out std_logic;
+    misaligned_instr_addr_o : out std_logic
+  );
+end component;
+
 begin
+
+  invalid_address_sig   <= invalid_address_fetch_sig or invalid_address_lsu_sig;
+  misaligned_access_sig <= misaligned_fetch_sig or misaligned_lsu_sig;
 
   --! @brief Program Counter instance
   u_pc : pc
@@ -311,6 +368,7 @@ begin
       clk_i     => clk_i,
       rst_i     => rst_i,
       pc_next_i => pc_next_sig,
+      halt_i    => halt_sig,
       pc_o      => pc_sig
     );
 
@@ -327,7 +385,7 @@ begin
   --! @brief Instruction decoder
   u_decoder : instruction_decoder
     port map (
-      instr_i         => instr_data_i,
+      instr_i         => fetched_instr_sig,
       opcode_o        => opcode_sig,
       rs1_o           => rs1_sig,
       rs2_o           => rs2_sig,
@@ -344,12 +402,15 @@ begin
   --! @brief Control unit instance
   u_control : control
     port map (
+	  mem_en_o           => mem_en_s,
+	  rst_i              => rst_i,
       opcode_i           => opcode_sig,
       funct3_i           => funct3_sig,
       funct7_i           => funct7_sig,
       imm_i_type_i       => imm_i_type_sig,
       br_eq_i            => br_eq_sig,
       br_lt_i            => br_lt_sig,
+      halt_i             => halt_sig,
       reg_write_enable_o => reg_we_sig,
       imm_sel_o          => imm_sel_sig,
       b_sel_o            => b_sel_sig,
@@ -360,7 +421,10 @@ begin
       mem_unsigned_o     => sign_s,
       wb_select_o        => wb_select_sig,
       pc_sel_o           => pc_sel_sig,
-      br_un_o            => br_un_sig
+      br_un_o            => br_un_sig,
+      invalid_instr_o    => invalid_instruction_sig,
+      out_of_bound_i     => invalid_address_fetch_sig,
+      misaligned_i       => misaligned_fetch_sig
     );
 
   --! @brief Immediate Generator unit instance
@@ -430,14 +494,17 @@ begin
       g_init_file => g_DMEM_INIT_FILE
     )
     port map (
-      clk_i        => clk_i,
-      rst_i        => rst_i,
-      addr_i       => alu_result_sig,
-      mem_RW_i     => mem_rw_sig,
-      data_write_i => rs2_data_sig,
-      data_read_o  => mem_data_sig,
-      sign_i       => sign_s,
-      width_i      => width_s
+	  mem_en_i            => mem_en_s,
+      clk_i               => clk_i,
+      rst_i               => rst_i,
+      addr_i              => alu_result_sig,
+      mem_RW_i            => mem_rw_sig,
+      data_write_i        => rs2_data_sig,
+      data_read_o         => mem_data_sig,
+      sign_i              => sign_s,
+      width_i             => width_s,
+      invalid_addr_o      => invalid_address_sig,
+      misaligned_access_o => misaligned_access_sig
     );
 
   --! @brief Write-Back Multiplexer
@@ -451,10 +518,34 @@ begin
       wb_data_o    => final_wb_sig
     );
 
+  u_exception_handler : exception_handler
+    port map (
+      clk_i                 => clk_i,
+      rst_i                 => rst_i,
+      misaligned_access_i   => misaligned_access_sig,
+      invalid_address_i     => invalid_address_sig,
+      invalid_instruction_i => invalid_instruction_sig,
+      halt_processor_o      => halt_sig
+    );
+
+  u_fetch : fetch_instruction
+    generic map (
+      g_INIT_FILE => g_IMEM_INIT_FILE
+    )
+    port map (
+      instruction_count_i     => pc_sig,
+      instruction_bits_o      => fetched_instr_sig,
+      halt_i                  => halt_sig,
+      invalid_instr_addr_o    => invalid_address_fetch_sig,
+      misaligned_instr_addr_o => misaligned_fetch_sig
+    );
+    
   --! @brief Output assignments
   instr_addr_o <= pc_sig;
+  
   pc_o         <= pc_sig;
   opcode_o     <= opcode_sig;
+  instr_data_o <= fetched_instr_sig;
   rd_o         <= rd_sig;
   rs1_o        <= rs1_sig;
   rs2_o        <= rs2_sig;
@@ -464,4 +555,6 @@ begin
   reg_we_o     <= reg_we_sig;
   wb_data_o    <= final_wb_sig;
   mem_data_o   <= mem_data_sig;
+  halt_o       <= halt_sig;
+  
 end arch;

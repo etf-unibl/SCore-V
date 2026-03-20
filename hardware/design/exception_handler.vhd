@@ -1,14 +1,24 @@
 -----------------------------------------------------------------------------
 -- Faculty of Electrical Engineering
 -- PDS 2025
--- https://github.com/etf-unibl/SCore-V/
+-- https://github.com/etf-unibl/SCore-V
 -----------------------------------------------------------------------------
 --
--- unit name:     pc
+-- unit name:     exception_handler
 --
 -- description:
 --
---   This file implements a simple Program Counter register.
+--   Exception handling unit for the processor. This module monitors
+--   exception signals generated during instruction execution.
+--   If any of the following conditions occur:
+--     - misaligned memory access
+--     - invalid memory address access
+--     - invalid or unsupported instruction
+--   the module asserts the halt signal which forces the processor
+--   to enter the HALT state.
+--
+--   The halt signal is registered on the rising edge of the clock
+--   and remains active until the processor is reset.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2025 Faculty of Electrical Engineering
@@ -35,53 +45,41 @@
 -- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 -- OTHER DEALINGS IN THE SOFTWARE
 -----------------------------------------------------------------------------
+
+--! @file exception_handler.vhd
+--! @brief Processor exception detection and handling unit
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
---! @file pc.vhd
---! @brief Program Counter (PC) register
---! @details Implements a 32-bit synchronous Program Counter register.
---! The PC value is updated on the rising edge of the clock.
---! If an exception occurs (halt_i = '1'), the PC retains its current value to stop instruction execution.
---! When reset is asserted, the PC is cleared to zero.
---! Otherwise, the next PC value is loaded from the input.
-
-entity pc is
+entity exception_handler is
   port (
-    clk_i     : in  std_logic;                     --! Input clock signal
-    rst_i     : in  std_logic;                     --! Active-high synchronous reset
-    pc_next_i : in  std_logic_vector(31 downto 0); --! Next PC value input
-    halt_i    : in  std_logic;                     --! Exception occured and processor should go to HALT state
-    pc_o      : out std_logic_vector(31 downto 0)  --! Current PC value output
-  );
-end pc;
+  clk_i                  : in  std_logic; --! Clock input
+  rst_i                  : in  std_logic; --! Reset input
+  misaligned_access_i    : in  std_logic; --! Incorrect address alignment
+  invalid_address_i      : in  std_logic; --! Address out of allowed range
+  invalid_instruction_i  : in  std_logic; --! Unsupported opcode or invalid format
+  halt_processor_o       : out std_logic  --! Processor goes to HALT state when exception occurs
+);
+end exception_handler;
 
---! @brief Architecture arch for Program Counter
---! @details Contains the PC register and synchronous update logic
-architecture arch of pc is
-  --! @brief Internal signal declarations
-  signal pc_reg : std_logic_vector(31 downto 0); --! Internal PC register
-begin
-
-  --! @brief PC register process
-  --! @details Updates PC on rising clock edge.
-  --! If reset is asserted, PC is cleared to zero.
-  --! Otherwise, loads the next PC value.
-  pc_reg_p : process(clk_i, rst_i)
+architecture arch of exception_handler is
+    signal int_halt : std_logic := '0';
   begin
-    if rst_i = '1' then
-      pc_reg <= (others => '0');
-    elsif rising_edge(clk_i) then
-      if halt_i = '1' then
-        pc_reg <= pc_reg;
-      else
-        pc_reg <= pc_next_i;
+    process(clk_i, rst_i)
+    begin
+      if rst_i = '1' then
+        int_halt <= '0';
+      elsif rising_edge(clk_i) then
+        if (misaligned_access_i = '1' or invalid_address_i = '1' or invalid_instruction_i = '1') then
+		  int_halt <= '1';
+		  if invalid_instruction_i = '1' then report "DEBUG: Invalid Instruction detected!"; end if;
+		  if invalid_address_i = '1' then report "DEBUG: Out of Bounds detected!"; end if;
+		  if misaligned_access_i = '1' then report "DEBUG: Misalignment detected!"; end if;
+		end if;
       end if;
-    end if;
-  end process pc_reg_p;
+    end process;
 
-  --! @brief Output assignment
-  --! @details Connects internal PC register to output port
-  pc_o <= pc_reg;
+    halt_processor_o <= int_halt;
 end arch;

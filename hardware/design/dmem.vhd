@@ -64,12 +64,15 @@ entity dmem is
   );
   port
   (
-    clk_i        : in  std_logic;                     --! Global clock signal
-    addr_i       : in  std_logic_vector(31 downto 0); --! Byte address for read/write access
-    we_i         : in  std_logic;                     --! Write enable: '1' = write, '0' = read
-    width_i      : in  std_logic_vector(1 downto 0);  --! Access width: byte=00, halfword=01, word=1x
-    data_write_i : in  std_logic_vector(31 downto 0); --! Data to write (synchronous)
-    data_read_o  : out std_logic_vector(31 downto 0)  --! Data read output (asynchronous, zero-extended)
+    clk_i               : in  std_logic;                     --! Global clock signal
+    rst_i               : in  std_logic;                     --! Synchronous reset, active high
+    addr_i              : in  std_logic_vector(31 downto 0); --! Byte address for read/write access
+    we_i                : in  std_logic;                     --! Write enable: '1' = write, '0' = read
+    width_i             : in  std_logic_vector(1 downto 0);  --! Access width: byte=00, halfword=01, word=1x
+    data_write_i        : in  std_logic_vector(31 downto 0); --! Data to write (synchronous)
+    data_read_o         : out std_logic_vector(31 downto 0); --! Data read output (asynchronous, zero-extended)
+    invalid_addr_o      : out std_logic;                     --! Trying to access out of bounds address
+    misaligned_access_o : out std_logic                      --! Trying to access misaligned address
   );
 end dmem;
 
@@ -107,6 +110,9 @@ architecture arch of dmem is
       readline(f_ptr, l);
       next when l'length = 0;
       hread(l, word);
+	  if i < 16 then -- Ispiši samo prvih par bajtova
+		report "INIT DEBUG: mem(" & integer'image(i) & ")=" & to_hstring(word);
+	  end if;
       result(i)     := word(7  downto 0);
       result(i + 1) := word(15 downto 8);
       result(i + 2) := word(23 downto 16);
@@ -123,55 +129,111 @@ architecture arch of dmem is
   --! @brief Byte-addressable data memory array, initialised at elaboration time.
   signal mem : t_bytes(0 to c_MEM_SIZE - 1) := initialize_dmem(g_INIT_FILE, c_MEM_SIZE);
 
-  signal address      : integer;
-  signal memory_bound : integer;
+  signal address                  : integer;
+  signal memory_bound             : integer;
+  signal is_invalid_addr_read     : std_logic := '0';
+  signal is_misaligned_addr_read  : std_logic := '0';
+  signal is_invalid_addr_write    : std_logic := '0';
+  signal is_misaligned_addr_write : std_logic := '0';
 
 begin
 
   address      <= to_integer(signed(addr_i));
-  memory_bound <= c_MEM_SIZE - 2 when width_i = "00" else
-                  c_MEM_SIZE - 3 when width_i = "01" else
-                  c_MEM_SIZE - 4;
 
   --! @brief Asynchronous zero-extended read.
-  process(address, width_i, mem) is
-    variable result : std_logic_vector(31 downto 0);
+  process(address, width_i, mem, addr_i) is
+    variable v_result             : std_logic_vector(31 downto 0);
+    variable v_is_invalid_addr    : std_logic;
+    variable v_is_misaligned_addr : std_logic;
   begin
-    if address >= 0 and address <= memory_bound then
-      case width_i is
-        when "00" =>
-          result := x"000000" & mem(address);
-        when "01" =>
-          result := x"0000" & mem(address + 1) & mem(address);
-        when others =>
-          result := mem(address + 3) & mem(address + 2) &
-                    mem(address + 1) & mem(address);
-      end case;
-    else
-      result := (others => '0');
+    v_result             := (others => '0');
+    v_is_invalid_addr    := '0';
+    v_is_misaligned_addr := '0';
+  case width_i is
+    when "00" =>  -- byte
+      if address >= 0 and address <= c_MEM_SIZE - 1 then
+        v_result := x"000000" & mem(address);
+      else
+        v_is_invalid_addr := '1';
+      end if;
+    when "01" =>  -- halfword
+      if address < 0 or address > c_MEM_SIZE - 2 then
+        v_is_invalid_addr := '1';
+      elsif addr_i(0) /= '0' then
+        v_is_misaligned_addr := '1';
+      else
+        v_result := x"0000" & mem(address + 1) & mem(address);
+      end if;
+    when others =>  -- word
+      if address < 0 or address > c_MEM_SIZE - 4 then
+        v_is_invalid_addr := '1';
+      elsif addr_i(1 downto 0) /= "00" then
+        v_is_misaligned_addr := '1';
+      else
+        v_result := mem(address + 3) & mem(address + 2) &
+                  mem(address + 1) & mem(address);
+      end if;
+  end case;
+  	if v_is_invalid_addr = '0' and v_is_misaligned_addr = '0' then
+       report "DMEM READ DEBUG: Addr=" & integer'image(address) & 
+              " Width=" & to_string(width_i) &
+              " Result=" & to_hstring(v_result);
     end if;
-    data_read_o <= result;
-  end process;
+  data_read_o              <= v_result;
+  is_invalid_addr_read     <= v_is_invalid_addr;
+  is_misaligned_addr_read  <= v_is_misaligned_addr;
+end process;
 
   --! @brief Synchronous write.
   process(clk_i) is
   begin
     if rising_edge(clk_i) then
-      if we_i = '1' and address >= 0 and address <= c_MEM_SIZE - 4 then
+      if rst_i = '1' then
+        is_invalid_addr_write    <= '0';
+        is_misaligned_addr_write <= '0';
+      elsif we_i = '1' then
+        is_invalid_addr_write    <= '0';
+        is_misaligned_addr_write <= '0';
         case width_i is
-          when "00" =>
-            mem(address)     <= data_write_i(7 downto 0);
-          when "01" =>
-            mem(address)     <= data_write_i(7 downto 0);
-            mem(address + 1) <= data_write_i(15 downto 8);
-          when others =>
-            mem(address)     <= data_write_i(7 downto 0);
-            mem(address + 1) <= data_write_i(15 downto 8);
-            mem(address + 2) <= data_write_i(23 downto 16);
-            mem(address + 3) <= data_write_i(31 downto 24);
+          when "00" => -- byte
+            if address >= 0 and address <= c_MEM_SIZE - 1 then
+              mem(address) <= data_write_i(7 downto 0);
+            else
+              is_invalid_addr_write <= '1';
+            end if;
+          when "01" => -- half
+            if address >= 0 and address <= c_MEM_SIZE - 2 then
+              if addr_i(0) = '0' then
+                mem(address)     <= data_write_i(7 downto 0);
+                mem(address + 1) <= data_write_i(15 downto 8);
+              else
+                is_misaligned_addr_write <= '1';
+              end if;
+            else
+              is_invalid_addr_write <= '1';
+            end if;
+          when others => -- word
+            if address >= 0 and address <= c_MEM_SIZE - 4 then
+              if addr_i(1 downto 0) = "00" then
+                mem(address)     <= data_write_i(7 downto 0);
+                mem(address + 1) <= data_write_i(15 downto 8);
+                mem(address + 2) <= data_write_i(23 downto 16);
+                mem(address + 3) <= data_write_i(31 downto 24);
+              else
+                is_misaligned_addr_write <= '1';
+              end if;
+            else
+              is_invalid_addr_write <= '1';
+            end if;
         end case;
+      else
+        is_invalid_addr_write    <= '0';
+        is_misaligned_addr_write <= '0';
       end if;
     end if;
   end process;
+
+  invalid_addr_o      <= is_invalid_addr_read or is_invalid_addr_write;
+  misaligned_access_o <= is_misaligned_addr_read or is_misaligned_addr_write;
 
 end arch;

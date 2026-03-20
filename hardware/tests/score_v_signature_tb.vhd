@@ -64,24 +64,27 @@ architecture sim of score_v_signature_tb is
 
   constant CLK_PERIOD : time := 10 ns;
 
-  signal clk_s        : std_logic := '0';
-  signal rst_s        : std_logic := '1';
-  signal sim_done_s   : std_logic := '0';
+  signal clk_s             : std_logic := '0';
+  signal rst_s             : std_logic := '1';
+  signal sim_done_s        : std_logic := '0';
 
-  signal instr_addr_s : std_logic_vector(31 downto 0);
-  signal instr_mem_s  : t_instruction_rec;
-  signal fetch_instr_s: t_instruction_rec;
-  signal pc_s         : std_logic_vector(31 downto 0);
-  signal opcode_s     : std_logic_vector(6 downto 0);
-  signal rd_addr_s    : std_logic_vector(4 downto 0);
-  signal rs1_addr_s   : std_logic_vector(4 downto 0);
-  signal rs2_addr_s   : std_logic_vector(4 downto 0);
-  signal rs1_data_s   : std_logic_vector(31 downto 0);
-  signal rs2_data_s   : std_logic_vector(31 downto 0);
-  signal alu_result_s : std_logic_vector(31 downto 0);
-  signal reg_we_s     : std_logic;
-  signal mem_data_s   : std_logic_vector(31 downto 0);
-  signal wb_data_s    : std_logic_vector(31 downto 0);
+  signal instr_addr_s      : std_logic_vector(31 downto 0);
+  signal instr_mem_s       : t_instruction_rec;
+  signal fetch_instr_s     : t_instruction_rec;
+  signal pc_s              : std_logic_vector(31 downto 0);
+  signal opcode_s          : std_logic_vector(6 downto 0);
+  signal rd_addr_s         : std_logic_vector(4 downto 0);
+  signal rs1_addr_s        : std_logic_vector(4 downto 0);
+  signal rs2_addr_s        : std_logic_vector(4 downto 0);
+  signal rs1_data_s        : std_logic_vector(31 downto 0);
+  signal rs2_data_s        : std_logic_vector(31 downto 0);
+  signal alu_result_s      : std_logic_vector(31 downto 0);
+  signal reg_we_s          : std_logic;
+  signal mem_data_s        : std_logic_vector(31 downto 0);
+  signal wb_data_s         : std_logic_vector(31 downto 0);
+  signal halt_s            : std_logic := '0';
+  signal invalid_addr_s    : std_logic := '0';
+  signal misaligned_addr_s : std_logic := '0';
 
   -- -------------------------------------------------------------------------
   -- Count non-blank lines in the IMEM init file (one hex byte per line).
@@ -134,8 +137,11 @@ begin
       g_INIT_FILE => g_init_file
     )
     port map (
-      instruction_count_i => instr_addr_s,
-      instruction_bits_o  => fetch_instr_s
+      instruction_count_i     => instr_addr_s,
+      halt_i                  => halt_s,
+      instruction_bits_o      => fetch_instr_s,
+      invalid_instr_addr_o    => invalid_addr_s,
+      misaligned_instr_addr_o => misaligned_addr_s
     );
 
   instr_mem_s <= fetch_instr_s;

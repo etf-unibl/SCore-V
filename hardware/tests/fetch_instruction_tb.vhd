@@ -102,8 +102,11 @@ architecture arch of fetch_instruction_tb is
   --! @brief Golden reference IMEM, sized from the file.
   constant c_IMEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_init_file, c_MEM_SIZE);
 
-  signal test_in  : std_logic_vector(31 downto 0);
-  signal test_out : t_instruction_rec;
+  signal test_in                 : std_logic_vector(31 downto 0);
+  signal test_out                : t_instruction_rec;
+  signal halt_s                  : std_logic := '0';
+  signal invalid_instr_addr_s    : std_logic := '0';
+  signal misaligned_instr_addr_s : std_logic := '0';
 
 begin
 
@@ -113,8 +116,11 @@ begin
       g_INIT_FILE => g_init_file
     )
     port map (
-      instruction_count_i => test_in,
-      instruction_bits_o  => test_out
+      instruction_count_i     => test_in,
+      halt_i                  => halt_s,
+      instruction_bits_o      => test_out,
+      invalid_instr_addr_o    => invalid_instr_addr_s,
+      misaligned_instr_addr_o => misaligned_instr_addr_s
     );
 
   main : process
@@ -134,12 +140,119 @@ begin
           full_instruction := c_IMEM(addr_int + 3) &
                               c_IMEM(addr_int + 2) &
                               c_IMEM(addr_int + 1) &
-                              c_IMEM(addr_int);
+                              c_IMEM(addr_int) when (addr_int < c_MEM_SIZE - 3) else (others => '0');
           check_equal(test_out.opcode, full_instruction(6 downto 0),
                     "Opcode mismatch at index " & integer'image(addr_int));
           check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
                     "Data bits mismatch at index " & integer'image(addr_int));
         end loop;
+
+      elsif run("test_exceptions_in_fetch_instr") then
+
+        --! HALT state detected test
+        halt_s  <= '1';
+        if c_MEM_SIZE >= 4 then
+          test_in <= std_logic_vector(to_unsigned(0, 32));
+          wait for 10 ns;
+          check_equal(test_out.opcode, std_logic_vector(to_unsigned(0, 7)), 
+                     "Opcode should be 0 when halted");
+          check_equal(test_out.other_instruction_bits, std_logic_vector(to_unsigned(0, 25)), 
+                     "Data should be 0 when halted");
+        else
+          info("Empty instruction memory.");
+        end if;
+
+        --! Reset after HALT state test
+        halt_s   <= '0';
+        if c_MEM_SIZE >= 4 then
+          test_in  <= std_logic_vector(to_unsigned(0, 32));
+          wait for 0 ns;  -- let signal assignments propagate before reading test_in
+          addr_int := to_integer(unsigned(test_in));
+          full_instruction := c_IMEM(addr_int + 3) &
+                              c_IMEM(addr_int + 2) &
+                              c_IMEM(addr_int + 1) &
+                              c_IMEM(addr_int) when (addr_int < c_MEM_SIZE - 3) else (others => '0');
+          wait for 10 ns;
+          check_equal(test_out.opcode, full_instruction(6 downto 0),
+                     "Opcode mismatch at index " & integer'image(addr_int));
+          check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                     "Data bits mismatch at index " & integer'image(addr_int));          
+          check_equal(invalid_instr_addr_s, '0', 
+                     "Invalid instruction address flag should be '0' after active reset");
+          check_equal(misaligned_instr_addr_s, '0', 
+                     "Misaligned instruction address flag should be '0' after active reset");
+        else
+          info("Empty instruction memory.");
+        end if;
+
+        --! Misaligned instruction address access test and out of boundaries instruction address
+
+        for i in 0 to c_MEM_SIZE - 1 loop
+          addr_int := i;
+          test_in  <= std_logic_vector(to_unsigned(addr_int, 32));
+          wait for 10 ns;
+        
+          if i <= c_MEM_SIZE - 4 then
+            check_equal(invalid_instr_addr_s, '0',
+                        "Invalid instruction address flag should be '0' at index " & integer'image(addr_int));
+            if i mod 4 = 0 then
+              check_equal(misaligned_instr_addr_s, '0',
+                          "Misaligned instruction address flag should be '0' for aligned address at index " & integer'image(addr_int));
+              full_instruction := c_IMEM(addr_int + 3) &
+                              c_IMEM(addr_int + 2) &
+                              c_IMEM(addr_int + 1) &
+                              c_IMEM(addr_int) when (addr_int < c_MEM_SIZE - 3) else (others => '0');
+              wait for 10 ns;
+              check_equal(test_out.opcode, full_instruction(6 downto 0),
+                         "Opcode mismatch at index " & integer'image(addr_int));
+              check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                         "Data bits mismatch at index " & integer'image(addr_int));
+            else
+              check_equal(misaligned_instr_addr_s, '1',
+                          "Misaligned instruction address flag should be '1' for misaligned address at index " & integer'image(addr_int));
+              full_instruction := (others => '0');
+              wait for 10 ns;
+              check_equal(test_out.opcode, full_instruction(6 downto 0),
+                         "Opcode mismatch at index " & integer'image(addr_int));
+              check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                         "Data bits mismatch at index " & integer'image(addr_int));
+
+            end if;
+          else
+            check_equal(invalid_instr_addr_s, '1',
+                        "Invalid instruction address flag should be '1' at index " & integer'image(addr_int));
+            
+            full_instruction := (others => '0');
+              wait for 10 ns;
+              check_equal(test_out.opcode, full_instruction(6 downto 0),
+                         "Opcode mismatch at index " & integer'image(addr_int));
+              check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                         "Data bits mismatch at index " & integer'image(addr_int));
+
+            if i mod 4 = 0 then
+              check_equal(misaligned_instr_addr_s, '0',
+                          "Misaligned instruction address flag should be '0' for aligned invalid address at index " & integer'image(addr_int));
+              
+              full_instruction := (others => '0');
+              wait for 10 ns;
+              check_equal(test_out.opcode, full_instruction(6 downto 0),
+                         "Opcode mismatch at index " & integer'image(addr_int));
+              check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                         "Data bits mismatch at index " & integer'image(addr_int));
+
+            else
+              check_equal(misaligned_instr_addr_s, '1',
+                          "Misaligned instruction address flag should be '1' for misaligned invalid address at index " & integer'image(addr_int));
+              full_instruction := (others => '0');
+              wait for 10 ns;
+              check_equal(test_out.opcode, full_instruction(6 downto 0),
+                         "Opcode mismatch at index " & integer'image(addr_int));
+              check_equal(test_out.other_instruction_bits, full_instruction(31 downto 7),
+                         "Data bits mismatch at index " & integer'image(addr_int));
+            end if;
+          end if;
+        end loop;
+
       end if;
     end loop;
 

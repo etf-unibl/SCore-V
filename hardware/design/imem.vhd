@@ -64,9 +64,15 @@ entity imem is
   port
   (
     --! @brief Byte address of the instruction to read.
-    addr_i : in  std_logic_vector(31 downto 0);
+    addr_i                  : in  std_logic_vector(31 downto 0);
+    --! @brief HALT state detected input
+    halt_i                  : in  std_logic;
     --! @brief 32-bit instruction word at addr_i (asynchronous).
-    data_o : out std_logic_vector(31 downto 0)
+    data_o                  : out std_logic_vector(31 downto 0);
+    --! @brief Instruction fetch address is outside valid instruction memory range
+    invalid_instr_addr_o    : out std_logic;
+    --! @brief Instruction fetch address is not 4-byte aligned (PC(1 downto 0) /= "00")
+    misaligned_instr_addr_o : out std_logic 
   );
 end imem;
 
@@ -104,6 +110,9 @@ architecture arch of imem is
       readline(f_ptr, l);
       next when l'length = 0;
       hread(l, temp);
+	  if i < 16 then
+		report "INIT DEBUG: mem(" & integer'image(i) & ")=" & to_hstring(temp);
+	  end if;
       result(i) := temp;
       i := i + 1;
     end loop;
@@ -115,14 +124,52 @@ architecture arch of imem is
   constant c_MEM_SIZE : integer := count_bytes(g_INIT_FILE);
 
   --! @brief Instruction memory contents, initialised at elaboration time.
-  constant c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
+  signal c_MEM : t_bytes(0 to c_MEM_SIZE - 1) := initialize_memory(g_INIT_FILE, c_MEM_SIZE);
+
+  signal invalid_instr_addr_s    : std_logic := '0';
+  signal misaligned_instr_addr_s : std_logic := '0';
 
 begin
+  
+  misaligned_instr_addr_s <= '1' when addr_i(1 downto 0) /= "00" else '0';
+  invalid_instr_addr_s    <= '1' when to_integer(unsigned(addr_i)) > c_MEM_SIZE - 4 else '0';
+  
 
-  --! @brief Asynchronous little-endian 32-bit read.
-  data_o <= c_MEM(to_integer(unsigned(addr_i)) + 3) &
-            c_MEM(to_integer(unsigned(addr_i)) + 2) &
-            c_MEM(to_integer(unsigned(addr_i)) + 1) &
-            c_MEM(to_integer(unsigned(addr_i))) when (to_integer(unsigned(addr_i)) < c_MEM_SIZE - 3) else (others => '0');
+comb_proc : process(addr_i, c_MEM, halt_i)
+    variable v_addr : integer;
+    variable v_invalid : std_logic;
+    variable v_misaligned : std_logic;
+  begin
+    v_addr := to_integer(unsigned(addr_i));
+    v_invalid := '0';
+    v_misaligned := '0';
+
+    report "PROCESS TRIGGERED: addr_i=" & to_hstring(addr_i) & 
+           " v_addr=" & integer'image(v_addr) & 
+           " c_MEM_SIZE=" & integer'image(c_MEM_SIZE);
+
+    if addr_i(1 downto 0) /= "00" then
+        v_misaligned := '1';
+    end if;
+
+    if v_addr < 0 or v_addr > c_MEM_SIZE - 4 then
+        v_invalid := '1';
+    end if;
+
+    if halt_i = '1' or v_invalid = '1' or v_misaligned = '1' then
+        data_o <= (others => '0');
+    else
+        data_o <= c_MEM(v_addr + 3) &
+                  c_MEM(v_addr + 2) &
+                  c_MEM(v_addr + 1) &
+                  c_MEM(v_addr);
+                  
+        report "IMEM READ: PC=" & integer'image(v_addr) & " DATA=" & 
+               to_hstring(c_MEM(v_addr + 3) & c_MEM(v_addr + 2) & c_MEM(v_addr + 1) & c_MEM(v_addr));
+    end if;
+
+    invalid_instr_addr_o    <= v_invalid;
+    misaligned_instr_addr_o <= v_misaligned;
+  end process;
 
 end arch;

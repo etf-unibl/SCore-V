@@ -65,6 +65,9 @@ architecture arch of load_store_unit_tb is
   signal sim_stop_s   : std_logic := '0';
   signal sign_s       : std_logic;
   signal width_s      : std_logic_vector(1 downto 0);
+  signal invalid_addr_s      : std_logic;
+  signal misaligned_access_s : std_logic;
+  signal mem_en_s     : std_logic;
 
   signal word_to_write : std_logic_vector(31 downto 0) := (others => '0');
   constant c_CLK_PERIOD : time := 10 ns;
@@ -76,6 +79,7 @@ begin
       g_init_file => g_init_file
     )
     port map (
+	  mem_en_i     => mem_en_s,
       clk_i        => clk_s,
       rst_i        => rst_s,
       addr_i       => addr_s,
@@ -83,7 +87,9 @@ begin
       data_write_i => data_write_s,
       data_read_o  => data_read_s,
       sign_i       => sign_s,
-      width_i      => width_s
+      width_i      => width_s,
+      invalid_addr_o => invalid_addr_s,
+      misaligned_access_o => misaligned_access_s
     );
 
   clk_process : process
@@ -144,16 +150,65 @@ begin
           error("Expected " & to_string(data_write_s) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Out-of-bounds and negative address writes (no verification)
+        -- Out-of-bounds word write: expect invalid_addr_s = '1'
         addr_s       <= std_logic_vector(to_unsigned(1000, 32));
         data_write_s <= std_logic_vector(to_unsigned(63, 32));
+        width_s      <= "10";
         mem_RW_s     <= '1';
         wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "SW oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "SW oob: misaligned should be '0'");
 
+        -- Check flags clear when write is de-asserted
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "SW oob: invalid_addr should clear");
+        check_equal(misaligned_access_s, '0', "SW oob: misaligned should stay '0'");
+
+        -- Negative address word write: expect invalid_addr_s = '1'
         addr_s       <= std_logic_vector(to_signed(-10, 32));
         data_write_s <= std_logic_vector(to_unsigned(63, 32));
         mem_RW_s     <= '1';
         wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "SW neg: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "SW neg: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "SW neg: invalid_addr should clear");
+
+        -- Misaligned word write (addr not 4-byte aligned): expect misaligned_access_s = '1'
+        addr_s   <= std_logic_vector(to_unsigned(2, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "SW misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "SW misaligned: invalid_addr should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '0', "SW misaligned: misaligned should clear");
+
+        -- Verify recovery: valid write after exceptions should succeed cleanly
+        addr_s       <= std_logic_vector(to_unsigned(4, 32));
+        data_write_s <= std_logic_vector(to_unsigned(99, 32));
+        mem_RW_s     <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "SW recovery: invalid_addr should be '0'");
+        check_equal(misaligned_access_s, '0', "SW recovery: misaligned should be '0'");
+        mem_RW_s <= '0';
+        wait for c_CLK_PERIOD;
+        check_equal(data_read_s, std_logic_vector(to_unsigned(99, 32)), "SW recovery: readback mismatch");
 
         info("Store word test passed");
 
@@ -175,10 +230,10 @@ begin
           error("Expected " & to_string(data_write_s(15 downto 0)) & ", got " & to_string(written16));
         end if;
 
-        -- Write halfword to addr 9, read back lower 16 bits to verify
+        -- Write halfword to addr 10, read back lower 16 bits to verify
         width_s                   <= "01";
         sign_s                    <= '1';
-        addr_s                    <= std_logic_vector(to_unsigned(9, 32));
+        addr_s                    <= std_logic_vector(to_unsigned(10, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
         mem_RW_s                  <= '1';
         wait until rising_edge(clk_s);
@@ -190,18 +245,52 @@ begin
           error("Expected " & to_string(data_write_s(15 downto 0)) & ", got " & to_string(written16));
         end if;
 
-        -- Out-of-bounds and negative address writes (no verification)
+        -- Out-of-bounds halfword write: expect invalid_addr_s = '1'
         width_s                   <= "01";
         addr_s                    <= std_logic_vector(to_unsigned(258, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
         mem_RW_s                  <= '1';
         wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "SH oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "SH oob: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "SH oob: invalid_addr should clear");
 
+        -- Negative address halfword write: expect invalid_addr_s = '1'
         width_s                   <= "01";
         addr_s                    <= std_logic_vector(to_signed(-5, 32));
         data_write_s(15 downto 0) <= "1100110011001100";
         mem_RW_s                  <= '1';
         wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "SH neg: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "SH neg: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "SH neg: invalid_addr should clear");
+
+        -- Misaligned halfword write (odd address): expect misaligned_access_s = '1'
+        width_s  <= "01";
+        addr_s   <= std_logic_vector(to_unsigned(3, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "SH misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "SH misaligned: invalid_addr should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '0', "SH misaligned: misaligned should clear");
 
       elsif run("test_store_byte") then
         info("Testing store byte (sb) function of lsu");
@@ -236,24 +325,43 @@ begin
           error("Expected " & to_string(data_write_s(7 downto 0)) & ", got " & to_string(written8));
         end if;
 
-        -- Out-of-bounds and negative address writes (no verification)
+        -- Out-of-bounds byte write: expect invalid_addr_s = '1'
         width_s                  <= "00";
         addr_s                   <= std_logic_vector(to_unsigned(258, 32));
         data_write_s(7 downto 0) <= "11001100";
         mem_RW_s                 <= '1';
         wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "SB oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "SB oob: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "SB oob: invalid_addr should clear");
 
+        -- Negative address byte write: expect invalid_addr_s = '1'
         width_s                  <= "00";
         addr_s                   <= std_logic_vector(to_signed(-5, 32));
         data_write_s(7 downto 0) <= "11001100";
         mem_RW_s                 <= '1';
         wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "SB neg: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "SB neg: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "SB neg: invalid_addr should clear");
 
       elsif run("test_load_word") then
         info("Testing load word (lw) function of load_store unit");
 
         -- First store values that will be loaded
-        width_s <= "01";
+        width_s <= "00";
         mem_RW_s <= '1';
         addr_s <= std_logic_vector(to_unsigned(0, 32));
         data_write_s(7 downto 0) <= "11111111";
@@ -319,21 +427,33 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Test reading a word out of bounds for DMEM
-        addr_s <= std_logic_vector(to_unsigned(1000, 32));
-        expected := (others => '0');
-        wait for c_CLK_PERIOD;
-        if data_read_s /= expected then
-          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
-        end if;
+        -- Out-of-bounds word read: expect invalid_addr_s = '1'
+        addr_s   <= std_logic_vector(to_unsigned(1000, 32));
+        mem_RW_s <= '0';
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "LW oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "LW oob: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LW oob: data_read should be zero");
 
-        -- Test reading a word out of negative address of DMEM
+        -- Negative address word read: expect invalid_addr_s = '1'
         addr_s <= std_logic_vector(to_signed(-199, 32));
-        expected := (others => '0');
-        wait for c_CLK_PERIOD;
-        if data_read_s /= expected then
-          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
-        end if;
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "LW neg: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "LW neg: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LW neg: data_read should be zero");
+
+        -- Misaligned word read (addr not 4-byte aligned): expect misaligned_access_s = '1'
+        addr_s <= std_logic_vector(to_unsigned(2, 32));
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "LW misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "LW misaligned: invalid_addr should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LW misaligned: data_read should be zero");
+
+        -- Verify flags clear on valid read (recovery)
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "LW recovery: invalid_addr should be '0'");
+        check_equal(misaligned_access_s, '0', "LW recovery: misaligned should be '0'");
 
         info("Load word test passed");
 
@@ -341,7 +461,7 @@ begin
         info("Testing load half word (lh) function of load_store_unit");
 
         -- First store values that will be loaded
-        width_s <= "01";
+        width_s <= "00";
         mem_RW_s <= '1';
         addr_s <= std_logic_vector(to_unsigned(0, 32));
         data_write_s(7 downto 0) <= "11111111";
@@ -403,34 +523,42 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Read 2 bytes of unreachable memory unsigned
-        addr_s <= std_logic_vector(to_unsigned(257, 32));
-        width_s <= "01";
-        sign_s <= '1';
-        expected := (others => '0');
-        
-        wait for c_CLK_PERIOD;
-        if data_read_s /= expected then
-          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
-        end if;
+        -- Out-of-bounds halfword read: expect invalid_addr_s = '1'
+        addr_s   <= std_logic_vector(to_unsigned(257, 32));
+        width_s  <= "01";
+        sign_s   <= '1';
+        mem_RW_s <= '0';
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "LH oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "LH oob: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LH oob: data_read should be zero");
+
+        -- Negative address halfword read: expect invalid_addr_s = '1'
+        addr_s <= std_logic_vector(to_signed(-4, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "LH neg: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "LH neg: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LH neg: data_read should be zero");
+
+        -- Misaligned halfword read (odd address): expect misaligned_access_s = '1'
+        addr_s <= std_logic_vector(to_unsigned(3, 32));
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "LH misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "LH misaligned: invalid_addr should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LH misaligned: data_read should be zero");
+
+        -- Verify flags clear on valid read (recovery)
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "LH recovery: invalid_addr should be '0'");
+        check_equal(misaligned_access_s, '0', "LH recovery: misaligned should be '0'");
 
         -- Read 2 bytes from address 4 memory unsigned
-        addr_s <= std_logic_vector(to_unsigned(4, 32));
         width_s <= "01";
         sign_s <= '1';
+        addr_s <= std_logic_vector(to_unsigned(4, 32));
         expected := "00000000000000001010101010101010";
 
-        wait for c_CLK_PERIOD;
-        if data_read_s /= expected then
-          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
-        end if;
-
-        -- Read 2 bytes of unreachable memory unsigned
-        addr_s <= std_logic_vector(to_signed(-4, 32));
-        width_s <= "01";
-        sign_s <= '1';
-        expected := (others => '0');
-        
         wait for c_CLK_PERIOD;
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
@@ -462,7 +590,7 @@ begin
         info("Testing load byte(lb) function of load_store_unit");
 
         -- First store values that will be loaded
-        width_s <= "01";
+        width_s <= "00";
         mem_RW_s <= '1';
         addr_s <= std_logic_vector(to_unsigned(0, 32));
         data_write_s(7 downto 0) <= "11111111";
@@ -524,27 +652,28 @@ begin
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
 
-        -- Read byte of unreachable memory unsigned
-        addr_s <= std_logic_vector(to_unsigned(257, 32));
-        width_s <= "00";
-        sign_s <= '1';
-        expected := (others => '0');
-        
-        wait for c_CLK_PERIOD;
-        if data_read_s /= expected then
-          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
-        end if;
+        -- Out-of-bounds byte read: expect invalid_addr_s = '1'
+        addr_s   <= std_logic_vector(to_unsigned(257, 32));
+        width_s  <= "00";
+        sign_s   <= '1';
+        mem_RW_s <= '0';
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "LB oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "LB oob: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LB oob: data_read should be zero");
 
-        -- Read byte of unreachable memory unsigned
+        -- Negative address byte read: expect invalid_addr_s = '1'
         addr_s <= std_logic_vector(to_signed(-4, 32));
-        width_s <= "00";
-        sign_s <= '1';
-        expected := (others => '0');
-        
-        wait for c_CLK_PERIOD;
-        if data_read_s /= expected then
-          error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
-        end if;
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "LB neg: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "LB neg: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "LB neg: data_read should be zero");
+
+        -- Verify flags clear on valid read (recovery)
+        addr_s <= std_logic_vector(to_unsigned(0, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "LB recovery: invalid_addr should be '0'");
+        check_equal(misaligned_access_s, '0', "LB recovery: misaligned should be '0'");
 
         -- Read byte of memory signed
         addr_s <= std_logic_vector(to_unsigned(0, 32));
@@ -578,6 +707,161 @@ begin
         if data_read_s /= expected then
           error("Expected " & to_string(expected) & ", got " & to_string(data_read_s));
         end if;
+
+      elsif run("test_exceptions") then
+        info("Testing exception signals of load_store_unit");
+
+        -- ----------------------------------------------------------------
+        -- WRITE EXCEPTIONS
+        -- ----------------------------------------------------------------
+
+        -- SW: out-of-bounds
+        width_s  <= "10";
+        addr_s   <= std_logic_vector(to_unsigned(1000, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "EXC SW oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "EXC SW oob: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "EXC SW oob: invalid_addr should clear");
+        check_equal(misaligned_access_s, '0', "EXC SW oob: misaligned should stay '0'");
+
+        -- SW: misaligned (addr not 4-byte aligned)
+        width_s  <= "10";
+        addr_s   <= std_logic_vector(to_unsigned(2, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "EXC SW misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "EXC SW misaligned: invalid_addr should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '0', "EXC SW misaligned: misaligned should clear");
+
+        -- SH: out-of-bounds
+        width_s  <= "01";
+        addr_s   <= std_logic_vector(to_unsigned(300, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "EXC SH oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "EXC SH oob: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "EXC SH oob: invalid_addr should clear");
+
+        -- SH: misaligned (odd address)
+        width_s  <= "01";
+        addr_s   <= std_logic_vector(to_unsigned(3, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "EXC SH misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "EXC SH misaligned: invalid_addr should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '0', "EXC SH misaligned: misaligned should clear");
+
+        -- SB: out-of-bounds
+        width_s  <= "00";
+        addr_s   <= std_logic_vector(to_unsigned(300, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "EXC SB oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "EXC SB oob: misaligned should be '0'");
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '0', "EXC SB oob: invalid_addr should clear");
+
+        -- ----------------------------------------------------------------
+        -- READ EXCEPTIONS (combinational — check after 1 ns delta)
+        -- ----------------------------------------------------------------
+
+        mem_RW_s <= '0';
+
+        -- LW: out-of-bounds
+        width_s <= "10";
+        addr_s  <= std_logic_vector(to_unsigned(1000, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "EXC LW oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "EXC LW oob: misaligned should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "EXC LW oob: data should be zero");
+
+        -- LW: misaligned
+        addr_s <= std_logic_vector(to_unsigned(2, 32));
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "EXC LW misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "EXC LW misaligned: invalid_addr should be '0'");
+        check_equal(data_read_s, std_logic_vector(to_unsigned(0, 32)), "EXC LW misaligned: data should be zero");
+
+        -- LH: out-of-bounds
+        width_s <= "01";
+        addr_s  <= std_logic_vector(to_unsigned(300, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "EXC LH oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "EXC LH oob: misaligned should be '0'");
+
+        -- LH: misaligned
+        addr_s <= std_logic_vector(to_unsigned(3, 32));
+        wait for 1 ns;
+        check_equal(misaligned_access_s, '1', "EXC LH misaligned: misaligned should be '1'");
+        check_equal(invalid_addr_s,      '0', "EXC LH misaligned: invalid_addr should be '0'");
+
+        -- LB: out-of-bounds (bytes have no alignment requirement, only bounds)
+        width_s <= "00";
+        addr_s  <= std_logic_vector(to_unsigned(300, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '1', "EXC LB oob: invalid_addr should be '1'");
+        check_equal(misaligned_access_s, '0', "EXC LB oob: misaligned should be '0'");
+
+        -- ----------------------------------------------------------------
+        -- RECOVERY: valid access after exceptions — both flags must be '0'
+        -- ----------------------------------------------------------------
+        width_s <= "10";
+        addr_s  <= std_logic_vector(to_unsigned(0, 32));
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "EXC recovery: invalid_addr should be '0'");
+        check_equal(misaligned_access_s, '0', "EXC recovery: misaligned should be '0'");
+
+        -- ----------------------------------------------------------------
+        -- RESET: verify rst_i clears write exception flags
+        -- ----------------------------------------------------------------
+        width_s  <= "10";
+        addr_s   <= std_logic_vector(to_unsigned(1000, 32));
+        mem_RW_s <= '1';
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s, '1', "EXC rst: flag should be raised before reset");
+
+        rst_s    <= '1';
+        mem_RW_s <= '0';
+        addr_s   <= std_logic_vector(to_unsigned(0, 32));
+        wait until rising_edge(clk_s);
+        wait until rising_edge(clk_s);
+        wait for 1 ns;
+        check_equal(invalid_addr_s,      '0', "EXC rst: invalid_addr should clear on reset");
+        check_equal(misaligned_access_s, '0', "EXC rst: misaligned should clear on reset");
+        rst_s <= '0';
+
+        info("Exception test passed");
 
       end if;
     end loop;
