@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from vunit import VUnit
 
+os.system("ghdl --version")
 script_dir = Path(__file__).parent.resolve()
 
 command = str(script_dir / "compile.sh")
@@ -46,5 +47,7 @@ score_v_tb = testbench_lib.test_bench("score_v_tb")
 score_v_tb.set_generic("g_init_file",      IMEM_FILE)
 score_v_tb.set_generic("g_dmem_init_file", DMEM_FILE)
 score_v_tb.set_generic("g_expected_file",  EXPECTED_FILE)
+
+VU.add_compile_option("ghdl.a_flags", ["--std=08", "-frelaxed-rules", "-O0"])
 
 VU.main()
